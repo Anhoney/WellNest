@@ -16,7 +16,7 @@ const FirstPage = ({ navigation }) => {
       source={require('./assets/FirstPage.png')}
       style={styles.background}
     >
-      <View style={styles.titleContainer}>
+      <View style={styles.firstContainer}>
         {/* <Image
           source={require('./assets/DrinkTea.png')}
           style={styles.logo}
