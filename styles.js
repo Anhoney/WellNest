@@ -72,13 +72,14 @@ export default StyleSheet.create({
     marginRight: 10,
   },
   // Title text used on both pages
-//   title: {
-//     fontSize: 32, // Larger font size for readability
-//     color: '#000000',
-//     fontWeight: 'bold',
-//     textAlign: 'center',
-//     marginBottom: 450,
-//   },
+  title: {
+    fontSize: 32, // Larger font size for readability
+    color: '#000000',
+    fontWeight: 'bold',
+    textAlign: 'center',
+    //marginTop: 100,
+   // marginBottom: 100,
+  },
   // TextInput style for LoginPage
   // input: {
   //   height: 50,
@@ -152,4 +153,67 @@ export default StyleSheet.create({
     position: 'absolute',
     bottom: 0,
   },
+  headerContainer: {
+    // flexDirection: 'row',
+    // alignItems: 'center',
+    // backgroundColor: 'white', // White rectangle background
+    // paddingVertical: 10, // Reduced padding to fit better
+    // paddingHorizontal: 10,
+    // borderRadius: 10,
+    // shadowColor: '#000',
+    // shadowOffset: { width: 0, height: 2 },
+    // shadowOpacity: 0.1,
+    // shadowRadius: 4,
+    // elevation: 3, // Android shadow
+    // alignSelf: 'center', // Center the rectangle
+    // width: '90%', // Adjust the width to fit the screen better
+    // justifyContent: 'center',
+    // marginBottom: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'white', // White rectangle background
+    // paddingVertical: 10, // Reduced padding to fit better
+    // paddingHorizontal: 10,
+    //borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3, // Android shadow
+    alignSelf: 'center', // Center the rectangle
+    width: '100%', // Adjust the width to fit the screen better
+    justifyContent: 'center',
+    height: 90, // Define the height of the rectangle
+    //position: 'absolute', // Use absolute positioning
+    top: 80, // Position the rectangle from the top
+    left: 0, // Position the rectangle from the left
+    right: 0, // Position the rectangle from the right
+    zIndex: 1, // Ensure the rectangle is on top of other components
+   marginBottom: 130,
+  },
+  backButton: {
+    // marginRight: 10,
+    position: 'absolute',
+    left: 10,  // Ensure the back button stays at the left
+  },
+  instructions: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 30,
+  },
+  icon: {
+    marginRight: 10,
+  },
+  resendContainer: {
+    flexDirection: 'row',
+    marginBottom: 20,
+  },
+  resendText: {
+    color: '#888',
+  },
+  resendLink: {
+    color: '#f60',
+    fontWeight: 'bold',
+  },
+
 });
