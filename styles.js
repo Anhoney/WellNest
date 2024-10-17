@@ -50,7 +50,7 @@ export default StyleSheet.create({
   },
   // Enlarged subtitle
   subtitle: {
-    fontSize: 20, // Increase the font size
+    fontSize: 22, // Increase the font size
     color: '#000000',
     textAlign: 'center',
     marginTop: -30,
@@ -183,7 +183,7 @@ export default StyleSheet.create({
     alignSelf: 'center', // Center the rectangle
     width: '100%', // Adjust the width to fit the screen better
     justifyContent: 'center',
-    height: 90, // Define the height of the rectangle
+    height: 80, // Define the height of the rectangle
     //position: 'absolute', // Use absolute positioning
     top: 80, // Position the rectangle from the top
     left: 0, // Position the rectangle from the left
@@ -197,23 +197,28 @@ export default StyleSheet.create({
     left: 10,  // Ensure the back button stays at the left
   },
   instructions: {
-    fontSize: 14,
+    fontSize: 19,
     color: '#666',
+    marginTop: -40,
     marginBottom: 30,
   },
   icon: {
     marginRight: 10,
   },
   resendContainer: {
-    flexDirection: 'row',
+    flexDirection: 'column',
     marginBottom: 20,
+    alignItems: 'flex-start',
   },
   resendText: {
     color: '#888',
+    textAlign: 'left',
   },
   resendLink: {
     color: '#f60',
     fontWeight: 'bold',
+    textAlign: 'left', // Ensure text is aligned to the left
+    marginTop: 5, // Add some space between the two texts
   },
 
 });

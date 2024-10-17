@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, ImageBackground, Image, TextInput, Button, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, ImageBackground, Image, TextInput, Button, StyleSheet, TouchableOpacity, Keyboard, TouchableWithoutFeedback } from 'react-native';
 import styles from './styles'; // Import shared styles
 import { Ionicons } from '@expo/vector-icons'; // Import icons from Expo
 import { useNavigation } from '@react-navigation/native';
@@ -21,6 +21,8 @@ const LoginPage = () => {
   };
 
   return (
+    // <TouchableWithoutFeedback onPress={Keyboard.dismiss}> {/* Dismiss keyboard on touch outside */}
+    // <View style={{ flex: 1 }}> {/* Wrap in a single View */}
     <ImageBackground
       source={require('./assets/LoadingBackground.png')}
       style={styles.background}
@@ -88,6 +90,8 @@ const LoginPage = () => {
               </View>
 
     </ImageBackground>
+    // </View>
+    // </TouchableWithoutFeedback>
   );
 };
 

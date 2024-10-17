@@ -71,11 +71,13 @@ const ForgotPasswordPage = () => {
         </View>
 
       {/* Resend Link */}
+      <View style={{ alignItems: 'flex-start', width: '90%' }}>
       <View style={styles.resendContainer}>
       <Text style={styles.resendText}>Don’t receive message? </Text>
       <TouchableOpacity onPress={handleResendLink}>
           <Text style={styles.forgotPassword}>Resend verification link</Text>
         </TouchableOpacity> 
+        </View>
         </View>
 
         {/* Submit Button */}
