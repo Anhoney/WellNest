@@ -1,3 +1,4 @@
+//styles.js
 import { StyleSheet } from 'react-native';
 
 export default StyleSheet.create({
@@ -80,28 +81,6 @@ export default StyleSheet.create({
     //marginTop: 100,
    // marginBottom: 100,
   },
-  // TextInput style for LoginPage
-  // input: {
-  //   height: 50,
-  //   width: '90%', // Make inputs wider
-  //   borderColor: '#ddd',
-  //   borderWidth: 1,
-  //   borderRadius: 5,
-  //   marginBottom: 20,
-  //   paddingHorizontal: 15,
-  //   fontSize: 18, // Larger text for input
-  //   backgroundColor: '#fff',
-  // },
-  // // Button style for LoginPage
-  // button: {
-  //   backgroundColor: '#ff8b49',
-  //   // backgroundColor: '#f9a825',
-  //   padding: 15,
-  //   borderRadius: 5,
-  //   alignItems: 'center',
-  //   width: '90%', // Make the button as wide as the input fields
-  //   marginBottom: 20,
-  // },
   input: {
     flex: 1,
     height: 50,
@@ -153,28 +132,30 @@ export default StyleSheet.create({
     position: 'absolute',
     bottom: 0,
   },
-  headerContainer: {
-    // flexDirection: 'row',
-    // alignItems: 'center',
-    // backgroundColor: 'white', // White rectangle background
-    // paddingVertical: 10, // Reduced padding to fit better
-    // paddingHorizontal: 10,
-    // borderRadius: 10,
-    // shadowColor: '#000',
-    // shadowOffset: { width: 0, height: 2 },
-    // shadowOpacity: 0.1,
-    // shadowRadius: 4,
-    // elevation: 3, // Android shadow
-    // alignSelf: 'center', // Center the rectangle
-    // width: '90%', // Adjust the width to fit the screen better
-    // justifyContent: 'center',
-    // marginBottom: 20,
+  smallHeaderContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: 'white', // White rectangle background
-    // paddingVertical: 10, // Reduced padding to fit better
-    // paddingHorizontal: 10,
-    //borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3, // Android shadow
+    alignSelf: 'center', // Center the rectangle
+    width: '100%', // Adjust the width to fit the screen better
+    justifyContent: 'center',
+    height: 70, // Define the height of the rectangle
+    //position: 'absolute', // Use absolute positioning
+    top: 80, // Position the rectangle from the top
+    left: 0, // Position the rectangle from the left
+    right: 0, // Position the rectangle from the right
+    zIndex: 1, // Ensure the rectangle is on top of other components
+   marginBottom: 40,
+  },
+  headerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'white', // White rectangle background
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -192,7 +173,6 @@ export default StyleSheet.create({
    marginBottom: 130,
   },
   backButton: {
-    // marginRight: 10,
     position: 'absolute',
     left: 10,  // Ensure the back button stays at the left
   },
@@ -219,6 +199,118 @@ export default StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'left', // Ensure text is aligned to the left
     marginTop: 5, // Add some space between the two texts
+  },
+  selectedRole: {
+    fontSize: 16,
+    color: 'green',
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginVertical: 5,
+  },
+  role: {
+    fontSize: 16,
+    color: '#007bff',
+    textAlign: 'center',
+    marginVertical: 5,
+  },
+  uploadButtonText: {
+    color: 'white',
+    fontSize: 16,
+  },
+  uploadButton: {
+    backgroundColor: '#007bff',
+    padding: 10,
+    marginVertical: 10,
+    borderRadius: 5,
+    alignItems: 'center',
+    flexDirection: 'row', // Align items in a row (horizontally)
+  justifyContent: 'center', // Center items horizontally
+  },
+  uploadPrecautions: {
+    color: '#808080',  // Same gray color
+    fontSize: 15,  // Keep it the same smaller font size
+    marginTop: -5,  // Provide enough space under the upload button
+    marginBottom: 12,  // More space before the next component
+  },  
+  smallInput: {
+    backgroundColor: 'white',
+    padding: 10,
+    marginVertical: 10,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: '#ccc',
+  },
+  scrollView: {
+    flexGrow: 1,
+    // justifyContent: 'center',
+    // alignItems: 'center',
+    // flexDirection: 'column', // Use column direction
+    // justifyContent: 'flex-start', // Start from the top
+    // alignItems: 'stretch', // Allow children to stretch to full width
+  },
+  question: {
+    fontSize: 23,
+    fontWeight: 'bold',
+    // marginTop: 20,
+    textAlign: 'left',  // Align the "Role" text to the left
+    width: '100%',  // Ensure full width
+    marginLeft: 25,
+  },
+  roleContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between', // Spacing roles evenly
+    alignItems: 'center',
+    width: '100%',
+    marginBottom: 10,
+  },
+  // radioButtonContainer: {
+  //   flexDirection: 'row',
+  //   alignItems: 'center',
+  //   // alignItems: 'flex-start',  // Align items to the left
+  //   justifyContent: 'flex-start', // Make sure it's aligned to the left
+  //   marginBottom: 10,
+  //   width: '100%',  // Take full width
+  //   // paddingHorizontal: 10, // Add horizontal padding for spacing
+  //   flexDirection: 'column', // Use column direction
+  //   justifyContent: 'flex-start', // Start from the top
+  //   alignItems: 'stretch', // Allow children to stretch to full width
+  // },
+  radioButtonContainer: {
+    flexDirection: 'row', // Align items in a row
+    alignItems: 'center', // Center vertically
+    justifyContent: 'flex-start', // Align items to the left
+    width: '100%', // Full width to align with the ScrollView
+  },
+  radioButtonLabel: {
+    marginLeft: 8, // Space between radio button and label
+    textAlign: 'left', // Ensure label is left-aligned
+  },
+  safeAreaContainer: {
+    flex: 1,
+    justifyContent: 'center', // Align content vertically to the center
+    alignItems: 'center',     // Align content horizontally to the center
+  },
+  keyboardAvoidingContainer: {
+    flex: 1,
+  },
+  precautions: {
+    color: '#808080', // Gray color (adjust to make it lighter or darker as needed)
+    fontSize: 15, // Smaller font size for precaution text
+    marginTop: -18, // Less space with the input field above
+    marginBottom: 12, // More space with the component below
+  },
+  underline: {
+    height: 2, // Height of the underline
+    backgroundColor: '#D3D3D3', // Color of the underline
+    width: '90%', // Width of the underline
+    alignSelf: 'center', // Center the underline horizontally
+    marginVertical: 10, // Margin above and below
+  },
+  radioButtonColor: {
+    color: '#FFA500',  // Orange color for the selected radio button
+  },
+  radioLabel: {
+    fontSize: 20, // Set the font size for radio button labels
   },
 
 });
