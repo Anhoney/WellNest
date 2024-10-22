@@ -7,6 +7,9 @@ export default StyleSheet.create({
     flex: 1,
     resizeMode: 'cover',
     justifyContent: 'flex-start',
+    width: '100%',
+    height: '100%',
+    // height: 200,
   },
   // Shared container style
   titleContainer: {
@@ -74,7 +77,7 @@ export default StyleSheet.create({
   },
   // Title text used on both pages
   title: {
-    fontSize: 32, // Larger font size for readability
+    fontSize: 30, // Larger font size for readability
     color: '#000000',
     fontWeight: 'bold',
     textAlign: 'center',
@@ -263,18 +266,6 @@ export default StyleSheet.create({
     width: '100%',
     marginBottom: 10,
   },
-  // radioButtonContainer: {
-  //   flexDirection: 'row',
-  //   alignItems: 'center',
-  //   // alignItems: 'flex-start',  // Align items to the left
-  //   justifyContent: 'flex-start', // Make sure it's aligned to the left
-  //   marginBottom: 10,
-  //   width: '100%',  // Take full width
-  //   // paddingHorizontal: 10, // Add horizontal padding for spacing
-  //   flexDirection: 'column', // Use column direction
-  //   justifyContent: 'flex-start', // Start from the top
-  //   alignItems: 'stretch', // Allow children to stretch to full width
-  // },
   radioButtonContainer: {
     flexDirection: 'row', // Align items in a row
     alignItems: 'center', // Center vertically
@@ -312,5 +303,167 @@ export default StyleSheet.create({
   radioLabel: {
     fontSize: 20, // Set the font size for radio button labels
   },
+  backgroundImage: {
+    width: '100%',
+    height: 200,
+    resizeMode: 'cover',
+  },
+   // Shared container style
+  pageContainer: {
+    flex: 1,
+    // alignItems: 'center',
+    // justifyContent: 'center',
+     // padding: 20,
+  },
+  greeting: {
+    fontSize: 26,
+    fontWeight: 'bold',
+    marginTop: 70,
+    textAlign: 'left',
+    marginLeft: 30,
+  },
+  medicineReminderContainer: {
+    padding: 15,
+    alignItems: 'center',
+  },
+  reminderText: {
+    fontSize: 16,
+    color: '#ff8c00',
+    textAlign: 'left',
+    marginBottom: 10,
+  },
+  medicineCard: {
+    backgroundColor: '#fff',
+    padding: 10,
+    borderRadius: 10,
+    width: '90%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  medicineImage: {
+    width: 50,
+    height: 50,
+  },
+  medicineName: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  medicineTime: {
+    color: 'gray',
+  },
+  doneButton: {
+    backgroundColor: '#ff8c00',
+    padding: 10,
+    borderRadius: 10,
+  },
+  doneButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  defaultImage: {
+    width: 165,
+    height: 165,
+    resizeMode: 'contain',
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    margin: 15,
+  },
+  moduleRow: {
+    flexDirection: 'row',
+    // justifyContent: 'space-around',
+    justifyContent: 'space-between',  // Ensure icons are spaced apart
+    marginBottom: 20,
+  },
+  icon: {
+    width: 50,
+    height: 50,
+    marginLeft: 7,
+  },
+  iconContainer: {
+    alignItems: 'center',
+    marginHorizontal: 20, // Increased space between each icon
+  },
+  iconText: {
+    textAlign: 'center',
+    marginTop: 5,
+    fontSize: 14,
+    marginLeft: -10,
+    // letterSpacing: 1.5,
+  },
+  navigationBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    paddingVertical: 10,
+    // backgroundColor: '#f5f5f5',
+    backgroundColor: 'white',
+    borderTopWidth: 1,
+    borderTopColor: '#ddd',
+  },
+  tabButton: {
+    alignItems: 'center',
+  },
+  navText: {
+    fontSize: 12,
+    // color: 'gray',
+    // textAlign: 'center',
+    marginTop: 4,
+  },
+  sectionContainer: {
+    backgroundColor: 'white', // Set the background color to white
+    padding: 10, // Add padding to the container
+    borderRadius: 20, // Optional: for rounded corners
+    marginBottom: 25, // Space between sections
+    marginRight: 15,
+    marginLeft: 15,
+  },
+  searchContainer: {
+        marginBottom: 20,
+      },
+      searchInput: {
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 10,
+        padding: 10,
+        marginBottom: 10,
+      },
+  filterButton: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+    marginHorizontal: 10,
+  },
+  specialtyContainer: {
+    flexGrow: 1,
+  },
+  specialtyButton: {
+    padding: 15,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 10,
+    marginVertical: 5,
+    backgroundColor: '#fff',
+  },
+  specialtyText: {
+    fontSize: 16,
+    textAlign: 'center',
+  },
+  appointmentContainer: {
+    flex: 1,
+    // padding: 20,
+    marginTop: 75,
+  },
+    // Enlarged subtitle
+    smallTitle: {
+      fontSize: 16, // Increase the font size
+      color: '#000000',
+      textAlign: 'center',
+      marginTop: -30,
+      marginBottom: 5,
+    },
 
 });

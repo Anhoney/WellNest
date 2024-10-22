@@ -13,6 +13,13 @@ const LoginPage = () => {
   const handleLogin = () => {
     // Handle login logic here, e.g., send to backend for validation
     console.log('Logging in with IC:', icNumber, 'Password:', password);
+    // You can add your login authentication logic here
+    // If login is successful, call the handleLogin function
+    // if (username === 'test' && password === 'password') {  // Replace with actual logic
+    //   handleLogin();
+    // } else {
+    //   alert('Invalid credentials');
+    // }
   }; 
 
   // Toggle password visibility
