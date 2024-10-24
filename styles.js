@@ -149,7 +149,7 @@ export default StyleSheet.create({
     justifyContent: 'center',
     height: 70, // Define the height of the rectangle
     //position: 'absolute', // Use absolute positioning
-    top: 80, // Position the rectangle from the top
+    top: 60, // Position the rectangle from the top
     left: 0, // Position the rectangle from the left
     right: 0, // Position the rectangle from the right
     zIndex: 1, // Ensure the rectangle is on top of other components
@@ -421,14 +421,25 @@ export default StyleSheet.create({
   },
   searchContainer: {
         marginBottom: 20,
+        flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
       },
-      searchInput: {
-        borderWidth: 1,
-        borderColor: '#ccc',
-        borderRadius: 10,
-        padding: 10,
-        marginBottom: 10,
-      },
+  searchInput: {
+    flex: 1,
+    backgroundColor: '#fff',
+    borderColor: '#ddd',
+    borderWidth: 1,
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    height: 50,
+    marginHorizontal: 5,
+    // borderWidth: 1,
+    // borderColor: '#ccc',
+    // borderRadius: 10,
+    // padding: 10,
+    // marginBottom: 10,
+  },
   filterButton: {
     borderWidth: 1,
     borderColor: '#ccc',
@@ -457,13 +468,28 @@ export default StyleSheet.create({
     // padding: 20,
     marginTop: 75,
   },
-    // Enlarged subtitle
-    smallTitle: {
-      fontSize: 16, // Increase the font size
-      color: '#000000',
-      textAlign: 'center',
-      marginTop: -30,
-      marginBottom: 5,
-    },
+// Enlarged subtitle
+smallTitle: {
+  fontSize: 16, // Increase the font size
+  color: '#000000',
+  textAlign: 'center',
+  marginTop: -50,
+  marginBottom: 5,
+},
+searchRow: {
+  flexDirection: 'row',      // Places input and button in the same row
+  alignItems: 'center',      // Vertically centers them
+},
+searchButton: {
+  backgroundColor: '#FFA500', // Orange color
+  padding: 10,
+  borderRadius: 10,          // Ensure the button has a consistent shape
+  justifyContent: 'center',  // Center content inside the button
+  alignItems: 'center',
+  marginLeft: 10,            // Adds spacing between input and button
+  height: 50,                // Ensures the button is square
+  width: 50,
+},
+
 
 });
