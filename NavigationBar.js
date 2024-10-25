@@ -1,3 +1,4 @@
+//NavigationBar.js
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -5,11 +6,11 @@ import styles from './styles'; // Assuming you have your styles.js setup
 
 const NavigationBar = ({ navigation, activePage }) => {
   const tabs = [
-    { name: 'Home', icon: 'home' },
-    { name: 'Schedule', icon: 'calendar' },
-    { name: 'Chat', icon: 'chatbubbles' },
-    { name: 'Notification', icon: 'notifications' },
-    { name: 'Account', icon: 'person' },
+    { name: 'MainPage',label: 'Home', icon: 'home' },
+    { name: 'Schedule', label: 'Schedule', icon: 'calendar' },
+    { name: 'Chat', label: 'Chat', icon: 'chatbubbles' },
+    { name: 'Notification', label: 'Notification', icon: 'notifications' },
+    { name: 'Account', label: 'Account', icon: 'person' },
   ];
 
   return (
@@ -22,7 +23,7 @@ const NavigationBar = ({ navigation, activePage }) => {
             color={activePage === tab.name ? 'orange' : 'gray'}
           />
           <Text style={[styles.navText, { color: activePage === tab.name ? 'orange' : 'gray' }]}>
-            {tab.name}
+            {tab.label}
           </Text>
         </TouchableOpacity>
       ))}

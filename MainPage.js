@@ -170,7 +170,7 @@ const MainPage = ({ userName = "John Doe", medicineReminder }) => {
             </TouchableOpacity>
         </View> */}
         {/* Navigation Bar */}
-        <NavigationBar navigation={navigation} activePage="Home" />
+        <NavigationBar navigation={navigation} activePage="MainPage" />
         </View>
     </ImageBackground>
   );

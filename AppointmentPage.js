@@ -1,23 +1,20 @@
 //AppointmentPage.js
 import React, { useState } from 'react'; // <-- Add useState here
-// import React from 'react';
-import { View, Text, ImageBackground, TextInput, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, ImageBackground, TextInput, TouchableOpacity, ScrollView, StyleSheet} from 'react-native';
 import styles from './styles'; // Import shared styles
 import { Ionicons } from '@expo/vector-icons'; // Import icons from Expo
 import { useNavigation } from '@react-navigation/native';
-import DateTimePicker from '@react-native-community/datetimepicker'; // Use Expo compatible DateTimePicker
 import Icon from 'react-native-vector-icons/FontAwesome';
-import DatePicker from 'react-native-date-picker'; // Ensure this package is correctly installed
-// import DateTimePickerModal from 'react-native-modal-datetime-picker'; // Ensure this is imported
+import DateTimePickerModal from 'react-native-modal-datetime-picker'; // Ensure this is imported
 import NavigationBar from './NavigationBar'; // Import your custom navigation bar component
 
 const AppointmentPage = () => {
     const navigation = useNavigation();
     const [date, setDate] = useState(new Date());
     const [open, setOpen] = useState(false);
-    const [selectedFilter, setSelectedFilter] = useState('');
-    // const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-    const [isDatePickerOpen, setDatePickerOpen] = useState(false);
+    const [selectedFilter, setSelectedFilter] = useState('relevance');
+    const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+    // const [isDatePickerOpen, setDatePickerOpen] = useState(false);
 
  // Functions to handle date picker
  const showDatePicker = () => {
@@ -28,163 +25,135 @@ const hideDatePicker = () => {
     setDatePickerVisibility(false);
 };
 
-// const handleConfirm = (date) => {
-//     setDate(date);
-//     hideDatePicker();
-// };
-
 const handleConfirm = (selectedDate) => {
     setDate(selectedDate);
     hideDatePicker();
-  };
+};
 
-  return (
-    <ImageBackground source={require('./assets/MainPage.png')} style={styles.background}>
+// Get today's date
+const today = new Date();
+
+// Function to format the date with commas
+const formatDate = (date) => {
+  return date.toLocaleDateString('en-US', {
+    weekday: 'short',
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  });
+};
+
+return (
+  <ImageBackground source={require('./assets/AppointmentPage.png')} style={styles.background}>
     {/* Title Section with Back Arrow */}
     <View style={styles.smallHeaderContainer}>
-      {/* <View style={styles.container}> */}
       <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color="#000" />
-        </TouchableOpacity>
+      </TouchableOpacity>
       <Text style={styles.title}>Booking Appointment</Text>
-      </View>
-      
-      <View style={styles.appointmentContainer}>
-     <Text style={styles.smallTitle}>Find Your Doctor</Text>
-
-       <View style={styles.searchContainer}>
-       <TouchableOpacity style={styles.searchButton}>
-          <Icon name="search" size={20} color="white" />
-        </TouchableOpacity>
-         <TextInput
-          style={styles.searchInput}
-          placeholder="Search Doctor..."
-        />
     </View>
+      
+    <View style={styles.appointmentContainer}>
+      <Text style={styles.smallTitle}>Find Your Doctor</Text>
 
-    <View style={styles.searchContainer}>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Location"
-        />
-        {/* <TextInput
-          style={styles.searchInput}
-          placeholder="Date"
-        />
-        </View> */}
- {/* Date Picker
- <TouchableOpacity onPress={() => setShow(true)} style={styles.dateInput}>
-            <Text style={styles.dateText}>{date.toDateString()}</Text>
+        <View style={styles.searchContainer}>
+          <TouchableOpacity style={styles.searchButton}>
+            <Icon name="search" size={20} color="white" />
+          </TouchableOpacity>
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search Doctor..."
+          />
+        </View>
+
+        <View style={styles.searchContainer}>
+          <View style={styles.smallInputContainer}>
+            <Ionicons name="location-outline" size={20} color="#000" style={styles.iconStyle} />
+              <TextInput
+                style={styles.searchInputWithIcon}
+                placeholder="Location"
+              />
+          </View>
+
+          {/* Show the date picker on initial render */}
+          <TouchableOpacity style={styles.dateInput} onPress={showDatePicker}>
+            <View style={styles.dateInputContent}>
+              {/* <Text style={styles.dateText}>{date.toDateString()}</Text> */}
+              <Ionicons name="calendar-outline" size={20} color="#000" style={styles.iconStyle} />
+              <Text style={styles.dateText}>{formatDate(date)}</Text>
+            </View>
           </TouchableOpacity>
 
-          {show && (
-            <DateTimePicker
-              value={date}
-              mode="date"
-              display="default"
-              onChange={onChange}
-            />
-          )}
-        </View> */}
-
-         {/* Date Picker */}
-         {/* <TouchableOpacity onPress={() => setOpen(true)} style={styles.dateInput}>
-                        <Text style={styles.dateText}>{date.toDateString()}</Text>
-                    </TouchableOpacity>
-                    <DatePicker
-                        modal
-                        open={open}
-                        date={date}
-                        onConfirm={(date) => {
-                            setOpen(false);
-                            setDate(date);
-                        }}
-                        onCancel={() => {
-                            setOpen(false);
-                        }}
-                    />
-                </View> */}
-
-                 {/* Date Picker */}
-                 {/* <TouchableOpacity onPress={showDatePicker} style={styles.dateInput}>
-                        <Text style={styles.dateText}>{date.toDateString()}</Text>
-                    </TouchableOpacity>
-                    <DateTimePickerModal
-                        isVisible={isDatePickerVisible}
-                        mode="date"
-                        onConfirm={handleConfirm}
-                        onCancel={hideDatePicker}
-                        date={date}
-                    />
-                </View> */}
-
-               {/* Date Picker Input */}
-               <TouchableOpacity onPress={showDatePicker} style={styles.dateInput}>
-                    <Text style={styles.dateText}>{date.toDateString()}</Text>
-                </TouchableOpacity>
-
-{/* <DateTimePickerModal
+          <DateTimePickerModal
             isVisible={isDatePickerVisible}
             mode="date"
+            display="inline" // Set to inline to resemble the calendar style
             onConfirm={handleConfirm}
             onCancel={hideDatePicker}
             date={date}
+            minimumDate={today} // Disallow future dates by setting maximum date to today
           />
-        </View> */}
-        {/* Calendar Date Picker */}
-        <DatePicker
-                    modal
-                    open={isDatePickerOpen}
-                    date={date}
-                    mode="date"
-                    onConfirm={handleConfirm}
-                    onCancel={hideDatePicker}
-                />
-</View>
-{/* Search Button
-<TouchableOpacity style={styles.searchButton}>
-        <Icon name="search" size={20} color="white" />
-        <Text style={styles.searchButtonText}>Search</Text>
-      </TouchableOpacity> */}
+        </View>
 
-            {/* Relevance and Favourite Buttons */}
-            <View style={styles.filterButtons}>
+      {/* Relevance and Favourite Buttons */}
+      {/* Adding a separator between buttons and ScrollView for better spacing */}
+      <View style={styles.filterButtonContainer}>
         <TouchableOpacity
           style={[
             styles.filterButton,
-            selectedFilter === 'relevance' ? styles.activeFilter : null,
+            selectedFilter === 'relevance' ? styles.activeFilter : styles.inactiveFilter,
           ]}
           onPress={() => setSelectedFilter('relevance')}
         >
-          <Text style={styles.filterButtonText}>Relevance</Text>
+          <Text style={[
+            styles.filterButtonText,
+            selectedFilter === 'relevance' ? styles.activeFilterText : styles.inactiveFilterText,
+          ]}>
+            Relevance
+          </Text>
         </TouchableOpacity>
+        
         <TouchableOpacity
           style={[
             styles.filterButton,
-            selectedFilter === 'favourite' ? styles.activeFilter : null,
+            selectedFilter === 'favourite' ? styles.activeFilter : styles.inactiveFilter,
           ]}
           onPress={() => setSelectedFilter('favourite')}
         >
-          <Text style={styles.filterButtonText}>Favourite</Text>
+          <Text style={[
+            styles.filterButtonText,
+            selectedFilter === 'favourite' ? styles.activeFilterText : styles.inactiveFilterText,
+          ]}>
+            Favourite
+          </Text>
         </TouchableOpacity>
       </View>
 
       {/* White Underline */}
       <View style={styles.underline}></View>
+
+      {/* ScrollView for relevant or favorite specialists */}
+      <ScrollView style={styles.specialtyContainer}>
+        {selectedFilter === 'relevance' ? (
+          ["Cardiology", "Dermatology", "General Medicine", "Gynecology", "Odontology", "Oncology", "Ophthalmology", "Orthopedics"].map((specialty, index) => (
+            <TouchableOpacity key={index} style={styles.specialtyButton}>
+              <Text style={styles.specialtyText}>{specialty}</Text>
+            </TouchableOpacity>
+          ))
+        ) : (
+          ["Saved Specialist 1", "Saved Specialist 2"].map((specialist, index) => (
+            <TouchableOpacity key={index} style={styles.specialtyButton}>
+              <Text style={styles.specialtyText}>{specialist}</Text>
+            </TouchableOpacity>
+          ))
+        )}
+      </ScrollView>
+              
     </View>
 
-      {/* <ScrollView style={styles.specialtyContainer}>
-         {["Cardiology", "Dermatology", "General Medicine", "Gynecology", "Odontology", "Oncology", "Ophthalmology", "Orthopedics"].map((specialty, index) => (
-          <TouchableOpacity key={index} style={styles.specialtyButton}>
-            <Text style={styles.specialtyText}>{specialty}</Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView> */}
-              
-    {/* </View> */}
-
-    </ImageBackground>
-   
+  <NavigationBar navigation={navigation} activePage="" />
+  
+</ImageBackground>
   );
 };
 

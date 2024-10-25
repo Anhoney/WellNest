@@ -185,9 +185,6 @@ export default StyleSheet.create({
     marginTop: -40,
     marginBottom: 30,
   },
-  icon: {
-    marginRight: 10,
-  },
   resendContainer: {
     flexDirection: 'column',
     marginBottom: 20,
@@ -295,7 +292,8 @@ export default StyleSheet.create({
     backgroundColor: '#D3D3D3', // Color of the underline
     width: '90%', // Width of the underline
     alignSelf: 'center', // Center the underline horizontally
-    marginVertical: 10, // Margin above and below
+    marginBottom: -10,
+    // marginVertical: 10, // Margin above and below
   },
   radioButtonColor: {
     color: '#FFA500',  // Orange color for the selected radio button
@@ -424,6 +422,7 @@ export default StyleSheet.create({
         flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+
       },
   searchInput: {
     flex: 1,
@@ -440,13 +439,17 @@ export default StyleSheet.create({
     // padding: 10,
     // marginBottom: 10,
   },
-  filterButton: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 10,
-    marginHorizontal: 10,
+  filterButtonContainer: {
+    // borderWidth: 1,
+    // borderColor: '#ccc',
+    // paddingVertical: 10,
+    // paddingHorizontal: 20,
+    // borderRadius: 10,
+    // marginHorizontal: 10,
+    flexDirection: 'row',
+  // justifyContent: 'space-between',
+  paddingHorizontal: 10,
+  marginTop: 10,
   },
   specialtyContainer: {
     flexGrow: 1,
@@ -490,6 +493,92 @@ searchButton: {
   height: 50,                // Ensures the button is square
   width: 50,
 },
-
-
+dateInput:{
+  // backgroundColor: '#fff',
+  flex: 1,
+  backgroundColor: '#fff',
+  borderColor: '#ddd',
+  borderWidth: 1,
+  borderRadius: 5,
+  paddingHorizontal: 10,
+  height: 50,
+  marginHorizontal: 5,
+  justifyContent: 'center',  // Center content inside the button
+  alignItems: 'center',
+},
+// Input field with space for the icon
+searchInputWithIcon: {
+  flex: 1,
+  backgroundColor: '#fff',
+  borderColor: '#ddd',
+  paddingHorizontal: 10,
+  paddingVertical: 8,
+  height: 50,
+},
+smallInputContainer: {
+  flex: 1,
+  flexDirection: 'row',
+  backgroundColor: '#fff',
+  borderColor: '#ddd',
+  borderWidth: 1,
+  borderRadius: 5,
+  paddingHorizontal: 10,
+},
+// Icon styling
+iconStyle: {
+  marginRight: 10, // Add some space between the icon and the input
+  paddingHorizontal: 5,
+  paddingVertical: 14,
+},
+filterButton:{
+  padding: 10,
+  borderRadius: 30,
+  backgroundColor: '#ff8b49',
+  padding: 15,
+  borderRadius: 15,
+  alignItems: 'center',
+  width: '50%',
+  shadowColor: '#000',
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.8,
+  shadowRadius: 2,
+  elevation: 5, // Add hover effect on Android
+},
+filterButtonContainer: {
+  flexDirection: 'row',
+  justifyContent: 'space-around',
+  marginVertical: 10,
+},
+filterButton: {
+  paddingVertical: 10,
+  paddingHorizontal: 20,
+  borderRadius: 5,
+  borderWidth: 1,
+},
+activeFilter: {
+  backgroundColor: '#FFA500', // Orange background for inactive button
+  borderColor: '#FFA500',
+},
+inactiveFilter: {
+  backgroundColor: '#ddd', // Gray background for active button
+  borderColor: '#000',
+},
+filterButtonText: {
+  fontSize: 17,
+},
+activeFilterText: {
+  color: '#fff', // White text for inactive button
+  fontWeight: 'bold',
+},
+inactiveFilterText: {
+  color: '#000', // Black text for active button
+},
+specialtyContainer: {
+  marginVertical: 20,
+},
+dateInputContent: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  flex: 1, // Allows the content to take full width
+},
 });
