@@ -287,13 +287,21 @@ export default StyleSheet.create({
     marginTop: -18, // Less space with the input field above
     marginBottom: 12, // More space with the component below
   },
-  underline: {
+  singleUnderline:{
     height: 2, // Height of the underline
     backgroundColor: '#D3D3D3', // Color of the underline
     width: '90%', // Width of the underline
     alignSelf: 'center', // Center the underline horizontally
     marginBottom: -10,
     // marginVertical: 10, // Margin above and below
+  },
+  underline: {
+    height: 2, // Height of the underline
+    backgroundColor: '#D3D3D3', // Color of the underline
+    width: '90%', // Width of the underline
+    alignSelf: 'center', // Center the underline horizontally
+    // marginBottom: -10,
+    marginVertical: 10, // Margin above and below
   },
   radioButtonColor: {
     color: '#FFA500',  // Orange color for the selected radio button
@@ -375,11 +383,11 @@ export default StyleSheet.create({
     justifyContent: 'space-between',  // Ensure icons are spaced apart
     marginBottom: 20,
   },
-  icon: {
-    width: 50,
-    height: 50,
-    marginLeft: 7,
-  },
+  // icon: {
+  //   width: 50,
+  //   height: 50,
+  //   marginLeft: 7,
+  // },
   iconContainer: {
     alignItems: 'center',
     marginHorizontal: 20, // Increased space between each icon
@@ -581,4 +589,142 @@ dateInputContent: {
   alignItems: 'center',
   flex: 1, // Allows the content to take full width
 },
+categoriesTitle: {
+  fontSize: 22, // Increase the font size
+  color: '#000000',
+  textAlign: 'center',
+  fontWeight: 'bold',
+  marginTop: 10,
+  // marginBottom: 5,
+},
+noBgSmallHeaderContainer: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  shadowColor: '#000',
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.1,
+  shadowRadius: 4,
+  elevation: 3, // Android shadow
+  alignSelf: 'center', // Center the rectangle
+  width: '100%', // Adjust the width to fit the screen better
+  justifyContent: 'center',
+  height: 70, // Define the height of the rectangle
+  //position: 'absolute', // Use absolute positioning
+  top: 60, // Position the rectangle from the top
+  left: 0, // Position the rectangle from the left
+  right: 0, // Position the rectangle from the right
+  zIndex: 1, // Ensure the rectangle is on top of other components
+ marginBottom: 40,
+},
+prescriptionContainer:{
+  flex: 1,
+  // padding: 20,
+  marginTop: 30,
+},
+noPrescriptionContainer: {
+  alignItems: 'center',
+  marginTop: 20,
+},
+noPrescriptionText: {
+  fontSize: 16,
+  color: '#000',
+  marginBottom: 10,
+},
+noPrescriptionImage: {
+  width: 150,
+  height: 150,
+  resizeMode: 'contain',
+},
+//ProfilePage
+profileContainer: {
+  alignItems: 'center',
+  paddingVertical: 20,
+},
+profileImage: {
+  width: 100,
+  height: 100,
+  borderRadius: 50,
+  borderWidth: 2,
+  borderColor: '#fff',
+},
+userName: {
+fontSize: 22,
+fontWeight: 'bold',
+marginTop: 10,
+},
+editProfileButton: {
+  backgroundColor: '#333',
+  paddingHorizontal: 15,
+  paddingVertical: 5,
+  borderRadius: 5,
+  marginTop: 10,
+},
+editProfileText: {
+  color: '#fff',
+  fontSize: 14,
+},
+healthBookingStatus: {
+  marginBottom: 20,
+},
+sectionTitle: {
+  fontSize: 18,
+  fontWeight: 'bold',
+  marginBottom: 10,
+},
+statusOptions: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+},
+statusCard: {
+  alignItems: 'center',
+  width: '30%',
+},
+statusIcon: {
+  width: 50,
+  height: 50,
+  marginBottom: 5,
+},
+statusText: {
+  textAlign: 'center',
+  fontSize: 12,
+},
+otherOptions: {
+  flexDirection: 'row',
+  flexWrap: 'wrap',
+  justifyContent: 'space-between',
+  backgroundColor: 'white', // Set the background color to white
+  padding: 10, // Add padding to the container
+  borderRadius: 20, // Optional: for rounded corners
+  marginBottom: 25, // Space between sections
+  marginRight: 15,
+  marginLeft: 15,
+},
+optionCard: {
+  alignItems: 'center',
+  width: '30%',
+  marginBottom: 20,
+},
+optionIcon: {
+  width: 50,
+  height: 50,
+  marginBottom: 5,
+},
+optionText: {
+  textAlign: 'center',
+  fontSize: 12,
+},
+accountSettings: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  paddingHorizontal: 15,
+  paddingVertical: 20,
+  backgroundColor: '#fff',
+  borderTopWidth: 1,
+  borderTopColor: '#ccc',
+},
+accountSettingsText: {
+  fontSize: 16,
+},
+
 });

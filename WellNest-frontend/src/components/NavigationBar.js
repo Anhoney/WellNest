@@ -10,7 +10,7 @@ const NavigationBar = ({ navigation, activePage }) => {
     { name: 'Schedule', label: 'Schedule', icon: 'calendar' },
     { name: 'Chat', label: 'Chat', icon: 'chatbubbles' },
     { name: 'Notification', label: 'Notification', icon: 'notifications' },
-    { name: 'Account', label: 'Account', icon: 'person' },
+    { name: 'ProfilePage', label: 'Account', icon: 'person' },
   ];
 
   return (

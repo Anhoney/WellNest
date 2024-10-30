@@ -3,15 +3,15 @@ import React from 'react';
 import { View, Text, Image, ImageBackground, TouchableOpacity, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons'; // Make sure you have Ionicons installed
-import styles from './styles'; // Assuming you have your styles.js setup
-import NavigationBar from './NavigationBar';  // Import here
+import styles from '../components/styles'; // Assuming you have your styles.js setup
+import NavigationBar from '../components/NavigationBar';  // Import here
 
 const MainPage = ({ userName = "John Doe", medicineReminder }) => {
   const navigation = useNavigation();
 
   return (
 
-   <ImageBackground source={require('./assets/MainPage.png')} style={styles.background}>
+   <ImageBackground source={require('../../assets/MainPage.png')} style={styles.background}>
 
         <View style={styles.pageContainer}>
 
@@ -24,7 +24,7 @@ const MainPage = ({ userName = "John Doe", medicineReminder }) => {
                     <>
                         <Text style={styles.reminderText}>Remember to take your medicine!</Text>
                         <View style={styles.medicineCard}>
-                            <Image source={require('./assets/Prescription.png')} style={styles.medicineImage} />
+                            <Image source={require('../../assets/Prescription.png')} style={styles.medicineImage} />
                             <View>
                                 <Text style={styles.medicineName}>{medicineReminder.name}</Text>
                                  <Text style={styles.medicineTime}>{medicineReminder.time} • {medicineReminder.instruction}</Text>
@@ -35,7 +35,7 @@ const MainPage = ({ userName = "John Doe", medicineReminder }) => {
                         </View>
                     </>
                 ) : (
-                    <Image source={require('./assets/DrinkTea.png')} style={styles.defaultImage} />
+                    <Image source={require('../../assets/DrinkTea.png')} style={styles.defaultImage} />
                 )}
             </View>
 
@@ -94,22 +94,22 @@ const MainPage = ({ userName = "John Doe", medicineReminder }) => {
             <Text style={styles.sectionTitle}>Healthcare</Text>
             <View style={styles.moduleRow}>
               <TouchableOpacity onPress={() => navigation.navigate('AppointmentBooking')}>
-                <Image source={require('./assets/AppointmentBooking.png')} style={styles.icon} />
+                <Image source={require('../../assets/AppointmentBooking.png')} style={styles.icon} />
                 <Text style={styles.iconText}>Appointment {"\n"} Booking</Text>
               </TouchableOpacity>
 
               <TouchableOpacity onPress={() => navigation.navigate('VirtualConsultation')}>
-                <Image source={require('./assets/VirtualConsultation.png')} style={styles.icon} />
+                <Image source={require('../../assets/VirtualConsultation.png')} style={styles.icon} />
                 <Text style={styles.iconText}>Virtual {"\n"} Consultation</Text>
               </TouchableOpacity>
 
               <TouchableOpacity onPress={() => navigation.navigate('Prescription')}>
-                <Image source={require('./assets/Prescription.png')} style={styles.icon} />
+                <Image source={require('../../assets/Prescription.png')} style={styles.icon} />
                 <Text style={styles.iconText}>Prescription</Text>
               </TouchableOpacity>
 
               <TouchableOpacity onPress={() => navigation.navigate('MedicationReminder')}>
-                <Image source={require('./assets/MedicationReminder.png')} style={styles.icon} />
+                <Image source={require('../../assets/MedicationReminder.png')} style={styles.icon} />
                 <Text style={styles.iconText}>Medication {"\n"} Reminder</Text>
               </TouchableOpacity>
             </View>
@@ -120,22 +120,22 @@ const MainPage = ({ userName = "John Doe", medicineReminder }) => {
             <Text style={styles.sectionTitle}>Wellness</Text>
             <View style={styles.moduleRow}>
               <TouchableOpacity onPress={() => navigation.navigate('ElderlyAssessment')}>
-                <Image source={require('./assets/ElderlyAssessment.png')} style={styles.icon} />
+                <Image source={require('../../assets/ElderlyAssessment.png')} style={styles.icon} />
                 <Text style={styles.iconText}>Elderly {"\n"} Assessment</Text>
               </TouchableOpacity>
 
               <TouchableOpacity onPress={() => navigation.navigate('SocialEvents')}>
-                <Image source={require('./assets/SocialEventsAndSupportGroups.png')} style={styles.icon} />
+                <Image source={require('../../assets/SocialEventsAndSupportGroups.png')} style={styles.icon} />
                 <Text style={styles.iconText}>Social Events {"\n"} & Support</Text>
               </TouchableOpacity>
 
               <TouchableOpacity onPress={() => navigation.navigate('VolunteerOpportunities')}>
-                <Image source={require('./assets/VolunteerOpportunities.png')} style={styles.icon} />
+                <Image source={require('../../assets/VolunteerOpportunities.png')} style={styles.icon} />
                 <Text style={styles.iconText}>Volunteer {"\n"} Opportunities</Text>
               </TouchableOpacity>
 
               <TouchableOpacity onPress={() => navigation.navigate('FamilyCollaboration')}>
-                <Image source={require('./assets/FamilyAndCaregiversCollaboration.png')} style={styles.icon} />
+                <Image source={require('../../assets/FamilyAndCaregiversCollaboration.png')} style={styles.icon} />
                 <Text style={styles.iconText}>Family & {"\n"} Caregiver {"\n"} Collaboration</Text>
               </TouchableOpacity>
             </View>

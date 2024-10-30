@@ -1,7 +1,7 @@
 // ForgotPasswordPage.js
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ImageBackground, Image, Keyboard, TouchableWithoutFeedback } from 'react-native';
-import styles from './styles'; // Import shared styles
+import styles from '../components/styles'; // Import shared styles
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
     
@@ -23,7 +23,7 @@ const ForgotPasswordPage = () => {
     // Dismiss keyboard when touching outside the inputs
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
     <ImageBackground
-      source={require('./assets/LoadingBackground.png')}
+      source={require('../../assets/LoadingBackground.png')}
       style={styles.background}
     >
     

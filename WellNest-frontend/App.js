@@ -8,12 +8,16 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Import your screens
-import FirstPage from './FirstPage';
-import LoginPage from './LoginPage';
-import ForgotPasswordPage from './ForgotPasswordPage';
-import RegisterPage from './RegisterPage';
-import MainPage from './MainPage';
-import AppointmentPage from './AppointmentPage'; // Appointment Page
+import FirstPage from './src/screens/FirstPage';
+import LoginPage from './src/screens/LoginPage';
+import ForgotPasswordPage from './src/screens/ForgotPasswordPage';
+import RegisterPage from './src/screens/RegisterPage';
+import MainPage from './src/screens/MainPage';
+import AppointmentPage from './src/screens/AppointmentPage'; // Appointment Page
+import VirtualConsultationPage from './src/screens/VirtualConsultationPage'; 
+import PrescriptionHistoryPage from './src/screens/PrescriptionHistoryPage';
+import ProfilePage from './src/screens/ProfilePage';
+
 // import SchedulePage from './SchedulePage'; // Example of other screens
 // import ChatPage from './ChatPage';
 // import NotificationPage from './NotificationPage';
@@ -73,12 +77,15 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="FirstPage" screenOptions={{ headerShown: false }}>
-        {/* <Stack.Screen name="FirstPage" component={FirstPage} />
+        <Stack.Screen name="FirstPage" component={FirstPage} />
         <Stack.Screen name="LoginPage" component={LoginPage} />
         <Stack.Screen name="ForgotPassword" component={ForgotPasswordPage} />
-        <Stack.Screen name="Register" component={RegisterPage} /> */}
+        <Stack.Screen name="Register" component={RegisterPage} />
         <Stack.Screen name="MainPage" component={MainPage} options={{ title: 'Home' }} />
         <Stack.Screen name="AppointmentBooking" component={AppointmentPage} options={{ title: 'Book Appointment' }}/>
+        <Stack.Screen name="VirtualConsultation" component={VirtualConsultationPage} options={{ title: 'Virtual Consultation' }}/>
+        <Stack.Screen name="Prescription" component={PrescriptionHistoryPage} options={{ title: 'Prescription' }}/>
+        <Stack.Screen name="ProfilePage" component={ProfilePage} options={{ title: 'Account' }}/>
       </Stack.Navigator>
     </NavigationContainer>
   );

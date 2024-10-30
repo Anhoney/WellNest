@@ -1,14 +1,14 @@
-//AppointmentPage.js
+//VirtualConsultationPage.js
 import React, { useState } from 'react'; // <-- Add useState here
 import { View, Text, ImageBackground, TextInput, TouchableOpacity, ScrollView, StyleSheet} from 'react-native';
-import styles from './styles'; // Import shared styles
+import styles from '../components/styles'; // Import shared styles
 import { Ionicons } from '@expo/vector-icons'; // Import icons from Expo
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import DateTimePickerModal from 'react-native-modal-datetime-picker'; // Ensure this is imported
-import NavigationBar from './NavigationBar'; // Import your custom navigation bar component
+import NavigationBar from '../components/NavigationBar'; // Import your custom navigation bar component
 
-const AppointmentPage = () => {
+const VirtualConsultationPage = () => {
     const navigation = useNavigation();
     const [date, setDate] = useState(new Date());
     const [open, setOpen] = useState(false);
@@ -44,17 +44,17 @@ const formatDate = (date) => {
 };
 
 return (
-  <ImageBackground source={require('./assets/AppointmentPage.png')} style={styles.background}>
+  <ImageBackground source={require('../../assets/VirtualConsultationPage.png')} style={styles.background}>
     {/* Title Section with Back Arrow */}
-    <View style={styles.smallHeaderContainer}>
+    <View style={styles.noBgSmallHeaderContainer}>
       <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color="#000" />
       </TouchableOpacity>
-      <Text style={styles.title}>Booking Appointment</Text>
+      <Text style={styles.title}>Virtual Consultation</Text>
     </View>
       
     <View style={styles.appointmentContainer}>
-      <Text style={styles.smallTitle}>Find Your Doctor</Text>
+      <Text style={styles.smallTitle}>Search Consult Categories</Text>
 
         <View style={styles.searchContainer}>
           <TouchableOpacity style={styles.searchButton}>
@@ -62,18 +62,11 @@ return (
           </TouchableOpacity>
           <TextInput
             style={styles.searchInput}
-            placeholder="Search Doctor..."
+            placeholder="Search Consult Categories..."
           />
         </View>
 
         <View style={styles.searchContainer}>
-          <View style={styles.smallInputContainer}>
-            <Ionicons name="location-outline" size={20} color="#000" style={styles.iconStyle} />
-              <TextInput
-                style={styles.searchInputWithIcon}
-                placeholder="Location"
-              />
-          </View>
 
           {/* Show the date picker on initial render */}
           <TouchableOpacity style={styles.dateInput} onPress={showDatePicker}>
@@ -98,6 +91,7 @@ return (
       {/* Relevance and Favourite Buttons */}
       {/* Adding a separator between buttons and ScrollView for better spacing */}
       <View style={styles.filterButtonContainer}>
+      <Text style={styles.categoriesTitle}>Categories      </Text>
         <TouchableOpacity
           style={[
             styles.filterButton,
@@ -130,7 +124,7 @@ return (
       </View>
 
       {/* White Underline */}
-      <View style={styles.underline}></View>
+      <View style={styles.singleUnderline}></View>
 
       {/* ScrollView for relevant or favorite specialists */}
       <ScrollView style={styles.specialtyContainer}>
@@ -152,9 +146,9 @@ return (
     </View>
 
   <NavigationBar navigation={navigation} activePage="" />
-  
+
 </ImageBackground>
   );
 };
 
-export default AppointmentPage;
+export default VirtualConsultationPage;
