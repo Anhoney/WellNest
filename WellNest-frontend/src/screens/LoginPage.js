@@ -17,14 +17,14 @@ import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
 
 const LoginPage = () => {
-  const [icNumber, setICNumber] = useState("");
+  const [phoneNo, setphoneNo] = useState("");
   const [password, setPassword] = useState("");
   const [isPasswordVisible, setPasswordVisible] = useState(false); // For toggling password visibility
   const navigation = useNavigation();
 
   const handleLogin = async () => {
     // Handle login logic here, e.g., send to backend for validation
-    //console.log('Logging in with IC:', icNumber, 'Password:', password);
+    //console.log('Logging in with IC:', phoneNo, 'Password:', password);
     // You can add your login authentication logic here
     // If login is successful, call the handleLogin function
     // if (username === 'test' && password === 'password') {  // Replace with actual logic
@@ -35,7 +35,7 @@ const LoginPage = () => {
     try {
       const response = await axios.post(
         "http://localhost:5001/api/auth/login",
-        { icNumber, password }
+        { phoneNo, password }
       );
       if (response.data.token) {
         // Navigate to the main page if login is successful
@@ -74,12 +74,12 @@ const LoginPage = () => {
 
         {/* Identity Card Input with Icon */}
         <View style={styles.inputContainer}>
-          <Ionicons name="card" size={24} color="#888" style={styles.icon} />
+          <Ionicons name="call" size={24} color="#888" style={styles.icon} />
           <TextInput
             style={styles.input}
-            placeholder="Identity Card Number"
-            value={icNumber}
-            onChangeText={setICNumber}
+            placeholder="Phone Number"
+            value={phoneNo}
+            onChangeText={setphoneNo}
             keyboardType="numeric"
             placeholderTextColor="#888"
           />

@@ -1,20 +1,20 @@
 // controllers/authController.js
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const { findUserByIC } = require("../models/userModel");
+const { findUserByPhoneNo } = require("../models/userModel");
 
 const loginUser = async (req, res) => {
-  const { icNumber, password } = req.body;
-  // console.log(icNumber)
+  const { phoneNo, password } = req.body;
+  // console.log(phoneNo)
   // console.log(password)
 
   try {
-    const user = await findUserByIC(icNumber);
+    const user = await findUserByPhoneNo(phoneNo);
     console.log(user);
     if (!user) return res.status(401).json({ error: "User not found" });
 
-    // const isMatch = await bcrypt.compare(password, user.password);
-    // if (!isMatch) return res.status(403).json({ error: 'Invalid password' });
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) return res.status(403).json({ error: "Invalid password" });
 
     const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
       expiresIn: "1h",

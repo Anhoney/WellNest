@@ -1,5 +1,11 @@
 import React, { useEffect } from "react";
-import { ImageBackground, View, Text, Image } from "react-native";
+import {
+  ImageBackground,
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+} from "react-native";
 //import { View, Text, StyleSheet, Image } from 'react-native';
 import styles from "../components/styles"; // Import shared styles
 

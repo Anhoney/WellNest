@@ -1,10 +1,18 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Image, StyleSheet, ImageBackground, ScrollView } from 'react-native';
-import * as ImagePicker from 'expo-image-picker';
-import { Ionicons } from '@expo/vector-icons'; // For icons
-import { useNavigation } from '@react-navigation/native';
-import NavigationBar from '../components/NavigationBar';  // Import here
-import styles from '../components/styles'; // Import shared styles
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Image,
+  StyleSheet,
+  ImageBackground,
+  ScrollView,
+} from "react-native";
+import * as ImagePicker from "expo-image-picker";
+import { Ionicons } from "@expo/vector-icons"; // For icons
+import { useNavigation } from "@react-navigation/native";
+import NavigationBar from "../components/NavigationBar"; // Import here
+import styles from "../components/styles"; // Import shared styles
 
 const ProfilePage = () => {
   const [profileImage, setProfileImage] = useState(null);
@@ -25,10 +33,16 @@ const ProfilePage = () => {
   };
 
   return (
-    <ImageBackground source={require('../../assets/MainPage.png')} style={styles.background}>
+    <ImageBackground
+      source={require("../../assets/MainPage.png")}
+      style={styles.background}
+    >
       <View style={styles.smallHeaderContainer}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={24} color="#000" />
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={styles.backButton}
+        >
+          <Ionicons name="chevron-back" size={24} color="#000" />
         </TouchableOpacity>
         <Text style={styles.title}>Profile</Text>
       </View>
@@ -37,12 +51,19 @@ const ProfilePage = () => {
         {/* Profile Image */}
         <TouchableOpacity onPress={pickImage}>
           <Image
-            source={profileImage ? { uri: profileImage } : require('../../assets/defaultProfile.jpg')}
+            source={
+              profileImage
+                ? { uri: profileImage }
+                : require("../../assets/defaultProfile.jpg")
+            }
             style={styles.profileImage}
           />
         </TouchableOpacity>
         <Text style={styles.userName}>John Doe</Text>
-        <TouchableOpacity style={styles.editProfileButton}>
+        <TouchableOpacity
+          style={styles.editProfileButton}
+          onPress={() => navigation.navigate("ProfileEditPage")}
+        >
           <Text style={styles.editProfileText}>Edit Profile</Text>
         </TouchableOpacity>
       </View>
@@ -53,15 +74,24 @@ const ProfilePage = () => {
           <Text style={styles.sectionTitle}>My Health Booking Status</Text>
           <View style={styles.statusOptions}>
             <TouchableOpacity style={styles.statusCard}>
-              <Image source={require('../../assets/VirtualConsultation.png')} style={styles.statusIcon} />
+              <Image
+                source={require("../../assets/VirtualConsultation.png")}
+                style={styles.statusIcon}
+              />
               <Text style={styles.statusText}>Virtual Consultation</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.statusCard}>
-              <Image source={require('../../assets/AppointmentBooking.png')} style={styles.statusIcon} />
+              <Image
+                source={require("../../assets/AppointmentBooking.png")}
+                style={styles.statusIcon}
+              />
               <Text style={styles.statusText}>Appointment Booking</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.statusCard}>
-              <Image source={require('../../assets/RatingStar.png')} style={styles.statusIcon} />
+              <Image
+                source={require("../../assets/RatingStar.png")}
+                style={styles.statusIcon}
+              />
               <Text style={styles.statusText}>Rating</Text>
             </TouchableOpacity>
           </View>
@@ -70,34 +100,55 @@ const ProfilePage = () => {
         {/* Other Options */}
         <View style={styles.otherOptions}>
           <TouchableOpacity style={styles.optionCard}>
-            <Image source={require('../../assets/Favourite.png')} style={styles.optionIcon} />
-            <Text style={styles.optionText}>Favourite</Text>
+            <Image
+              source={require("../../assets/Favourite.png")}
+              style={styles.optionIcon}
+            />
+            <Text style={styles.statusText}>Favourite</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.optionCard}>
-            <Image source={require('../../assets/MedicalHistory.png')} style={styles.optionIcon} />
-            <Text style={styles.optionText}>Medical History</Text>
+            <Image
+              source={require("../../assets/MedicalHistory.png")}
+              style={styles.optionIcon}
+            />
+            <Text style={styles.statusText}>Medical History</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.optionCard}>
-            <Image source={require('../../assets/PrescriptionBottle.png')} style={styles.optionIcon} />
-            <Text style={styles.optionText}>Prescription History</Text>
+            <Image
+              source={require("../../assets/PrescriptionBottle.png")}
+              style={styles.optionIcon}
+            />
+            <Text style={styles.statusText}>Prescription History</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.optionCard}>
-            <Image source={require('../../assets/ElderlyAssessment.png')} style={styles.optionIcon} />
-            <Text style={styles.optionText}>Elderly Assessment</Text>
+            <Image
+              source={require("../../assets/ElderlyAssessment.png")}
+              style={styles.optionIcon}
+            />
+            <Text style={styles.statusText}>Elderly Assessment</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.optionCard}>
-            <Image source={require('../../assets/CarePlanDevelopment.png')} style={styles.optionIcon} />
-            <Text style={styles.optionText}>Care Plan</Text>
+            <Image
+              source={require("../../assets/CarePlanDevelopment.png")}
+              style={styles.optionIcon}
+            />
+            <Text style={styles.statusText}>Care Plan</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.optionCard}>
-            <Image source={require('../../assets/CaregiverInformation.png')} style={styles.optionIcon} />
-            <Text style={styles.optionText}>Caregiver Information</Text>
+            <Image
+              source={require("../../assets/CaregiverInformation.png")}
+              style={styles.optionIcon}
+            />
+            <Text style={styles.statusText}>Caregiver Information</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
 
       {/* Account Settings */}
-      <TouchableOpacity style={styles.accountSettings}>
+      <TouchableOpacity
+        style={styles.accountSettings}
+        onPress={() => navigation.navigate("SettingPage")}
+      >
         <Text style={styles.accountSettingsText}>Account Settings</Text>
         <Ionicons name="chevron-forward" size={20} color="#000" />
       </TouchableOpacity>

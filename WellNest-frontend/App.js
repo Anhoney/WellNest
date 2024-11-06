@@ -1,22 +1,26 @@
 //App.js
 // import * as React from 'react';
 //import React from 'react';
-import React, { useState, useEffect } from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { useState, useEffect } from "react";
+import { NavigationContainer } from "@react-navigation/native";
+import { createStackNavigator } from "@react-navigation/stack";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // Import your screens
-import FirstPage from './src/screens/FirstPage';
-import LoginPage from './src/screens/LoginPage';
-import ForgotPasswordPage from './src/screens/ForgotPasswordPage';
-import RegisterPage from './src/screens/RegisterPage';
-import MainPage from './src/screens/MainPage';
-import AppointmentPage from './src/screens/AppointmentPage'; // Appointment Page
-import VirtualConsultationPage from './src/screens/VirtualConsultationPage'; 
-import PrescriptionHistoryPage from './src/screens/PrescriptionHistoryPage';
-import ProfilePage from './src/screens/ProfilePage';
+import FirstPage from "./src/screens/FirstPage";
+import LoginPage from "./src/screens/LoginPage";
+import ForgotPasswordPage from "./src/screens/ForgotPasswordPage";
+import RegisterPage from "./src/screens/RegisterPage";
+import MainPage from "./src/screens/MainPage";
+import AppointmentPage from "./src/screens/AppointmentPage"; // Appointment Page
+import VirtualConsultationPage from "./src/screens/VirtualConsultationPage";
+import PrescriptionHistoryPage from "./src/screens/PrescriptionHistoryPage";
+import ProfilePage from "./src/screens/ProfilePage";
+import SettingPage from "./src/screens/SettingPage";
+import ProfileEditPage from "./src/screens/ProfileEditPage";
+import MedicationReminderPage from "./src/screens/MedicationReminderPage";
+// import ElderlyAssessmentPage from "./src/screens/ElderlyAsssesmentPage";
 
 // import SchedulePage from './SchedulePage'; // Example of other screens
 // import ChatPage from './ChatPage';
@@ -76,16 +80,59 @@ const Tab = createBottomTabNavigator();
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="FirstPage" screenOptions={{ headerShown: false }}>
+      <Stack.Navigator
+        initialRouteName="FirstPage"
+        screenOptions={{ headerShown: false }}
+      >
         <Stack.Screen name="FirstPage" component={FirstPage} />
         <Stack.Screen name="LoginPage" component={LoginPage} />
         <Stack.Screen name="ForgotPassword" component={ForgotPasswordPage} />
         <Stack.Screen name="Register" component={RegisterPage} />
-        <Stack.Screen name="MainPage" component={MainPage} options={{ title: 'Home' }} />
-        <Stack.Screen name="AppointmentBooking" component={AppointmentPage} options={{ title: 'Book Appointment' }}/>
-        <Stack.Screen name="VirtualConsultation" component={VirtualConsultationPage} options={{ title: 'Virtual Consultation' }}/>
-        <Stack.Screen name="Prescription" component={PrescriptionHistoryPage} options={{ title: 'Prescription' }}/>
-        <Stack.Screen name="ProfilePage" component={ProfilePage} options={{ title: 'Account' }}/>
+        <Stack.Screen
+          name="MainPage"
+          component={MainPage}
+          options={{ title: "Home" }}
+        />
+        <Stack.Screen
+          name="AppointmentBooking"
+          component={AppointmentPage}
+          options={{ title: "Book Appointment" }}
+        />
+        <Stack.Screen
+          name="VirtualConsultation"
+          component={VirtualConsultationPage}
+          options={{ title: "Virtual Consultation" }}
+        />
+        <Stack.Screen
+          name="Prescription"
+          component={PrescriptionHistoryPage}
+          options={{ title: "Prescription" }}
+        />
+        <Stack.Screen
+          name="ProfilePage"
+          component={ProfilePage}
+          options={{ title: "Account" }}
+        />
+        <Stack.Screen
+          name="SettingPage"
+          component={SettingPage}
+          options={{ title: "Setting" }}
+        />
+        <Stack.Screen
+          name="ProfileEditPage"
+          component={ProfileEditPage}
+          options={{ title: "ProfileEdit" }}
+        />
+        <Stack.Screen
+          name="MedicationReminderPage"
+          component={MedicationReminderPage}
+          options={{ title: "MedicationReminder" }}
+        />
+        {/* <Stack.Screen
+          name="ElderlyAssessmentPage"
+          component={ElderlyAssessmentPage}
+          options={{ title: "ElderlyAssessment" }}
+        /> */}
       </Stack.Navigator>
     </NavigationContainer>
   );
