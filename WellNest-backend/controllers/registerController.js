@@ -11,9 +11,9 @@ const storage = multer.memoryStorage(); // Store files in memory for easy handli
 //   { name: "communityOrganizerFile", maxCount: 1 },
 // ]);
 const upload = multer({ storage }).fields([
-  { name: "identityCardImage", maxCount: 1 },
-  { name: "healthcareLicenseDocument", maxCount: 1 },
-  { name: "communityOrganizerDocument", maxCount: 1 },
+  { name: "identityCardFile", maxCount: 1 },
+  { name: "healthcareLicenseFile", maxCount: 1 },
+  { name: "communityOrganizerFile", maxCount: 1 },
 ]);
 
 // Configure Multer for file storage
@@ -33,10 +33,17 @@ const upload = multer({ storage }).fields([
 // ]);
 
 const registerUser = async (req, res) => {
+  console.log(req.files); // Check the file upload
+
   upload(req, res, async (err) => {
     if (err) {
       console.error("Error uploading files:", err);
       return res.status(500).json({ error: "File upload failed" });
+    }
+
+    // Proceed with the rest of the logic if files are available
+    if (!req.files) {
+      return res.status(400).json({ error: "No files uploaded" });
     }
 
     const {
@@ -67,20 +74,20 @@ const registerUser = async (req, res) => {
       // Hash the password
       const hashedPassword = await bcrypt.hash(password, 10);
 
-      console.log(req.files);
+      // console.log(req.files);
 
       // Prepare file buffers for database insertion
-      const identityCardImage = req.files.identityCardImage
-        ? req.files.identityCardImage[0].buffer
+      const identityCardFile = req.files.identityCardFile
+        ? req.files.identityCardFile[0].buffer
         : null;
-      const healthcareLicenseDocument = req.files.healthcareLicenseDocument
-        ? req.files.healthcareLicenseDocument[0].buffer
+      const healthcareLicenseFile = req.files.healthcareLicenseFile
+        ? req.files.healthcareLicenseFile[0].buffer
         : null;
-      const communityOrganizerDocument = req.files.communityOrganizerDocument
-        ? req.files.communityOrganizerDocument[0].buffer
+      const communityOrganizerFile = req.files.communityOrganizerFile
+        ? req.files.communityOrganizerFile[0].buffer
         : null;
 
-      console.log(identityCardImage);
+      console.log(identityCardFile);
 
       // Insert user into the database
       const insertQuery = `
@@ -97,9 +104,9 @@ const registerUser = async (req, res) => {
         hashedPassword,
         roleValue,
         healthcareLicenseNo || null,
-        identityCardImage,
-        healthcareLicenseDocument,
-        communityOrganizerDocument,
+        identityCardFile,
+        healthcareLicenseFile,
+        communityOrganizerFile,
       ];
 
       const result = await pool.query(insertQuery, values);

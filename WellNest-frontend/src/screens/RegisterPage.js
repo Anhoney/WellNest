@@ -34,7 +34,11 @@ const RegisterPage = () => {
   const [identityCardFile, setIdentityCardFile] = useState(null);
   const [identityCardFileName, setIdentityCardFileName] = useState(""); // State for file name feedback
   const [healthcareLicenseFile, setHealthcareLicenseFile] = useState(null);
+  const [healthcareLicenseFileName, setHealthcareLicenseFileName] =
+    useState(""); // State for file name feedback
   const [communityOrganizerFile, setCommunityOrganizerFile] = useState(null);
+  const [communityOrganizerFileName, setCommunityOrganizerFileName] =
+    useState(""); // State for file name feedback
   const [selectedFile, setSelectedFile] = useState(null);
   const [feedbackMessage, setFeedbackMessage] = useState("");
 
@@ -57,7 +61,11 @@ const RegisterPage = () => {
   //   }
   // };
 
-  const handleFileSelection = async (setFileState, setFileName) => {
+  const handleFileSelection = async (
+    setFileState,
+    setFileName,
+    documentType
+  ) => {
     try {
       const result = await DocumentPicker.getDocumentAsync({
         type: [
@@ -72,9 +80,20 @@ const RegisterPage = () => {
       if (result != null) {
         // console.log();
         setFileState(result);
+        if (documentType === "identityCard") {
+          setIdentityCardFile(result);
+        }
+        // } else if (documentType === "healthcareLicense") {
+        //   setHealthcareLicenseFile(result);
+        // } else if (documentType === "communityOrganizer") {
+        //   setCommunityOrganizerFile(result);
+        // }
+
         setFileName(result.assets[0].name);
-        console.log(identityCardFileName);
+        // console.log(result.type);
+        console.log(healthcareLicenseFileName);
       } else {
+        console.log("No file selected or result is null");
         Alert.alert("File Selection", "File selection was canceled");
       }
     } catch (error) {
@@ -184,23 +203,24 @@ const RegisterPage = () => {
     formData.append("identityCard", identityCard);
     formData.append("password", password);
     formData.append("role", roleValue);
+    formData.append("healthcareLicenseNo", healthcareLicenseNo);
     formData.append("identityCardFile", {
       uri: identityCardFile.uri,
-      name: identityCardFile.name,
-      type: identityCardFile.mimeType || "application/octet-stream",
+      name: identityCardFile.name || "identityCard",
+      type: identityCardFile.type,
     });
 
     if (role === "Healthcare Provider" && healthcareLicenseFile) {
       formData.append("healthcareLicenseFile", {
         uri: healthcareLicenseFile.uri,
-        name: healthcareLicenseFile.name,
-        type: healthcareLicenseFile.mimeType || "application/octet-stream",
+        name: healthcareLicenseFile.name || "healthcare_license",
+        type: healthcareLicenseFile.type,
       });
     }
     if (role === "Community Organizer" && communityOrganizerFile) {
       formData.append("communityOrganizerFile", {
         uri: communityOrganizerFile.uri,
-        name: communityOrganizerFile.name,
+        name: communityOrganizerFile.name || "community_organizer",
         type: communityOrganizerFile.mimeType || "application/octet-stream",
       });
     }
@@ -234,7 +254,7 @@ const RegisterPage = () => {
       ]);
     } catch (error) {
       Alert.alert("Error", "Failed to register. Please try again.");
-      console.log(error);
+      console.log("Registration error:", error);
     }
 
     // axios
@@ -366,13 +386,13 @@ const RegisterPage = () => {
                 We will send a notification after authentication succeeds.
               </Text>
               {/* Upload Identity Card with Camera Icon */}
-              {/* Problem here couldn't upload. */}
               <TouchableOpacity
                 style={styles.uploadButton}
                 onPress={() =>
                   handleFileSelection(
                     setIdentityCardFile,
-                    setIdentityCardFileName
+                    setIdentityCardFileName,
+                    "identityCard"
                   )
                 }
               >
@@ -388,7 +408,8 @@ const RegisterPage = () => {
               </TouchableOpacity>
               {identityCardFileName ? (
                 <Text style={styles.uploadFeedback}>
-                  {/* {identityCardFileName} */}
+                  Uploaded file: {identityCardFileName}
+                  {"\n"}
                 </Text>
               ) : null}
               <Text style={styles.uploadPrecautions}>
@@ -518,7 +539,13 @@ const RegisterPage = () => {
                 </View>
                 <TouchableOpacity
                   style={styles.uploadButton}
-                  onPress={() => handleFileSelection(setHealthcareLicenseFile)}
+                  onPress={() =>
+                    handleFileSelection(
+                      setHealthcareLicenseFile,
+                      setHealthcareLicenseFileName,
+                      "healthcareLicense"
+                    )
+                  }
                 >
                   <Ionicons
                     name="document"
@@ -530,6 +557,12 @@ const RegisterPage = () => {
                     Upload Healthcare License Document
                   </Text>
                 </TouchableOpacity>
+                {healthcareLicenseFileName ? (
+                  <Text style={styles.uploadFeedback}>
+                    Uploaded file: {healthcareLicenseFileName}
+                    {"\n"}
+                  </Text>
+                ) : null}
                 <Text style={styles.uploadPrecautions}>
                   Please upload related documents to verify your role identity.
                 </Text>
@@ -540,7 +573,13 @@ const RegisterPage = () => {
               <View style={styles.container}>
                 <TouchableOpacity
                   style={styles.uploadButton}
-                  onPress={() => handleFileSelection(setCommunityOrganizerFile)}
+                  onPress={() =>
+                    handleFileSelection(
+                      setCommunityOrganizerFile,
+                      setCommunityOrganizerFileName,
+                      "communityOrganizer"
+                    )
+                  }
                 >
                   <Ionicons
                     name="document"
@@ -552,6 +591,12 @@ const RegisterPage = () => {
                     Upload Community Organizer Document
                   </Text>
                 </TouchableOpacity>
+                {communityOrganizerFileName ? (
+                  <Text style={styles.uploadFeedback}>
+                    Uploaded file: {communityOrganizerFileName}
+                    {"\n"}
+                  </Text>
+                ) : null}
                 <Text style={styles.uploadPrecautions}>
                   Please upload related documents to verify your role identity.
                 </Text>
