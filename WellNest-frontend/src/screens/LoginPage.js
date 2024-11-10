@@ -15,6 +15,7 @@ import styles from "../components/styles"; // Import shared styles
 import { Ionicons } from "@expo/vector-icons"; // Import icons from Expo
 import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const LoginPage = () => {
   const [phoneNo, setphoneNo] = useState("");
@@ -22,7 +23,7 @@ const LoginPage = () => {
   const [isPasswordVisible, setPasswordVisible] = useState(false); // For toggling password visibility
   const navigation = useNavigation();
 
-  const handleLogin = async () => {
+  const handleLogin = async (responseData) => {
     // Handle login logic here, e.g., send to backend for validation
     //console.log('Logging in with IC:', phoneNo, 'Password:', password);
     // You can add your login authentication logic here
@@ -37,9 +38,47 @@ const LoginPage = () => {
         "http://localhost:5001/api/auth/login",
         { phoneNo, password }
       );
+      console.log("Response from login:", response.data); // Log the response
+      // if (response.data.token && response.data.role !== undefined) {
       if (response.data.token) {
+        // Store the token in AsyncStorage
+        await AsyncStorage.setItem("token", response.data.token);
+        const storedToken = await AsyncStorage.getItem("token");
+        console.log("Token stored successfully:", response.data.token);
+        console.log("Stored Token:", storedToken); // Check if the token is stored
+
+        // Navigate based on user role
+        const { role, full_name } = response.data;
+
+        if (full_name) {
+          try {
+            await AsyncStorage.setItem("full_name", full_name); // Save full_name only if it exists
+          } catch (error) {
+            console.error("Error saving user data:", error);
+          }
+        } else {
+          console.warn("full_name is missing in the response");
+        }
+
         // Navigate to the main page if login is successful
-        navigation.navigate("MainPage"); // Define MainPage in your navigation stack
+        // navigation.navigate("MainPage"); // Define MainPage in your navigation stack
+        // Navigate based on user role
+        console.log("Login successful:", response.data);
+        switch (role) {
+          case "1": // Elderly
+          case "4": // Family/Caregiver/Volunteer
+            navigation.navigate("MainPage");
+            break;
+          case "2": // Community Organizer
+            navigation.navigate("CommunityOrganizerMainPage");
+            break;
+          case "3": // Healthcare Provider
+            navigation.navigate("HealthcareProviderMainPage");
+            break;
+          default:
+            alert("Invalid role");
+            break;
+        }
       } else {
         alert("Login failed");
       }

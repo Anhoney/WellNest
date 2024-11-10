@@ -87,8 +87,8 @@ const registerUser = async (req, res) => {
         ? req.files.communityOrganizerFile[0].buffer
         : null;
 
-      console.log(identityCardFile);
-
+      // console.log(identityCardFile);
+      console.log("Pool object:", pool);
       // Insert user into the database
       const insertQuery = `
       INSERT INTO users (full_name, phone_no, email, identity_card, password, role, healthcare_license, identity_card_image, healthcare_license_document, 

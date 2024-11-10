@@ -20,7 +20,16 @@ import ProfilePage from "./src/screens/ProfilePage";
 import SettingPage from "./src/screens/SettingPage";
 import ProfileEditPage from "./src/screens/ProfileEditPage";
 import MedicationReminderPage from "./src/screens/MedicationReminderPage";
-// import ElderlyAssessmentPage from "./src/screens/ElderlyAsssesmentPage";
+import ElderlyAssessmentPage from "./src/screens/ElderlyAssessmentPage";
+
+//HealthcareProvider
+import HealthcareProviderMainPage from "./src/screens/HealthcareProvider/HealthcareProviderMainPage";
+import HpAppointmentManagementPage from "./src/screens/HealthcareProvider/HpAppointmentManagementPage";
+import HpAppointmentCreationPage from "./src/screens/HealthcareProvider/HpAppointmentCreationPage";
+import HpMyCreatedAppointments from "./src/screens/HealthcareProvider/HpMyCreatedAppointments";
+import HpAppointmentEditPage from "./src/screens/HealthcareProvider/HpAppointmentEditPage";
+import HpProfilePage from "./src/screens/HealthcareProvider/HpProfilePage";
+import HpEditProfilePage from "./src/screens/HealthcareProvider/HpEditProfilePage";
 
 // import SchedulePage from './SchedulePage'; // Example of other screens
 // import ChatPage from './ChatPage';
@@ -128,11 +137,46 @@ export default function App() {
           component={MedicationReminderPage}
           options={{ title: "MedicationReminder" }}
         />
-        {/* <Stack.Screen
+        <Stack.Screen
           name="ElderlyAssessmentPage"
           component={ElderlyAssessmentPage}
           options={{ title: "ElderlyAssessment" }}
-        /> */}
+        />
+        <Stack.Screen
+          name="HealthcareProviderMainPage"
+          component={HealthcareProviderMainPage}
+          options={{ title: "HealthcareProvider" }}
+        />
+        <Stack.Screen
+          name="HpAppointmentManagementPage"
+          component={HpAppointmentManagementPage}
+          options={{ title: "AppointmentManagement" }}
+        />
+        <Stack.Screen
+          name="HpAppointmentCreationPage"
+          component={HpAppointmentCreationPage}
+          options={{ title: "AppointmentCreation" }}
+        />
+        <Stack.Screen
+          name="HpMyCreatedAppointments"
+          component={HpMyCreatedAppointments}
+          options={{ title: "MyCreatedAppointments" }}
+        />
+        <Stack.Screen
+          name="HpAppointmentEditPage"
+          component={HpAppointmentEditPage}
+          options={{ title: "AppointmentEditPage" }}
+        />
+        <Stack.Screen
+          name="HpProfilePage"
+          component={HpProfilePage}
+          options={{ title: "HpProfilePage" }}
+        />
+        <Stack.Screen
+          name="HpEditProfilePage"
+          component={HpEditProfilePage}
+          options={{ title: "HpEditProfilePage" }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );

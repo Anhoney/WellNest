@@ -845,4 +845,191 @@ export default StyleSheet.create({
     justifyContent: "center", // Center items horizontally
     marginTop: 150,
   },
+  invalidInput: {
+    borderColor: "red",
+    borderWidth: 1,
+  },
+  //HpMainPage
+  hPTitle: {
+    fontSize: 27, // Larger font size for the second line
+    color: "#000000",
+    padding: 30,
+    marginBottom: 40,
+    marginRight: 30, // Same adjustment for horizontal position, move left
+  },
+  //HpAppointmentManagementPage
+  hPGreeting: {
+    fontSize: 40,
+    fontWeight: "bold",
+    marginTop: 80,
+    textAlign: "left",
+    marginLeft: 30,
+  },
+  hPModuleRow: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    // justifyContent: "space-between", // Ensure icons are spaced apart
+    marginBottom: 20,
+  },
+  // Title text used on both pages
+  hpTitle: {
+    fontSize: 25, // Larger font size for readability
+    color: "#000000",
+    fontWeight: "bold",
+    textAlign: "center",
+    //marginTop: 100,
+    // marginBottom: 100,
+  },
+  scrollContainer: {
+    flexGrow: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 20,
+  },
+  hpButton: {
+    width: "80%",
+    backgroundColor: "white",
+    paddingVertical: 30,
+    borderRadius: 10,
+    marginVertical: 20,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5, // For Android shadow
+  },
+  hpButtonText: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "black",
+  },
+  // AppointmentCreationPage
+  hpContainer: {
+    flexGrow: 1,
+    backgroundColor: "#D3D3D3",
+    padding: 20,
+  },
+  formContainer: {
+    backgroundColor: "#FFF",
+    borderRadius: 10,
+    padding: 15,
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: "bold",
+    marginTop: 10,
+  },
+  hpInput: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 5,
+    padding: 10,
+    marginTop: 5,
+  },
+  hpradioButtonContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: -8,
+  },
+  hpradioLabel: {
+    fontSize: 16,
+    // fontWeight: "bold",
+  },
+  timeInput: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 5,
+    padding: 10,
+    marginTop: 5,
+  },
+  addTimeText: {
+    color: "#FFA500",
+    fontWeight: "bold",
+    marginTop: 10,
+  },
+  doneButton: {
+    backgroundColor: "#FFA500",
+    paddingVertical: 15,
+    borderRadius: 10,
+    alignItems: "center",
+    marginVertical: 20,
+    marginTop: 70,
+  },
+  doneButtonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  timeSlotContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 5,
+    paddingRight: 10,
+  },
+  dateTimePickerContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    marginVertical: 10,
+  },
+  confirmButton: {
+    backgroundColor: "#FFA500",
+    paddingVertical: 5,
+    paddingHorizontal: 15,
+    borderRadius: 5,
+    marginLeft: 10,
+  },
+  confirmButtonText: {
+    color: "#FFF",
+    fontSize: 16,
+  },
+  //HpMyCreatedAppointments.js
+  list: {
+    paddingBottom: 16,
+  },
+  appointmentContainer: {
+    backgroundColor: "#FFF",
+    padding: 16,
+    borderRadius: 8,
+    marginBottom: 16,
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    shadowOffset: { width: 0, height: 2 },
+  },
+  appointmentHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  createdByText: {
+    fontWeight: "bold",
+  },
+  appointmentDate: {
+    fontSize: 16,
+    color: "green",
+    marginBottom: 16,
+  },
+  hpAbuttonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  hpAbutton: {
+    backgroundColor: "#FF8C00",
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 5,
+  },
+  hpAbuttonText: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
+  hpAcontainer: {
+    flex: 1,
+    backgroundColor: "#D3D3D3",
+    padding: 16,
+  },
 });

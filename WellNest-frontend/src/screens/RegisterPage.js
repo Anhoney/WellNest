@@ -39,33 +39,28 @@ const RegisterPage = () => {
   const [communityOrganizerFile, setCommunityOrganizerFile] = useState(null);
   const [communityOrganizerFileName, setCommunityOrganizerFileName] =
     useState(""); // State for file name feedback
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [feedbackMessage, setFeedbackMessage] = useState("");
 
-  // // Function to handle document picking
-  // const handleFileSelection = async (setFileState, setFileName) => {
-  //   try {
-  //     const result = await DocumentPicker.getDocumentAsync({
-  //       type: "*/*",
-  //       copyToCacheDirectory: false,
-  //     });
-  //     if (result.type === "success") {
-  //       setFileState(result);
-  //       setFileName(result.name); // Set the file name for feedback
-  //     } else {
-  //       Alert.alert("File selection was canceled");
-  //     }
-  //   } catch (error) {
-  //     console.error("Document selection error:", error);
-  //     Alert.alert("Error selecting document");
-  //   }
-  // };
+  // State for invalid fields
+  const [invalidFields, setInvalidFields] = useState({
+    fullName: false,
+    phoneNo: false,
+    email: false,
+    identityCard: false,
+    password: false,
+    confirmPassword: false,
+    healthcareLicenseNo: false,
+  });
 
-  const handleFileSelection = async (
-    setFileState,
-    setFileName,
-    documentType
-  ) => {
+  const validatePassword = (password) => {
+    // Ensure password is at least 6 characters and contains both numbers and letters
+    const isValidLength = password.length > 8;
+    const hasLetters = /[A-Za-z]/.test(password);
+    const hasNumbers = /[0-9]/.test(password);
+    return isValidLength && hasLetters && hasNumbers;
+  };
+
+  // Function to handle document picking
+  const handleFileSelection = async (setFileState, setFileName) => {
     try {
       const result = await DocumentPicker.getDocumentAsync({
         type: [
@@ -80,18 +75,9 @@ const RegisterPage = () => {
       if (result != null) {
         // console.log();
         setFileState(result);
-        if (documentType === "identityCard") {
-          setIdentityCardFile(result);
-        }
-        // } else if (documentType === "healthcareLicense") {
-        //   setHealthcareLicenseFile(result);
-        // } else if (documentType === "communityOrganizer") {
-        //   setCommunityOrganizerFile(result);
-        // }
-
         setFileName(result.assets[0].name);
         // console.log(result.type);
-        console.log(healthcareLicenseFileName);
+        // console.log(healthcareLicenseFileName);
       } else {
         console.log("No file selected or result is null");
         Alert.alert("File Selection", "File selection was canceled");
@@ -102,184 +88,196 @@ const RegisterPage = () => {
     }
   };
 
-  // const handleFileChange = (event) => {
-  //   const file = event.target.files[0];
-  //   if (file) {
-  //     setSelectedFile(file);
-  //   }
-  // };
-
   const handleRegister = async () => {
+    const updatedInvalidFields = { ...invalidFields };
+    let missingFields = [];
+    let specificErrors = [];
+
     // Validate required fields
     if (!fullName) {
-      Alert.alert("Error", "Full name is required.");
-      return;
+      updatedInvalidFields.fullName = true;
+      // Alert.alert("Error", "Full name is required.");
+      missingFields.push("Full Name");
+      // return;
+    } else {
+      updatedInvalidFields.fullName = false;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.(com|my)$/;
+    if (!email) {
+      updatedInvalidFields.email = true;
+      missingFields.push("Email");
+    } else if (!emailRegex.test(email)) {
+      updatedInvalidFields.email = true;
+      specificErrors.push("Email must end with .com or .my.");
+    } else {
+      updatedInvalidFields.email = false;
     }
 
     if (!phoneNo) {
-      Alert.alert("Error", "Phone number is required.");
-      return;
+      updatedInvalidFields.phoneNo = true;
+      missingFields.push("Phone Number");
+    } else if (phoneNo.length < 10) {
+      updatedInvalidFields.phoneNo = true;
+      specificErrors.push("Phone Number must be at least 10 digits.");
+    } else {
+      updatedInvalidFields.phoneNo = false;
     }
 
-    // Email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.(com|my)$/;
-    if (!email) {
-      Alert.alert("Error", "Email address is required.");
-      return;
-    } else if (!emailRegex.test(email)) {
-      Alert.alert(
-        "Invalid Email",
-        "Please enter a valid email address ending with .com or .my."
-      );
-      return;
-    }
-
-    // Phone number validation (at least 10 digits)
-    if (phoneNo.length < 10) {
-      Alert.alert(
-        "Invalid Phone Number",
-        "Phone number must be at least 10 digits."
-      );
-      return;
-    }
-
-    // Identity card validation (must be exactly 12 digits)
     if (!identityCard) {
-      Alert.alert("Error", "Identity card number is required.");
-      return;
+      updatedInvalidFields.identityCard = true;
+      missingFields.push("Identity Card Number");
     } else if (identityCard.length !== 12 || !/^\d+$/.test(identityCard)) {
-      Alert.alert(
-        "Invalid Identity Card Number",
-        "Identity card number must be exactly 12 digits."
-      );
-      return;
+      updatedInvalidFields.identityCard = true;
+      specificErrors.push("Identity Card Number must be 12 digits.");
+    } else {
+      updatedInvalidFields.identityCard = false;
     }
 
     if (!password) {
-      Alert.alert("Error", "Password is required.");
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      Alert.alert("Error", "Passwords do not match.");
-      return;
-    }
-
-    if (!identityCardFile) {
-      Alert.alert("Error", "Identity card photo upload is required.");
-      return;
-    }
-
-    // Role-specific validations
-    if (role === "Healthcare Provider") {
-      if (!healthcareLicenseNo) {
-        Alert.alert("Error", "Healthcare license number is required.");
-        return;
-      }
-      if (!healthcareLicenseFile) {
-        Alert.alert("Error", "Healthcare license document upload is required.");
-        return;
-      }
-    }
-
-    if (role === "Community Organizer" && !communityOrganizerFile) {
-      Alert.alert("Error", "Community organizer document upload is required.");
-      return;
-    }
-
-    // Role mapping: "1" for User, "2" for Community Organizer, "3" for Healthcare Provider
-    const roleMapping = {
-      Elderly: 1,
-      "Family / Caregiver / Volunteer": 4,
-      "Community Organizer": 2,
-      "Healthcare Provider": 3,
-    };
-    const roleValue = roleMapping[role];
-
-    const formData = new FormData();
-    formData.append("fullName", fullName);
-    formData.append("phoneNo", phoneNo);
-    formData.append("email", email);
-    formData.append("identityCard", identityCard);
-    formData.append("password", password);
-    formData.append("role", roleValue);
-    formData.append("healthcareLicenseNo", healthcareLicenseNo);
-    formData.append("identityCardFile", {
-      uri: identityCardFile.uri,
-      name: identityCardFile.name || "identityCard",
-      type: identityCardFile.type,
-    });
-
-    if (role === "Healthcare Provider" && healthcareLicenseFile) {
-      formData.append("healthcareLicenseFile", {
-        uri: healthcareLicenseFile.uri,
-        name: healthcareLicenseFile.name || "healthcare_license",
-        type: healthcareLicenseFile.type,
-      });
-    }
-    if (role === "Community Organizer" && communityOrganizerFile) {
-      formData.append("communityOrganizerFile", {
-        uri: communityOrganizerFile.uri,
-        name: communityOrganizerFile.name || "community_organizer",
-        type: communityOrganizerFile.mimeType || "application/octet-stream",
-      });
-    }
-
-    //   axios
-    //     .post("http://localhost:5001/api/auth/register", formData, {
-    //       headers: { "Content-Type": "multipart/form-data" },
-    //     })
-    //     .then((response) => {
-    //       Alert.alert("Success", "You are registered successfully!", [
-    //         { text: "OK", onPress: () => navigation.navigate("LoginPage") },
-    //       ]);
-    //     })
-    //     .catch((error) => {
-    //       console.error("Registration error:", error);
-    //       Alert.alert("Error", "Failed to register. Please try again.");
-    //     });
-    // };
-
-    try {
-      const response = await axios.post(
-        "http://localhost:5001/api/auth/register",
-        formData,
-        {
-          headers: { "Content-Type": "multipart/form-data" },
-        }
+      updatedInvalidFields.password = true;
+      // Alert.alert("Error", "Password is required.");
+      missingFields.push("Password");
+      // return;
+    } else if (!validatePassword(password)) {
+      updatedInvalidFields.password = true;
+      // Alert.alert(
+      //   "Invalid Password",
+      //   "Password must be more than 6 characters long and contain both letters and numbers."
+      // );
+      specificErrors.push(
+        "Password must be more than 6 characters long and include a mix of letters, numbers, and symbols."
       );
-      console.log(response);
-      Alert.alert("Success", "You are registered successfully!", [
-        { text: "OK", onPress: () => navigation.navigate("LoginPage") },
-      ]);
-    } catch (error) {
-      Alert.alert("Error", "Failed to register. Please try again.");
-      console.log("Registration error:", error);
+    } else {
+      updatedInvalidFields.password = false;
     }
 
-    // axios
-    //   .post("http://localhost:5001/api/auth/register", formData, {
-    //     // fullName,
-    //     // phoneNo,
-    //     // email,
-    //     // identityCard,
-    //     // password,
-    //     // // role: roleNumber,
-    //     // role: roleValue,
-    //     // healthcareLicenseNo:
-    //     //   role === "Healthcare Provider" ? healthcareLicenseNo : null, // Optional based on role
-    //     headers: { "Content-Type": "multipart/form-data" },
-    //   })
-    //   .then((response) => {
-    //     console.log("Registration success:", response.data);
-    //     Alert.alert("Success", "You are registered successfully!", [
-    //       { text: "OK", onPress: () => navigation.navigate("LoginPage") },
-    //     ]);
-    //   })
-    //   .catch((error) => {
-    //     console.error("Registration error:", error);
-    //     Alert.alert("Error", "Failed to register. Please try again.");
-    //   });
+    if (!confirmPassword) {
+      updatedInvalidFields.confirmPassword = true;
+      // Alert.alert("Error", "Password is required.");
+      missingFields.push("Password");
+      // return;
+    } else if (password !== confirmPassword) {
+      updatedInvalidFields.confirmPassword = true;
+      // Alert.alert("Error", "Passwords do not match.");
+      // missingFields.push("Password Confirmation");
+      specificErrors.push("Password confirmation does not match.");
+      // return;
+    } else {
+      updatedInvalidFields.confirmPassword = false;
+    }
+
+    // Validate healthcare license number if role is Healthcare Provider
+    if (role === "Healthcare Provider" && !healthcareLicenseNo) {
+      updatedInvalidFields.healthcareLicenseNo = true;
+      // Alert.alert(
+      //   "Error",
+      //   "Healthcare license number is required for Healthcare Providers."
+      // );
+      missingFields.push("Healthcare License Number");
+    } else {
+      updatedInvalidFields.healthcareLicenseNo = false;
+    }
+
+    setInvalidFields(updatedInvalidFields);
+
+    // Show specific alerts if there are 1-2 issues, otherwise a general alert
+    if (missingFields.length > 2 || specificErrors.length > 2) {
+      Alert.alert(
+        "Incomplete Registration",
+        "Please fill in all required fields highlighted in red."
+      );
+    } else if (missingFields.length > 0) {
+      Alert.alert(
+        "Missing Information",
+        `Please fill in the following fields: ${missingFields.join(", ")}.`
+      );
+    } else if (specificErrors.length > 0) {
+      Alert.alert("Invalid Information", specificErrors.join("\n"));
+    } else {
+      if (!identityCardFile) {
+        Alert.alert("Error", "Identity card photo upload is required.");
+        return;
+      }
+
+      // Role-specific validations
+      if (role === "Healthcare Provider") {
+        if (!healthcareLicenseNo) {
+          Alert.alert("Error", "Healthcare license number is required.");
+          return;
+        }
+        if (!healthcareLicenseFile) {
+          Alert.alert(
+            "Error",
+            "Healthcare license document upload is required."
+          );
+          return;
+        }
+      }
+
+      if (role === "Community Organizer" && !communityOrganizerFile) {
+        Alert.alert(
+          "Error",
+          "Community organizer document upload is required."
+        );
+        return;
+      }
+
+      // Role mapping: "1" for User, "2" for Community Organizer, "3" for Healthcare Provider
+      const roleMapping = {
+        Elderly: 1,
+        "Family / Caregiver / Volunteer": 4,
+        "Community Organizer": 2,
+        "Healthcare Provider": 3,
+      };
+      const roleValue = roleMapping[role];
+
+      const formData = new FormData();
+      formData.append("fullName", fullName);
+      formData.append("phoneNo", phoneNo);
+      formData.append("email", email);
+      formData.append("identityCard", identityCard);
+      formData.append("password", password);
+      formData.append("role", roleValue);
+      formData.append("healthcareLicenseNo", healthcareLicenseNo);
+      formData.append("identityCardFile", {
+        uri: identityCardFile.assets[0].uri,
+        name: identityCardFile.assets[0].name || "identityCard",
+        type: identityCardFile.type,
+      });
+
+      if (role === "Healthcare Provider" && healthcareLicenseFile) {
+        formData.append("healthcareLicenseFile", {
+          uri: healthcareLicenseFile.assets[0].uri,
+          name: healthcareLicenseFile.name || "healthcare_license",
+          type: healthcareLicenseFile.type,
+        });
+      }
+      if (role === "Community Organizer" && communityOrganizerFile) {
+        formData.append("communityOrganizerFile", {
+          uri: communityOrganizerFile.assets[0].uri,
+          name: communityOrganizerFile.name || "community_organizer",
+          type: communityOrganizerFile.mimeType || "application/octet-stream",
+        });
+      }
+
+      try {
+        const response = await axios.post(
+          "http://localhost:5001/api/auth/register",
+          formData,
+          {
+            headers: { "Content-Type": "multipart/form-data" },
+          }
+        );
+        console.log(response);
+        Alert.alert("Success", "You are registered successfully!", [
+          { text: "OK", onPress: () => navigation.navigate("LoginPage") },
+        ]);
+      } catch (error) {
+        Alert.alert("Error", "Failed to register. Please try again.");
+        console.log("Registration error:", error);
+      }
+    }
   };
 
   const handleRoleChange = (selectedRole) => {
@@ -325,7 +323,10 @@ const RegisterPage = () => {
                   style={styles.icon}
                 />
                 <TextInput
-                  style={styles.input}
+                  style={[
+                    styles.input,
+                    invalidFields.fullName && styles.invalidInput,
+                  ]}
                   placeholder="Full name"
                   value={fullName}
                   onChangeText={setFullName}
@@ -343,7 +344,10 @@ const RegisterPage = () => {
                   style={styles.icon}
                 />
                 <TextInput
-                  style={styles.input}
+                  style={[
+                    styles.input,
+                    invalidFields.phoneNo && styles.invalidInput,
+                  ]}
                   placeholder="Phone No (Eg. 0123456789)"
                   value={phoneNo}
                   onChangeText={setPhoneNo}
@@ -359,7 +363,10 @@ const RegisterPage = () => {
                   style={styles.icon}
                 />
                 <TextInput
-                  style={styles.input}
+                  style={[
+                    styles.input,
+                    invalidFields.email && styles.invalidInput,
+                  ]}
                   placeholder="Email Address"
                   value={email}
                   onChangeText={setEmail}
@@ -375,7 +382,10 @@ const RegisterPage = () => {
                   style={styles.icon}
                 />
                 <TextInput
-                  style={styles.input}
+                  style={[
+                    styles.input,
+                    invalidFields.identityCard && styles.invalidInput,
+                  ]}
                   placeholder="Identity Card Number"
                   value={identityCard}
                   onChangeText={setIdentityCard}
@@ -391,8 +401,7 @@ const RegisterPage = () => {
                 onPress={() =>
                   handleFileSelection(
                     setIdentityCardFile,
-                    setIdentityCardFileName,
-                    "identityCard"
+                    setIdentityCardFileName
                   )
                 }
               >
@@ -425,7 +434,10 @@ const RegisterPage = () => {
                   style={styles.icon}
                 />
                 <TextInput
-                  style={styles.input}
+                  style={[
+                    styles.input,
+                    invalidFields.password && styles.invalidInput,
+                  ]}
                   placeholder="Password"
                   value={password}
                   onChangeText={setPassword}
@@ -452,7 +464,10 @@ const RegisterPage = () => {
                   style={styles.icon}
                 />
                 <TextInput
-                  style={styles.input}
+                  style={[
+                    styles.input,
+                    invalidFields.confirmPassword && styles.invalidInput,
+                  ]}
                   placeholder="Confirm Password"
                   value={confirmPassword}
                   onChangeText={setConfirmPassword}
@@ -530,7 +545,10 @@ const RegisterPage = () => {
                     style={styles.icon}
                   />
                   <TextInput
-                    style={styles.input}
+                    style={[
+                      styles.input,
+                      invalidFields.healthcareLicenseNo && styles.invalidInput,
+                    ]}
                     placeholder="Healthcare License Number"
                     value={healthcareLicenseNo}
                     onChangeText={setHealthcareLicenseNo}
@@ -542,8 +560,7 @@ const RegisterPage = () => {
                   onPress={() =>
                     handleFileSelection(
                       setHealthcareLicenseFile,
-                      setHealthcareLicenseFileName,
-                      "healthcareLicense"
+                      setHealthcareLicenseFileName
                     )
                   }
                 >
@@ -576,8 +593,7 @@ const RegisterPage = () => {
                   onPress={() =>
                     handleFileSelection(
                       setCommunityOrganizerFile,
-                      setCommunityOrganizerFileName,
-                      "communityOrganizer"
+                      setCommunityOrganizerFileName
                     )
                   }
                 >

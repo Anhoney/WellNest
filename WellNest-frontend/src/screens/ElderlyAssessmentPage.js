@@ -71,17 +71,17 @@ const ElderlyAssessmentPage = () => {
         <ScrollView contentContainerStyle={styles.assessmentList}>
           <AssessmentItem
             title="Activities of Daily Living (ADLs)"
-            imageSrc={require("./path_to_ADLs_image.png")}
+            // imageSrc={require("./path_to_ADLs_image.png")}
             onPress={() => startAssessment("ADLs")}
           />
           <AssessmentItem
             title="Instrumental Activities of Daily Living (IADLs)"
-            imageSrc={require("./path_to_IADLs_image.png")}
+            // imageSrc={require("./path_to_IADLs_image.png")}
             onPress={() => startAssessment("IADLs")}
           />
           <AssessmentItem
             title="Social and Emotional Wellbeing Assessment"
-            imageSrc={require("./path_to_Wellbeing_image.png")}
+            // imageSrc={require("./path_to_Wellbeing_image.png")}
             onPress={() => startAssessment("Wellbeing")}
           />
         </ScrollView>

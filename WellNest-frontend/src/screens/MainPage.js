@@ -1,5 +1,5 @@
 //MainPage.js
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -12,9 +12,25 @@ import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons"; // Make sure you have Ionicons installed
 import styles from "../components/styles"; // Assuming you have your styles.js setup
 import NavigationBar from "../components/NavigationBar"; // Import here
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const MainPage = ({ userName = "John Doe", medicineReminder }) => {
+const MainPage = ({ medicineReminder }) => {
+  const [userName, setUserName] = useState("");
   const navigation = useNavigation();
+
+  useEffect(() => {
+    const fetchUserName = async () => {
+      try {
+        const fullName = await AsyncStorage.getItem("full_name"); // Assuming you store it in AsyncStorage
+        console.log(fullName);
+        setUserName(fullName || "User"); // Fallback to "User" if not found
+      } catch (error) {
+        console.error("Failed to fetch full name:", error);
+      }
+    };
+
+    fetchUserName();
+  }, []);
 
   return (
     <ImageBackground
@@ -158,7 +174,7 @@ const MainPage = ({ userName = "John Doe", medicineReminder }) => {
             <Text style={styles.sectionTitle}>Wellness</Text>
             <View style={styles.moduleRow}>
               <TouchableOpacity
-                onPress={() => navigation.navigate("ElderlyAssessment")}
+                onPress={() => navigation.navigate("ElderlyAssessmentPage")}
               >
                 <Image
                   source={require("../../assets/ElderlyAssessment.png")}

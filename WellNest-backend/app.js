@@ -59,12 +59,15 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const authRoutes = require("./routes/authRoutes");
 const registerRoute = require("./routes/registerRoute");
+const appointmentsRoute = require("./routes/appointmentsRoute");
+// const usersRoute = require("./routes/usersRoute");
 
 require("dotenv").config();
 
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
+app.use(express.json());
 
 // Basic home route for testing
 app.get("/", (req, res) => {
@@ -75,6 +78,10 @@ app.get("/", (req, res) => {
 app.use("/api/auth", registerRoute);
 
 app.use("/api/auth", authRoutes);
+
+app.use("/api", appointmentsRoute);
+
+// app.use("/api", usersRoute);
 
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, "0.0.0.0", () => {

@@ -16,10 +16,26 @@ const loginUser = async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(403).json({ error: "Invalid password" });
 
-    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
-      expiresIn: "1h",
+    // Create a JWT token with the user's ID and role
+    const token = jwt.sign(
+      { id: user.id, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
+
+    // Return token and role
+    res.json({
+      message: "Login successful",
+      token,
+      role: user.role,
+      full_name: user.full_name,
     });
-    res.json({ message: "Login successful", token });
+
+    // const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
+    //   expiresIn: "1h",
+    // });
+
+    // res.json({ message: "Login successful", token });
   } catch (error) {
     res.status(500).json({ error: "Server error" });
   }
