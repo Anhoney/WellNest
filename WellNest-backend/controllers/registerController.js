@@ -16,22 +16,6 @@ const upload = multer({ storage }).fields([
   { name: "communityOrganizerFile", maxCount: 1 },
 ]);
 
-// Configure Multer for file storage
-// const storage = multer.diskStorage({
-//   destination: (req, file, cb) => {
-//     cb(null, "uploads/"); // Directory where files will be stored
-//   },
-//   filename: (req, file, cb) => {
-//     cb(null, Date.now() + path.extname(file.originalname)); // File name with timestamp to prevent duplicates
-//   },
-// });
-
-// const upload = multer({ storage: storage }).fields([
-//   { name: "identityCardImage", maxCount: 1 },
-//   { name: "healthcareLicenseDocument", maxCount: 1 },
-//   { name: "communityOrganizerDocument", maxCount: 1 },
-// ]);
-
 const registerUser = async (req, res) => {
   console.log(req.files); // Check the file upload
 

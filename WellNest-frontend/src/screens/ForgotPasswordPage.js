@@ -13,6 +13,7 @@ import {
 import styles from "../components/styles"; // Import shared styles
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useNavigation } from "@react-navigation/native";
+import API_BASE_URL from "../../config/config";
 
 const ForgotPasswordPage = () => {
   const [phoneNo, setPhoneNo] = useState("");
@@ -131,7 +132,7 @@ export default ForgotPasswordPage;
 //   const handleSendOtp = async () => {
 //     try {
 //       const response = await axios.post(
-//         "http://localhost:5001/api/forgot-password/send-otp",
+//         "`${API_BASE_URL}/forgot-password/send-otp",
 //         { phoneNo }
 //       );
 //       Alert.alert("Success", response.data.message);
@@ -152,7 +153,7 @@ export default ForgotPasswordPage;
 //   const handleSubmit = async () => {
 //     try {
 //       const response = await axios.post(
-//         "http://localhost:5001/api/forgot-password/verify-otp",
+//         "`${API_BASE_URL}/forgot-password/verify-otp",
 //         {
 //           phoneNo,
 //           otp,

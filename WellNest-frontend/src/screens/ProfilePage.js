@@ -13,6 +13,7 @@ import { Ionicons } from "@expo/vector-icons"; // For icons
 import { useNavigation } from "@react-navigation/native";
 import NavigationBar from "../components/NavigationBar"; // Import here
 import styles from "../components/styles"; // Import shared styles
+import API_BASE_URL from "../../config/config";
 
 const ProfilePage = () => {
   const [profileImage, setProfileImage] = useState(null);

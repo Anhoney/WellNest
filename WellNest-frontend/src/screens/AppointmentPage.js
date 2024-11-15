@@ -14,7 +14,7 @@ import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import DateTimePickerModal from "react-native-modal-datetime-picker"; // Ensure this is imported
 import NavigationBar from "../components/NavigationBar"; // Import your custom navigation bar component
-
+import API_BASE_URL from "../../config/config";
 const AppointmentPage = () => {
   const navigation = useNavigation();
   const [date, setDate] = useState(new Date());

@@ -17,6 +17,7 @@ import { RadioButton } from "react-native-paper"; // For the radio button
 import HpNavigationBar from "../../components/HpNavigationBar"; // Import your custom navigation bar component
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import API_BASE_URL from "../../../config/config";
 
 const HpAppointmentEditPage = () => {
   const [description, setDescription] = useState("");
@@ -44,7 +45,7 @@ const HpAppointmentEditPage = () => {
         const token = await AsyncStorage.getItem("token");
         console.log("Token:", token); // Log the token to verify it's correct
         const response = await axios.get(
-          `http://localhost:5001/api/appointments/${appointmentId}`,
+          `${API_BASE_URL}/appointments/${appointmentId}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -82,7 +83,7 @@ const HpAppointmentEditPage = () => {
       }
 
       const response = await axios.put(
-        `http://localhost:5001/api/appointments/${appointmentId}`,
+        `${API_BASE_URL}/appointments/${appointmentId}`,
         {
           description,
           location,

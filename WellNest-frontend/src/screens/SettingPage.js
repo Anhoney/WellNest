@@ -1,5 +1,5 @@
 // import React from "react";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import {
   View,
   Text,
@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   ScrollView,
   ImageBackground,
+  Alert,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import Ionicons from "react-native-vector-icons/Ionicons";
@@ -15,8 +16,11 @@ import styles from "../components/styles"; // Import shared styles
 import NavigationBar from "../components/NavigationBar"; // Import here
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import API_BASE_URL from "../../config/config";
+import { AuthContext } from "../../context/AuthProvider";
 
 const SettingPage = () => {
+  const { logout } = useContext(AuthContext); // Get logout from AuthContext
   const [profileImage, setProfileImage] = useState(null);
   const navigation = useNavigation();
 
@@ -33,20 +37,43 @@ const SettingPage = () => {
     }
   };
 
-  // Sign Out Function
-  const handleSignOut = async () => {
-    try {
-      // Remove token from AsyncStorage
-      await AsyncStorage.removeItem("authToken");
-      // Navigate back to the login page
-      navigation.reset({
-        index: 0,
-        routes: [{ name: "LoginPage" }],
-      });
-    } catch (error) {
-      console.error("Error signing out:", error);
-    }
+  const handleSignOut = () => {
+    Alert.alert(
+      "Confirm Sign Out",
+      "Are you sure you want to log out?",
+      [
+        {
+          text: "Cancel", // User cancels
+          style: "cancel",
+        },
+        {
+          text: "Yes", // User confirms
+          onPress: async () => {
+            try {
+              await logout(navigation); // Log out function from AuthContext
+            } catch (error) {
+              console.error("Error signing out:", error);
+            }
+          },
+        },
+      ],
+      { cancelable: false } // Prevent closing the alert by tapping outside
+    );
   };
+  // Sign Out Function
+  // const handleSignOut = async () => {
+  //   try {
+  //     // Remove token from AsyncStorage
+  //     await AsyncStorage.removeItem("authToken");
+  //     // Navigate back to the login page
+  //     navigation.reset({
+  //       index: 0,
+  //       routes: [{ name: "LoginPage" }],
+  //     });
+  //   } catch (error) {
+  //     console.error("Error signing out:", error);
+  //   }
+  // };
 
   return (
     <ImageBackground

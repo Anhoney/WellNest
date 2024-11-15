@@ -60,6 +60,7 @@ const cors = require("cors");
 const authRoutes = require("./routes/authRoutes");
 const registerRoute = require("./routes/registerRoute");
 const appointmentsRoute = require("./routes/appointmentsRoute");
+const profileRoutes = require("./routes/profileRoutes");
 // const usersRoute = require("./routes/usersRoute");
 
 require("dotenv").config();
@@ -80,6 +81,8 @@ app.use("/api/auth", registerRoute);
 app.use("/api/auth", authRoutes);
 
 app.use("/api", appointmentsRoute);
+
+app.use("/api", profileRoutes);
 
 // app.use("/api", usersRoute);
 

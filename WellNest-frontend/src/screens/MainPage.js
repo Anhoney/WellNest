@@ -13,6 +13,7 @@ import { Ionicons } from "@expo/vector-icons"; // Make sure you have Ionicons in
 import styles from "../components/styles"; // Assuming you have your styles.js setup
 import NavigationBar from "../components/NavigationBar"; // Import here
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import API_BASE_URL from "../../config/config";
 
 const MainPage = ({ medicineReminder }) => {
   const [userName, setUserName] = useState("");

@@ -18,6 +18,7 @@ import { SafeAreaView } from "react-native-safe-area-context"; // Import SafeAre
 import axios from "axios";
 import * as DocumentPicker from "expo-document-picker"; // Import DocumentPicker
 import * as ImagePicker from "react-native-image-picker";
+import API_BASE_URL from "../../config/config";
 
 const MedicationReminderPage = () => {
   const navigation = useNavigation();
@@ -59,7 +60,7 @@ const MedicationReminderPage = () => {
 
     try {
       const response = await axios.put(
-        "http://localhost:5001/api/update-identity-card/2",
+        `${API_BASE_URL}/update-identity-card/2`,
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },

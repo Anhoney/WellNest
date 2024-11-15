@@ -16,6 +16,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import jwt_decode from "jwt-decode";
 import styles from "../../components/styles"; // Import shared styles
 import HpNavigationBar from "../../components/HpNavigationBar"; // Import your custom navigation bar component
+import API_BASE_URL from "../../../config/config";
 
 const HpMyCreatedAppointments = () => {
   const [appointments, setAppointments] = useState([]);
@@ -59,7 +60,7 @@ const HpMyCreatedAppointments = () => {
       }
 
       const response = await axios.get(
-        `http://localhost:5001/api/appointments/user/${userId}`,
+        `${API_BASE_URL}/appointments/user/${userId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -81,7 +82,7 @@ const HpMyCreatedAppointments = () => {
         return;
       }
 
-      await axios.delete(`http://localhost:5001/api/appointments/${id}`, {
+      await axios.delete(`${API_BASE_URL}/appointments/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       Alert.alert("Deleted", "Appointment deleted successfully");

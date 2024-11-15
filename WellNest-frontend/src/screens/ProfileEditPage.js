@@ -18,6 +18,7 @@ import { useNavigation } from "@react-navigation/native";
 import NavigationBar from "../components/NavigationBar"; // Import here
 import styles from "../components/styles"; // Import shared styles
 import { RadioButton } from "react-native-paper"; // For the radio button
+import API_BASE_URL from "../../config/config";
 
 const ProfileEditPage = () => {
   const [profileImage, setProfileImage] = useState(null);
@@ -439,58 +440,5 @@ const ProfileEditPage = () => {
     </ImageBackground>
   );
 };
-
-// const styles = StyleSheet.create({
-//   container: { padding: 20, backgroundColor: "#F5F5F5" },
-//   title: {
-//     fontSize: 24,
-//     fontWeight: "bold",
-//     textAlign: "center",
-//     marginVertical: 10,
-//   },
-//   imageContainer: { alignItems: "center", marginBottom: 20 },
-//   profileImage: { width: 100, height: 100, borderRadius: 50 },
-//   changePictureText: { color: "gray", marginTop: 5 },
-//   fieldContainer: {
-//     backgroundColor: "#fff",
-//     padding: 10,
-//     borderRadius: 10,
-//     marginBottom: 10,
-//   },
-//   input: {
-//     borderWidth: 1,
-//     borderColor: "#ddd",
-//     borderRadius: 5,
-//     padding: 8,
-//     marginBottom: 10,
-//   },
-//   dateInput: {
-//     padding: 10,
-//     borderWidth: 1,
-//     borderColor: "#ddd",
-//     borderRadius: 5,
-//     backgroundColor: "#f9f9f9",
-//   },
-//   radioContainer: {
-//     flexDirection: "row",
-//     justifyContent: "space-around",
-//     marginBottom: 10,
-//   },
-//   updateButton: {
-//     backgroundColor: "#F1A55C",
-//     padding: 10,
-//     borderRadius: 5,
-//     alignItems: "center",
-//   },
-//   updateButtonText: { color: "#fff", fontWeight: "bold" },
-//   cancelButton: {
-//     backgroundColor: "#ccc",
-//     padding: 10,
-//     borderRadius: 5,
-//     alignItems: "center",
-//     marginTop: 10,
-//   },
-//   cancelButtonText: { color: "#333" },
-// });
 
 export default ProfileEditPage;

@@ -24,6 +24,7 @@ const HealthcareProviderMainPage = ({}) => {
       try {
         const fullName = await AsyncStorage.getItem("full_name"); // Assuming you store it in AsyncStorage
         setUserName(fullName || "User"); // Fallback to "User" if not found
+        console.log("Full Name:", fullName);
       } catch (error) {
         console.error("Failed to fetch full name:", error);
       }

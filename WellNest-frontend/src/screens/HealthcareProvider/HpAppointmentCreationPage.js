@@ -21,6 +21,7 @@ import {
   validateFields,
   getInputStyle,
 } from "../../components/validationUtils"; // Import validation functions
+import API_BASE_URL from "../../../config/config";
 
 const HpAppointmentCreationPage = () => {
   const [description, setDescription] = useState("");
@@ -124,7 +125,7 @@ const HpAppointmentCreationPage = () => {
       }
 
       const response = await axios.post(
-        "http://localhost:5001/api/appointments",
+        `${API_BASE_URL}/appointments`,
         {
           description,
           location,

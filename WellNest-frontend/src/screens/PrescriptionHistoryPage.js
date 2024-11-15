@@ -14,6 +14,7 @@ import { useNavigation } from "@react-navigation/native";
 import styles from "../components/styles"; // Import shared styles
 import { Ionicons } from "@expo/vector-icons"; // Import icons from Expo
 import Icon from "react-native-vector-icons/FontAwesome";
+import API_BASE_URL from "../../config/config";
 
 const PrescriptionHistoryPage = () => {
   const [prescriptions, setPrescriptions] = useState([]);

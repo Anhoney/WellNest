@@ -5,6 +5,7 @@ import React, { useState, useEffect } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { AuthProvider } from "./context/AuthProvider";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // Import your screens
@@ -88,96 +89,98 @@ const Tab = createBottomTabNavigator();
 
 export default function App() {
   return (
-    <NavigationContainer>
-      <Stack.Navigator
-        initialRouteName="FirstPage"
-        screenOptions={{ headerShown: false }}
-      >
-        <Stack.Screen name="FirstPage" component={FirstPage} />
-        <Stack.Screen name="LoginPage" component={LoginPage} />
-        <Stack.Screen name="ForgotPassword" component={ForgotPasswordPage} />
-        <Stack.Screen name="Register" component={RegisterPage} />
-        <Stack.Screen
-          name="MainPage"
-          component={MainPage}
-          options={{ title: "Home" }}
-        />
-        <Stack.Screen
-          name="AppointmentBooking"
-          component={AppointmentPage}
-          options={{ title: "Book Appointment" }}
-        />
-        <Stack.Screen
-          name="VirtualConsultation"
-          component={VirtualConsultationPage}
-          options={{ title: "Virtual Consultation" }}
-        />
-        <Stack.Screen
-          name="Prescription"
-          component={PrescriptionHistoryPage}
-          options={{ title: "Prescription" }}
-        />
-        <Stack.Screen
-          name="ProfilePage"
-          component={ProfilePage}
-          options={{ title: "Account" }}
-        />
-        <Stack.Screen
-          name="SettingPage"
-          component={SettingPage}
-          options={{ title: "Setting" }}
-        />
-        <Stack.Screen
-          name="ProfileEditPage"
-          component={ProfileEditPage}
-          options={{ title: "ProfileEdit" }}
-        />
-        <Stack.Screen
-          name="MedicationReminderPage"
-          component={MedicationReminderPage}
-          options={{ title: "MedicationReminder" }}
-        />
-        <Stack.Screen
-          name="ElderlyAssessmentPage"
-          component={ElderlyAssessmentPage}
-          options={{ title: "ElderlyAssessment" }}
-        />
-        <Stack.Screen
-          name="HealthcareProviderMainPage"
-          component={HealthcareProviderMainPage}
-          options={{ title: "HealthcareProvider" }}
-        />
-        <Stack.Screen
-          name="HpAppointmentManagementPage"
-          component={HpAppointmentManagementPage}
-          options={{ title: "AppointmentManagement" }}
-        />
-        <Stack.Screen
-          name="HpAppointmentCreationPage"
-          component={HpAppointmentCreationPage}
-          options={{ title: "AppointmentCreation" }}
-        />
-        <Stack.Screen
-          name="HpMyCreatedAppointments"
-          component={HpMyCreatedAppointments}
-          options={{ title: "MyCreatedAppointments" }}
-        />
-        <Stack.Screen
-          name="HpAppointmentEditPage"
-          component={HpAppointmentEditPage}
-          options={{ title: "AppointmentEditPage" }}
-        />
-        <Stack.Screen
-          name="HpProfilePage"
-          component={HpProfilePage}
-          options={{ title: "HpProfilePage" }}
-        />
-        <Stack.Screen
-          name="HpEditProfilePage"
-          component={HpEditProfilePage}
-          options={{ title: "HpEditProfilePage" }}
-        />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <AuthProvider>
+      <NavigationContainer>
+        <Stack.Navigator
+          initialRouteName="FirstPage"
+          screenOptions={{ headerShown: false }}
+        >
+          <Stack.Screen name="FirstPage" component={FirstPage} />
+          <Stack.Screen name="LoginPage" component={LoginPage} />
+          <Stack.Screen name="ForgotPassword" component={ForgotPasswordPage} />
+          <Stack.Screen name="Register" component={RegisterPage} />
+          <Stack.Screen
+            name="MainPage"
+            component={MainPage}
+            options={{ title: "Home" }}
+          />
+          <Stack.Screen
+            name="AppointmentBooking"
+            component={AppointmentPage}
+            options={{ title: "Book Appointment" }}
+          />
+          <Stack.Screen
+            name="VirtualConsultation"
+            component={VirtualConsultationPage}
+            options={{ title: "Virtual Consultation" }}
+          />
+          <Stack.Screen
+            name="Prescription"
+            component={PrescriptionHistoryPage}
+            options={{ title: "Prescription" }}
+          />
+          <Stack.Screen
+            name="ProfilePage"
+            component={ProfilePage}
+            options={{ title: "Account" }}
+          />
+          <Stack.Screen
+            name="SettingPage"
+            component={SettingPage}
+            options={{ title: "Setting" }}
+          />
+          <Stack.Screen
+            name="ProfileEditPage"
+            component={ProfileEditPage}
+            options={{ title: "ProfileEdit" }}
+          />
+          <Stack.Screen
+            name="MedicationReminderPage"
+            component={MedicationReminderPage}
+            options={{ title: "MedicationReminder" }}
+          />
+          <Stack.Screen
+            name="ElderlyAssessmentPage"
+            component={ElderlyAssessmentPage}
+            options={{ title: "ElderlyAssessment" }}
+          />
+          <Stack.Screen
+            name="HealthcareProviderMainPage"
+            component={HealthcareProviderMainPage}
+            options={{ title: "HealthcareProvider" }}
+          />
+          <Stack.Screen
+            name="HpAppointmentManagementPage"
+            component={HpAppointmentManagementPage}
+            options={{ title: "AppointmentManagement" }}
+          />
+          <Stack.Screen
+            name="HpAppointmentCreationPage"
+            component={HpAppointmentCreationPage}
+            options={{ title: "AppointmentCreation" }}
+          />
+          <Stack.Screen
+            name="HpMyCreatedAppointments"
+            component={HpMyCreatedAppointments}
+            options={{ title: "MyCreatedAppointments" }}
+          />
+          <Stack.Screen
+            name="HpAppointmentEditPage"
+            component={HpAppointmentEditPage}
+            options={{ title: "AppointmentEditPage" }}
+          />
+          <Stack.Screen
+            name="HpProfilePage"
+            component={HpProfilePage}
+            options={{ title: "HpProfilePage" }}
+          />
+          <Stack.Screen
+            name="HpEditProfilePage"
+            component={HpEditProfilePage}
+            options={{ title: "HpEditProfilePage" }}
+          />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </AuthProvider>
   );
 }

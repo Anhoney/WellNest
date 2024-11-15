@@ -19,6 +19,7 @@ import { RadioButton } from "react-native-paper"; // For the radio button
 import { SafeAreaView } from "react-native-safe-area-context"; // Import SafeAreaView for iOS
 import axios from "axios";
 import * as DocumentPicker from "expo-document-picker"; // Import DocumentPicker
+import API_BASE_URL from "../../config/config";
 
 const RegisterPage = () => {
   const [role, setRole] = useState("Elderly");
@@ -53,7 +54,7 @@ const RegisterPage = () => {
 
   const validatePassword = (password) => {
     // Ensure password is at least 6 characters and contains both numbers and letters
-    const isValidLength = password.length > 8;
+    const isValidLength = password.length > 7;
     const hasLetters = /[A-Za-z]/.test(password);
     const hasNumbers = /[0-9]/.test(password);
     return isValidLength && hasLetters && hasNumbers;
@@ -146,7 +147,7 @@ const RegisterPage = () => {
       //   "Password must be more than 6 characters long and contain both letters and numbers."
       // );
       specificErrors.push(
-        "Password must be more than 6 characters long and include a mix of letters, numbers, and symbols."
+        "Password must be more than 8 characters long and include a mix of letters, numbers, and symbols."
       );
     } else {
       updatedInvalidFields.password = false;
@@ -263,7 +264,7 @@ const RegisterPage = () => {
 
       try {
         const response = await axios.post(
-          "http://localhost:5001/api/auth/register",
+          `${API_BASE_URL}/auth/register`,
           formData,
           {
             headers: { "Content-Type": "multipart/form-data" },
