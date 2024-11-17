@@ -1,297 +1,3 @@
-// // HpEditProfilePage.js
-// import React, { useState, useEffect } from "react";
-// import {
-//   View,
-//   Text,
-//   TextInput,
-//   TouchableOpacity,
-//   Image,
-//   ScrollView,
-//   ImageBackground,
-// } from "react-native";
-// import * as ImagePicker from "expo-image-picker";
-// import { Ionicons } from "@expo/vector-icons"; // For icons
-// import axios from "axios";
-// import styles from "../../components/styles"; // Your style file
-
-// const HpEditProfilePage = ({ navigation, userId }) => {
-//   const [profileData, setProfileData] = useState({
-//     username: "",
-//     age: "",
-//     gender: "",
-//     identificationCardNumber: "",
-//     dateOfBirth: "",
-//     phoneNumber: "",
-//     email: "",
-//     address: "",
-//     emergencyContact: "",
-//     summary: "",
-//     education: "",
-//     credentials: "",
-//     languages: "",
-//     services: "",
-//     businessHours: "",
-//     businessDays: "",
-//     experience: "",
-//     specialist: "",
-//     hospital: "",
-//   });
-//   const [profileImage, setProfileImage] = useState(null);
-
-//   useEffect(() => {
-//     // Fetch existing profile data
-//     axios
-//       .get(`http://localhost:5000/api/hp-profile/${userId}`)
-//       .then((response) => setProfileData(response.data))
-//       .catch((error) => console.error(error));
-//   }, []);
-
-//   const handleInputChange = (field, value) => {
-//     setProfileData({ ...profileData, [field]: value });
-//   };
-
-//   const pickImage = async () => {
-//     let result = await ImagePicker.launchImageLibraryAsync({
-//       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-//       allowsEditing: true,
-//       aspect: [1, 1],
-//       quality: 1,
-//     });
-
-//     if (!result.cancelled) {
-//       setProfileImage(result.uri);
-//     }
-//   };
-
-//   const saveProfile = async () => {
-//     try {
-//       const formData = new FormData();
-//       if (profileImage) {
-//         const fileName = profileImage.split("/").pop();
-//         const fileType = profileImage.substring(
-//           profileImage.lastIndexOf(".") + 1
-//         );
-//         formData.append("profileImage", {
-//           uri: profileImage,
-//           name: fileName,
-//           type: `image/${fileType}`,
-//         });
-//       }
-
-//       formData.append("profileData", JSON.stringify(profileData));
-
-//       await axios.put(
-//         `http://localhost:5000/api/hp-profile/${userId}`,
-//         formData,
-//         {
-//           headers: { "Content-Type": "multipart/form-data" },
-//         }
-//       );
-
-//       alert("Profile updated successfully");
-//     } catch (error) {
-//       console.error("Failed to save profile:", error);
-//     }
-//   };
-
-//   return (
-//     <ImageBackground
-//       source={require("../../../assets/MainPage.png")}
-//       style={styles.background}
-//     >
-//       <View style={styles.smallHeaderContainer}>
-//         <TouchableOpacity
-//           onPress={() => navigation.goBack()}
-//           style={styles.backButton}
-//         >
-//           <Ionicons name="chevron-back" size={24} color="#000" />
-//         </TouchableOpacity>
-//         <Text style={styles.title}>Edit Profile</Text>
-//       </View>
-//       <ScrollView contentContainerStyle={styles.contentContainer}>
-//         <TouchableOpacity onPress={pickImage} style={styles.imageContainer}>
-//           {profileImage ? (
-//             <Image source={{ uri: profileImage }} style={styles.profileImage} />
-//           ) : (
-//             <Text>Change Picture</Text>
-//           )}
-//         </TouchableOpacity>
-
-//         {/* Render input fields */}
-//         {Object.keys(profileData).map((key) => (
-//           <TextInput
-//             key={key}
-//             placeholder={key.replace(/([A-Z])/g, " $1").toUpperCase()}
-//             style={styles.input}
-//             value={profileData[key]}
-//             onChangeText={(text) => handleInputChange(key, text)}
-//           />
-//         ))}
-
-//         <TouchableOpacity onPress={saveProfile} style={styles.saveButton}>
-//           <Text style={styles.saveButtonText}>Save Profile</Text>
-//         </TouchableOpacity>
-//       </ScrollView>
-//     </ImageBackground>
-//   );
-// };
-
-// export default HpEditProfilePage;
-
-//second version
-// import React, { useState, useEffect } from "react";
-// import {
-//   View,
-//   Text,
-//   TextInput,
-//   Image,
-//   TouchableOpacity,
-//   ScrollView,
-//   ImageBackground,
-// } from "react-native";
-// import * as ImagePicker from "expo-image-picker";
-// import { Ionicons } from "@expo/vector-icons";
-// import axios from "axios";
-// import styles from "../../components/styles"; // Adjusted import path for shared styles
-
-// const HpEditProfilePage = ({ navigation, userId }) => {
-//   const [profileData, setProfileData] = useState({
-//     username: "",
-//     age: "",
-//     gender: "",
-//     identificationCardNumber: "",
-//     dateOfBirth: "",
-//     phoneNumber: "",
-//     email: "",
-//     address: "",
-//     emergencyContact: "",
-//     summary: "",
-//     education: "",
-//     credentials: "",
-//     languages: "",
-//     services: "",
-//     businessHours: "",
-//     businessDays: "",
-//     experience: "",
-//     specialist: "",
-//     hospital: "",
-//   });
-//   const [profileImage, setProfileImage] = useState(null);
-
-//   useEffect(() => {
-//     axios
-//       .get(`http://localhost:5000/api/hp-profile/${userId}`)
-//       .then((response) => setProfileData(response.data))
-//       .catch((error) => console.error(error));
-//   }, [userId]);
-
-//   const handleInputChange = (field, value) => {
-//     setProfileData({ ...profileData, [field]: value });
-//   };
-
-//   const pickImage = async () => {
-//     const result = await ImagePicker.launchImageLibraryAsync({
-//       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-//       allowsEditing: true,
-//       aspect: [1, 1],
-//       quality: 1,
-//     });
-
-//     if (!result.cancelled) {
-//       setProfileImage(result.uri);
-//     }
-//   };
-
-//   const saveProfile = async () => {
-//     try {
-//       const formData = new FormData();
-//       if (profileImage) {
-//         const fileName = profileImage.split("/").pop();
-//         const fileType = profileImage.substring(
-//           profileImage.lastIndexOf(".") + 1
-//         );
-//         formData.append("profileImage", {
-//           uri: profileImage,
-//           name: fileName,
-//           type: `image/${fileType}`,
-//         });
-//       }
-//       formData.append("profileData", JSON.stringify(profileData));
-
-//       await axios.put(
-//         `http://localhost:5000/api/hp-profile/${userId}`,
-//         formData,
-//         {
-//           headers: { "Content-Type": "multipart/form-data" },
-//         }
-//       );
-
-//       alert("Profile updated successfully");
-//     } catch (error) {
-//       console.error("Failed to save profile:", error);
-//     }
-//   };
-
-//   return (
-//     <ImageBackground
-//       source={require("../../../assets/MainPage.png")}
-//       style={styles.background}
-//     >
-//       <View style={styles.smallHeaderContainer}>
-//         <TouchableOpacity
-//           onPress={() => navigation.goBack()}
-//           style={styles.backButton}
-//         >
-//           <Ionicons name="chevron-back" size={24} color="#000" />
-//         </TouchableOpacity>
-//         <Text style={styles.title}>Edit Profile</Text>
-//       </View>
-
-//       <View style={styles.profileContainer}>
-//         <TouchableOpacity onPress={pickImage}>
-//           <Image
-//             source={
-//               profileImage
-//                 ? { uri: profileImage }
-//                 : require("../../../assets/defaultProfile.jpg")
-//             }
-//             style={styles.profileImage}
-//           />
-//         </TouchableOpacity>
-//         <Text style={styles.changePictureText}>Change Picture</Text>
-//       </View>
-
-//       <ScrollView contentContainerStyle={styles.scrollView}>
-//         {Object.keys(profileData).map((key) => (
-//           <View style={styles.fieldContainer} key={key}>
-//             <Text style={styles.fieldLabel}>
-//               {key.replace(/([A-Z])/g, " $1").toUpperCase()}
-//             </Text>
-//             <TextInput
-//               style={styles.input}
-//               placeholder={key.replace(/([A-Z])/g, " $1")}
-//               value={profileData[key]}
-//               onChangeText={(text) => handleInputChange(key, text)}
-//             />
-//           </View>
-//         ))}
-
-//         <TouchableOpacity onPress={saveProfile} style={styles.updateButton}>
-//           <Text style={styles.updateButtonText}>Save Profile</Text>
-//         </TouchableOpacity>
-//         <TouchableOpacity
-//           onPress={() => navigation.goBack()}
-//           style={styles.cancelButton}
-//         >
-//           <Text style={styles.cancelButtonText}>Cancel</Text>
-//         </TouchableOpacity>
-//       </ScrollView>
-//     </ImageBackground>
-//   );
-// };
-
-// export default HpEditProfilePage;
-
 //HpEditProfilePage.js
 import React, { useState, useEffect } from "react";
 import {
@@ -313,6 +19,7 @@ import styles from "../../components/styles";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import jwt_decode from "jwt-decode";
 import API_BASE_URL from "../../../config/config";
+import { Buffer } from "buffer"; // Import Buffer if you're using React Native
 
 const HpEditProfilePage = () => {
   const [profile_image, setProfile_image] = useState(null);
@@ -366,15 +73,22 @@ const HpEditProfilePage = () => {
 
   // Function to handle profile picture change
   const pickImage = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 1,
-    });
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 1,
+      });
 
-    if (!result.cancelled) {
-      setProfile_image(result.uri);
+      if (!result.canceled) {
+        // console.log("Image selected:", result.assets[0].uri);
+        setProfile_image(result.assets[0].uri);
+      } else {
+        console.log("Image selection was cancelled.");
+      }
+    } catch (error) {
+      console.error("Error picking image:", error);
     }
   };
 
@@ -427,7 +141,7 @@ const HpEditProfilePage = () => {
       });
 
       if (response.data) {
-        console.log("Fetched profile data:", response.data);
+        // console.log("Fetched profile data:", response.data);
 
         const data = response.data;
         setUsername(data.username || "");
@@ -452,17 +166,28 @@ const HpEditProfilePage = () => {
         setHospital(data.hospital || "");
         setExperience(data.experience || "");
         setSpecialist(data.specialist || "");
-        setProfile_image(
-          data.profile_image ? `${API_BASE_URL}${data.profile_image}` : null
-        ); // Set image URL
-        setUsername(data.username || "");
-        setAge(data.age ? data.age.toString() : "");
+
+        // Check if profile_image is a Buffer
+        if (data.profile_image && data.profile_image.type === "Buffer") {
+          const byteArray = data.profile_image.data; // Access the data property of the Buffer
+
+          // Use Buffer to convert to Base64
+          const base64String = Buffer.from(byteArray).toString("base64");
+          const imageUri = `data:image/jpeg;base64,${base64String}`;
+          // console.log("Profile Image URI:", imageUri);
+          setProfile_image(imageUri);
+        } else {
+          console.log("No valid profile image found.");
+          setProfile_image(null);
+        }
       }
     } catch (error) {
       console.log("Error fetching profile:", error);
     }
   };
 
+  // Debug log after setting the image URI
+  // console.log("Profile image URI after selection:", profile_image);
   //     fetchProfile();
   //   }, [userId]);
 
@@ -487,8 +212,8 @@ const HpEditProfilePage = () => {
         "date_of_birth",
         date_of_birth.toISOString().split("T")[0]
       );
-      console.log("Identification Card:", identification_card_number);
-      formData.append("identity_card", identification_card_number.toString());
+      // console.log("Identification Card:", identification_card_number);
+      // formData.append("identity_card", identification_card_number.toString());
       formData.append("phone_number", phone_number.toString());
       formData.append("email", email);
       formData.append("address", address);
@@ -518,30 +243,34 @@ const HpEditProfilePage = () => {
       //   // formData.append("profile_image", file);
       //   formData.append("profile_image", { uri, name: filename, type });
       // Add profile image as binary data (send as a file)
-      console.log("profile_image before if statement:", profile_image);
+      const normalizeFilePath = (uri) => {
+        if (uri.startsWith("file://")) {
+          return uri.replace("file://", "");
+        }
+        return uri;
+      };
+
+      // console.log("profile_image before if statement:", profile_image);
       if (profile_image) {
-        const uri = profile_image;
+        // const uri = profile_image;
+        // const uri = profile_image.startsWith("file://")
+        //   ? profile_image
+        //   : `file://${profile_image}`; // Ensure correct URI format
         // const localUri = uri;
+        const uri = normalizeFilePath(profile_image);
         const filename = uri.split("/").pop();
         const type = `image/${filename.split(".").pop()}`;
 
-        console.log("Filename:", filename);
-        // formData.append("profile_image", {
-        //   uri,
-        //   name: filename,
-        //   type,
-        // });
         const file = {
-          // uri: localUri,
-          uri: uri,
+          uri: profile_image,
           name: filename,
           type: type,
         };
+        // console.log("Appending image to FormData:", file);
         formData.append("profile_image", file);
+      } else {
+        console.log("No profile image to upload.");
       }
-
-      // Log the FormData entries here
-      console.log("FormData Entries:", [...formData]);
 
       const response = await axios.put(
         `${API_BASE_URL}/hp-profile/${userId}`,
@@ -552,47 +281,23 @@ const HpEditProfilePage = () => {
             Authorization: `Bearer ${token}`,
           },
         }
-
-        // const response = await axios.put(
-        //   `${API_BASE_URL}/hp-profile/${userId}`,
-        //   {
-        //     username,
-        //     age: parseInt(age, 10),
-        //     gender,
-        //     identification_card_number: identification_card_number.toString(),
-        //     date_of_birth: date_of_birth.toISOString().split("T")[0],
-        //     phone_number: phone_number.toString(),
-        //     email,
-        //     address,
-        //     emergency_contact: emergency_contact.toString(),
-        //     summary,
-        //     education,
-        //     credentials,
-        //     languages,
-        //     services,
-        //     business_hours,
-        //     business_days,
-        //     experience: experience.toString(),
-        //     specialist,
-        //     hospital,
-        //   },
-        //   {
-        //     headers: {
-        //       // "Content-Type": "application/json",
-        //       Authorization: `Bearer ${token}`,
-        //     },
-        //   }
       );
-      console.log("Profile update response:", response.data);
+
+      //Handle response
       if (response.status === 200) {
         alert("Profile updated successfully!");
-        // alert("Profile updated successfully!");
+
+        console.log(
+          "Server response data after profile update:",
+          response.data
+        );
+
         // Optionally, fetch the updated profile image and display it again
         // setProfileImage(response.data.profile_image); // Assuming the API returns the profile image URL
         setProfile_image(
           response.data.profile_image
             ? `${API_BASE_URL}${response.data.profile_image}`
-            : null
+            : profile_image
         ); // Set new image
       }
       // alert("Profile updated successfully!");
@@ -625,9 +330,13 @@ const HpEditProfilePage = () => {
                 : require("../../../assets/defaultProfile.jpg")
             }
             style={styles.profileImage}
+            onError={(error) =>
+              console.log("Image loading error:", error.nativeEvent.error)
+            }
           />
+
+          <Text style={styles.changePictureText}>Change Picture</Text>
         </TouchableOpacity>
-        <Text style={styles.changePictureText}>Change Picture</Text>
       </View>
       <ScrollView contentContainerStyle={styles.scrollView}>
         {/* <TouchableOpacity onPress={pickImage} style={styles.imageContainer}>
@@ -749,7 +458,7 @@ const HpEditProfilePage = () => {
             <TextInput
               placeholder="Identification Card Number"
               value={identification_card_number}
-              onChangeText={setIdentification_card_number}
+              // onChangeText={setIdentification_card_number}
               style={styles.input}
               editable={false} // Make it non-editable
             />
