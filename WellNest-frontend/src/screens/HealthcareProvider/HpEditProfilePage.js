@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   ScrollView,
   ImageBackground,
+  ActivityIndicator, // Import ActivityIndicator for loading state
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { Ionicons } from "@expo/vector-icons";
@@ -46,6 +47,7 @@ const HpEditProfilePage = () => {
   const [userId, setUserId] = useState(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const navigation = useNavigation();
+  const [loading, setLoading] = useState(true); // Loading state
 
   // Get today's date
   const today = new Date();
@@ -128,6 +130,7 @@ const HpEditProfilePage = () => {
 
   //   useEffect(() => {
   const fetchProfile = async (userId) => {
+    setLoading(true); // Start loading
     console.log("fetchuserid", userId);
     try {
       const token = await AsyncStorage.getItem("token");
@@ -144,6 +147,7 @@ const HpEditProfilePage = () => {
         // console.log("Fetched profile data:", response.data);
 
         const data = response.data;
+        // Batch state updates
         setUsername(data.username || "");
         setAge(data.age ? data.age.toString() : "");
         setGender(data.gender || "");
@@ -183,6 +187,8 @@ const HpEditProfilePage = () => {
       }
     } catch (error) {
       console.log("Error fetching profile:", error);
+    } finally {
+      setLoading(false); // End loading
     }
   };
 
@@ -338,8 +344,11 @@ const HpEditProfilePage = () => {
           <Text style={styles.changePictureText}>Change Picture</Text>
         </TouchableOpacity>
       </View>
-      <ScrollView contentContainerStyle={styles.scrollView}>
-        {/* <TouchableOpacity onPress={pickImage} style={styles.imageContainer}>
+      {loading ? ( // Show loading indicator
+        <ActivityIndicator size="large" color="gray" />
+      ) : (
+        <ScrollView contentContainerStyle={styles.scrollView}>
+          {/* <TouchableOpacity onPress={pickImage} style={styles.imageContainer}>
           {profileImage ? (
             <Image source={{ uri: profileImage }} style={styles.profileImage} />
           ) : (
@@ -347,71 +356,71 @@ const HpEditProfilePage = () => {
           )}
         </TouchableOpacity> */}
 
-        <View style={styles.container}>
-          <Text style={styles.question}>Username</Text>
-          <View style={styles.underline} />
-          <View style={styles.inputContainer}>
-            {/* Input Fields */}
-            <TextInput
-              placeholder="Username"
-              value={username}
-              onChangeText={setUsername}
-              style={styles.input}
-            />
-          </View>
+          <View style={styles.container}>
+            <Text style={styles.question}>Username</Text>
+            <View style={styles.underline} />
+            <View style={styles.inputContainer}>
+              {/* Input Fields */}
+              <TextInput
+                placeholder="Username"
+                value={username}
+                onChangeText={setUsername}
+                style={styles.input}
+              />
+            </View>
 
-          <Text style={styles.question}>Age</Text>
+            <Text style={styles.question}>Age</Text>
+            <View style={styles.underline} />
+            <View style={styles.inputContainer}>
+              <TextInput
+                placeholder="Age"
+                value={age}
+                onChangeText={(text) => setAge(text)}
+                style={styles.input}
+                keyboardType="numeric"
+              />
+            </View>
+          </View>
+          {/* Gender Radio Button */}
+          <Text style={styles.question}>Gender</Text>
           <View style={styles.underline} />
-          <View style={styles.inputContainer}>
-            <TextInput
-              placeholder="Age"
-              value={age}
-              onChangeText={(text) => setAge(text)}
-              style={styles.input}
-              keyboardType="numeric"
-            />
-          </View>
-        </View>
-        {/* Gender Radio Button */}
-        <Text style={styles.question}>Gender</Text>
-        <View style={styles.underline} />
-        <RadioButton.Group onValueChange={setGender} value={gender}>
-          <View style={styles.genderRadioButtonContainer}>
-            <RadioButton.Item
-              label="Male"
-              value="Male"
-              mode="android"
-              position="leading"
-              color={styles.radioButtonColor.color}
-              labelStyle={styles.radioLabel}
-            />
-          </View>
-          <View style={styles.genderRadioButtonContainer}>
-            <RadioButton.Item
-              label="Female"
-              value="Female"
-              mode="android"
-              position="leading"
-              color={styles.radioButtonColor.color}
-              labelStyle={styles.radioLabel}
-            />
-          </View>
-          <View style={styles.genderRadioButtonContainer}>
-            <RadioButton.Item
-              label="Other"
-              value="Other"
-              mode="android"
-              position="leading"
-              color={styles.radioButtonColor.color}
-              labelStyle={styles.radioLabel}
-            />
-          </View>
-        </RadioButton.Group>
+          <RadioButton.Group onValueChange={setGender} value={gender}>
+            <View style={styles.genderRadioButtonContainer}>
+              <RadioButton.Item
+                label="Male"
+                value="Male"
+                mode="android"
+                position="leading"
+                color={styles.radioButtonColor.color}
+                labelStyle={styles.radioLabel}
+              />
+            </View>
+            <View style={styles.genderRadioButtonContainer}>
+              <RadioButton.Item
+                label="Female"
+                value="Female"
+                mode="android"
+                position="leading"
+                color={styles.radioButtonColor.color}
+                labelStyle={styles.radioLabel}
+              />
+            </View>
+            <View style={styles.genderRadioButtonContainer}>
+              <RadioButton.Item
+                label="Other"
+                value="Other"
+                mode="android"
+                position="leading"
+                color={styles.radioButtonColor.color}
+                labelStyle={styles.radioLabel}
+              />
+            </View>
+          </RadioButton.Group>
 
-        {/* Date of Birth Picker */}
-        <Text style={styles.question}>Date of Birth</Text>
-        <View style={styles.underline} />
-        {/* <TouchableOpacity
+          {/* Date of Birth Picker */}
+          <Text style={styles.question}>Date of Birth</Text>
+          <View style={styles.underline} />
+          {/* <TouchableOpacity
           onPress={() => setShowDatePicker(true)}
           style={styles.datePickerButton}
         >
@@ -428,219 +437,220 @@ const HpEditProfilePage = () => {
             onChange={handleDateChange}
           />
         )} */}
-        <View style={styles.leftDateInput}>
-          <View style={styles.dateInputContent}>
-            <Ionicons
-              name="calendar-outline"
-              size={20}
-              color="#000"
-              style={styles.iconStyle}
-            />
-            <DateTimePicker
-              value={date_of_birth}
-              mode="date"
-              display="default"
-              maximumDate={today}
-              onChange={(event, selectedDate) => {
-                setShowDatePicker(false);
-                setDate_of_birth(selectedDate || date_of_birth);
-              }}
-            />
-          </View>
-        </View>
-
-        <View style={styles.container}>
-          {/* Other fields */}
-          <Text style={styles.question}>Identification Card Number</Text>
-          <View style={styles.underline} />
-          <View style={styles.inputContainer}>
-            {/* Other Fields */}
-            <TextInput
-              placeholder="Identification Card Number"
-              value={identification_card_number}
-              // onChangeText={setIdentification_card_number}
-              style={styles.input}
-              editable={false} // Make it non-editable
-            />
+          <View style={styles.leftDateInput}>
+            <View style={styles.dateInputContent}>
+              <Ionicons
+                name="calendar-outline"
+                size={20}
+                color="#000"
+                style={styles.iconStyle}
+              />
+              <DateTimePicker
+                value={date_of_birth}
+                mode="date"
+                display="default"
+                maximumDate={today}
+                onChange={(event, selectedDate) => {
+                  setShowDatePicker(false);
+                  setDate_of_birth(selectedDate || date_of_birth);
+                }}
+              />
+            </View>
           </View>
 
-          <Text style={styles.question}>Phone Number</Text>
-          <View style={styles.underline} />
-          <View style={styles.inputContainer}>
-            {/* Other Fields */}
-            <TextInput
-              placeholder="Phone Number"
-              value={phone_number}
-              onChangeText={setPhone_number}
-              style={styles.input}
-            />
-          </View>
+          <View style={styles.container}>
+            {/* Other fields */}
+            <Text style={styles.question}>Identification Card Number</Text>
+            <View style={styles.underline} />
+            <View style={styles.inputContainer}>
+              {/* Other Fields */}
+              <TextInput
+                placeholder="Identification Card Number"
+                value={identification_card_number}
+                // onChangeText={setIdentification_card_number}
+                style={styles.input}
+                editable={false} // Make it non-editable
+              />
+            </View>
 
-          <Text style={styles.question}>Email</Text>
-          <View style={styles.underline} />
-          <View style={styles.inputContainer}>
-            <TextInput
-              placeholder="Email"
-              value={email}
-              onChangeText={setEmail}
-              style={styles.input}
-            />
-          </View>
+            <Text style={styles.question}>Phone Number</Text>
+            <View style={styles.underline} />
+            <View style={styles.inputContainer}>
+              {/* Other Fields */}
+              <TextInput
+                placeholder="Phone Number"
+                value={phone_number}
+                onChangeText={setPhone_number}
+                style={styles.input}
+              />
+            </View>
 
-          <Text style={styles.question}>Address</Text>
-          <View style={styles.underline} />
-          <View style={styles.inputContainer}>
-            <TextInput
-              placeholder="Address"
-              value={address}
-              onChangeText={setAddress}
-              style={styles.input}
-              multiline
-            />
-          </View>
+            <Text style={styles.question}>Email</Text>
+            <View style={styles.underline} />
+            <View style={styles.inputContainer}>
+              <TextInput
+                placeholder="Email"
+                value={email}
+                onChangeText={setEmail}
+                style={styles.input}
+              />
+            </View>
 
-          <Text style={styles.question}>Emergency Contact</Text>
-          <View style={styles.underline} />
-          <View style={styles.inputContainer}>
-            <TextInput
-              placeholder="Emergency Contact"
-              value={emergency_contact}
-              onChangeText={setEmergency_contact}
-              style={styles.input}
-            />
-          </View>
+            <Text style={styles.question}>Address</Text>
+            <View style={styles.underline} />
+            <View style={styles.inputContainer}>
+              <TextInput
+                placeholder="Address"
+                value={address}
+                onChangeText={setAddress}
+                style={styles.input}
+                multiline
+              />
+            </View>
 
-          <Text style={styles.question}>Summary</Text>
-          <View style={styles.underline} />
-          <View style={styles.inputContainer}>
-            <TextInput
-              placeholder="Summary"
-              value={summary}
-              onChangeText={setSummary}
-              style={styles.input}
-            />
-          </View>
+            <Text style={styles.question}>Emergency Contact</Text>
+            <View style={styles.underline} />
+            <View style={styles.inputContainer}>
+              <TextInput
+                placeholder="Emergency Contact"
+                value={emergency_contact}
+                onChangeText={setEmergency_contact}
+                style={styles.input}
+              />
+            </View>
 
-          <Text style={styles.question}>Education</Text>
-          <View style={styles.underline} />
-          <View style={styles.inputContainer}>
-            <TextInput
-              placeholder="Education"
-              value={education}
-              onChangeText={setEducation}
-              style={styles.input}
-              multiline
-            />
-          </View>
+            <Text style={styles.question}>Summary</Text>
+            <View style={styles.underline} />
+            <View style={styles.inputContainer}>
+              <TextInput
+                placeholder="Summary"
+                value={summary}
+                onChangeText={setSummary}
+                style={styles.input}
+              />
+            </View>
 
-          <Text style={styles.question}>Credentials</Text>
-          <View style={styles.underline} />
-          <View style={styles.inputContainer}>
-            <TextInput
-              placeholder="credentials"
-              value={credentials}
-              onChangeText={setCredentials}
-              style={styles.input}
-              multiline
-            />
-          </View>
+            <Text style={styles.question}>Education</Text>
+            <View style={styles.underline} />
+            <View style={styles.inputContainer}>
+              <TextInput
+                placeholder="Education"
+                value={education}
+                onChangeText={setEducation}
+                style={styles.input}
+                multiline
+              />
+            </View>
 
-          <Text style={styles.question}>Languages</Text>
-          <View style={styles.underline} />
-          <View style={styles.inputContainer}>
-            <TextInput
-              placeholder="Languages"
-              value={languages}
-              onChangeText={setLanguages}
-              style={styles.input}
-              multiline
-            />
-          </View>
+            <Text style={styles.question}>Credentials</Text>
+            <View style={styles.underline} />
+            <View style={styles.inputContainer}>
+              <TextInput
+                placeholder="credentials"
+                value={credentials}
+                onChangeText={setCredentials}
+                style={styles.input}
+                multiline
+              />
+            </View>
 
-          <Text style={styles.question}>Services</Text>
-          <View style={styles.underline} />
-          <View style={styles.inputContainer}>
-            <TextInput
-              placeholder="Services"
-              value={services}
-              onChangeText={setServices}
-              style={styles.input}
-              multiline
-            />
-          </View>
+            <Text style={styles.question}>Languages</Text>
+            <View style={styles.underline} />
+            <View style={styles.inputContainer}>
+              <TextInput
+                placeholder="Languages"
+                value={languages}
+                onChangeText={setLanguages}
+                style={styles.input}
+                multiline
+              />
+            </View>
 
-          <Text style={styles.question}>Business Hours</Text>
-          <View style={styles.underline} />
-          <View style={styles.inputContainer}>
-            <TextInput
-              placeholder="Bussiness hours"
-              value={business_hours}
-              onChangeText={setBusiness_hours}
-              style={styles.input}
-              multiline
-            />
-          </View>
+            <Text style={styles.question}>Services</Text>
+            <View style={styles.underline} />
+            <View style={styles.inputContainer}>
+              <TextInput
+                placeholder="Services"
+                value={services}
+                onChangeText={setServices}
+                style={styles.input}
+                multiline
+              />
+            </View>
 
-          <Text style={styles.question}>Business Days</Text>
-          <View style={styles.underline} />
-          <View style={styles.inputContainer}>
-            <TextInput
-              placeholder="Business days"
-              value={business_days}
-              onChangeText={setBusiness_days}
-              style={styles.input}
-              multiline
-            />
-          </View>
+            <Text style={styles.question}>Business Hours</Text>
+            <View style={styles.underline} />
+            <View style={styles.inputContainer}>
+              <TextInput
+                placeholder="Bussiness hours"
+                value={business_hours}
+                onChangeText={setBusiness_hours}
+                style={styles.input}
+                multiline
+              />
+            </View>
 
-          <Text style={styles.question}>Working Experience</Text>
-          <View style={styles.underline} />
-          <View style={styles.inputContainer}>
-            <TextInput
-              placeholder="Working experience"
-              value={experience}
-              onChangeText={setExperience}
-              style={styles.input}
-              multiline
-            />
-          </View>
+            <Text style={styles.question}>Business Days</Text>
+            <View style={styles.underline} />
+            <View style={styles.inputContainer}>
+              <TextInput
+                placeholder="Business days"
+                value={business_days}
+                onChangeText={setBusiness_days}
+                style={styles.input}
+                multiline
+              />
+            </View>
 
-          <Text style={styles.question}>Specialist</Text>
-          <View style={styles.underline} />
-          <View style={styles.inputContainer}>
-            <TextInput
-              placeholder="Specialist"
-              value={specialist}
-              onChangeText={setSpecialist}
-              style={styles.input}
-              multiline
-            />
-          </View>
+            <Text style={styles.question}>Working Experience</Text>
+            <View style={styles.underline} />
+            <View style={styles.inputContainer}>
+              <TextInput
+                placeholder="Working experience"
+                value={experience}
+                onChangeText={setExperience}
+                style={styles.input}
+                multiline
+              />
+            </View>
 
-          <Text style={styles.question}>Hospital</Text>
-          <View style={styles.underline} />
-          <View style={styles.inputContainer}>
-            <TextInput
-              placeholder="Hospital"
-              value={hospital}
-              onChangeText={setHospital}
-              style={styles.input}
-              multiline
-            />
-          </View>
+            <Text style={styles.question}>Specialist</Text>
+            <View style={styles.underline} />
+            <View style={styles.inputContainer}>
+              <TextInput
+                placeholder="Specialist"
+                value={specialist}
+                onChangeText={setSpecialist}
+                style={styles.input}
+                multiline
+              />
+            </View>
 
-          {/* Update and Cancel Buttons */}
-          <TouchableOpacity onPress={handleUpdate} style={styles.button}>
-            <Text style={styles.buttonText}>Save Profile</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            style={styles.cancelButton}
-          >
-            <Text style={styles.cancelButtonText}>Cancel</Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
+            <Text style={styles.question}>Hospital</Text>
+            <View style={styles.underline} />
+            <View style={styles.inputContainer}>
+              <TextInput
+                placeholder="Hospital"
+                value={hospital}
+                onChangeText={setHospital}
+                style={styles.input}
+                multiline
+              />
+            </View>
+
+            {/* Update and Cancel Buttons */}
+            <TouchableOpacity onPress={handleUpdate} style={styles.button}>
+              <Text style={styles.buttonText}>Save Profile</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => navigation.goBack()}
+              style={styles.cancelButton}
+            >
+              <Text style={styles.cancelButtonText}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      )}
     </ImageBackground>
   );
 };
