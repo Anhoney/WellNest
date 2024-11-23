@@ -1032,4 +1032,19 @@ export default StyleSheet.create({
     backgroundColor: "#D3D3D3",
     padding: 16,
   },
+  //changePassword
+  changePwdContainer: {
+    flex: 1,
+    padding: 20,
+    justifyContent: "center",
+    marginTop: -140,
+    alignItems: "center",
+    paddingVertical: 10,
+  },
+  buttonContainer: {
+    marginTop: -160, // Space above buttons
+    marginBottom: 70,
+    alignItems: "center", // Center buttons
+    justifyContent: "space-between", // Adjust spacing between buttons if needed
+  },
 });

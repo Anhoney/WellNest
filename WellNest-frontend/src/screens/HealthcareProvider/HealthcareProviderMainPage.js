@@ -14,6 +14,8 @@ import styles from "../../components/styles"; // Assuming you have your styles.j
 import HpNavigationBar from "../../components/HpNavigationBar"; // Import here
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import BlankSpacer from "react-native-blank-spacer";
+import axios from "axios";
+import API_BASE_URL from "../../../config/config";
 
 const HealthcareProviderMainPage = ({}) => {
   const [userName, setUserName] = useState("");
@@ -22,11 +24,50 @@ const HealthcareProviderMainPage = ({}) => {
   useEffect(() => {
     const fetchUserName = async () => {
       try {
+        const userId = await AsyncStorage.getItem("userId");
+        const token = await AsyncStorage.getItem("token");
+        if (!token) {
+          alert("No token found. Please log in.");
+          return;
+        }
+        console.log("Authorization token:", token); // Debugging log
+
         const fullName = await AsyncStorage.getItem("full_name"); // Assuming you store it in AsyncStorage
-        setUserName(fullName || "User"); // Fallback to "User" if not found
+        if (!userId) {
+          console.warn("No userId found. Redirecting to login.");
+          navigation.reset({
+            index: 0,
+            routes: [{ name: "LoginPage" }],
+          });
+          return;
+        }
+
+        // Call the profile API to get the user data
+        const response = await axios.get(`${API_BASE_URL}/profile/${userId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        // const response = await fetch(`http://your-api-url/profile/${userId}`); // Replace 'http://your-api-url' with the actual API endpoint
+        // const data = await response.json();
+        const data = response.data;
+        // if (response.ok) {
+        if (response.data) {
+          const fetchedUserName = data.username || data.full_name || "User";
+          setUserName(fetchedUserName);
+        } else {
+          console.warn(
+            "Failed to fetch user profile:",
+            data.error || "Unknown error"
+          );
+          setUserName("User");
+        }
+        // console.log("Fetched Data:", data);
+        // setUserName(fullName || "User"); // Fallback to "User" if not found
+        console.log("username:", userName);
         console.log("Full Name:", fullName);
+        console.log("Main Page: User ID:", userId);
       } catch (error) {
         console.error("Failed to fetch full name:", error);
+        setUserName("User"); // Fallback to default name on error
       }
     };
 

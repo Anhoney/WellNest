@@ -18,9 +18,9 @@ import { useNavigation } from "@react-navigation/native";
 import { RadioButton } from "react-native-paper";
 import styles from "../../components/styles";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import jwt_decode from "jwt-decode";
 import API_BASE_URL from "../../../config/config";
 import { Buffer } from "buffer"; // Import Buffer if you're using React Native
+import { getUserIdFromToken } from "../../../services/authService";
 
 const HpEditProfilePage = () => {
   const [profile_image, setProfile_image] = useState(null);
@@ -103,30 +103,15 @@ const HpEditProfilePage = () => {
 
   useEffect(() => {
     const fetchUserId = async () => {
-      try {
-        const token = await AsyncStorage.getItem("token");
-        console.log("token:", token);
-        if (!token) {
-          alert("No token found. Please log in.");
-          return;
-        }
-
-        const decodedToken = jwt_decode(token);
-        const decodedUserId = decodedToken.id;
-        // console.log("decodeuserid:", decodedUserId);
-        if (decodedUserId) {
-          setUserId(decodedUserId);
-          fetchProfile(decodedUserId);
-        } else {
-          alert("Failed to retrieve user ID from token.");
-        }
-      } catch (error) {
-        console.error("Error decoding token:", error);
-        Alert.alert("Error", "Failed to decode token");
+      const userId = await getUserIdFromToken();
+      console.log("userId:", userId);
+      if (userId) {
+        setUserId(userId);
+        fetchProfile(userId);
       }
     };
     fetchUserId();
-  }, [userId]);
+  }, []);
 
   //   useEffect(() => {
   const fetchProfile = async (userId) => {
@@ -139,9 +124,10 @@ const HpEditProfilePage = () => {
         return;
       }
       console.log("Authorization token:", token); // Debugging log
-      const response = await axios.get(`${API_BASE_URL}/hp-profile/${userId}`, {
+      const response = await axios.get(`${API_BASE_URL}/profile/${userId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
+      // console.log(response);
 
       if (response.data) {
         // console.log("Fetched profile data:", response.data);
@@ -170,6 +156,7 @@ const HpEditProfilePage = () => {
         setHospital(data.hospital || "");
         setExperience(data.experience || "");
         setSpecialist(data.specialist || "");
+        // console.log("data", data);
 
         // Check if profile_image is a Buffer
         if (data.profile_image && data.profile_image.type === "Buffer") {
@@ -279,7 +266,7 @@ const HpEditProfilePage = () => {
       }
 
       const response = await axios.put(
-        `${API_BASE_URL}/hp-profile/${userId}`,
+        `${API_BASE_URL}/profile/${userId}`,
         formData,
         {
           headers: {
