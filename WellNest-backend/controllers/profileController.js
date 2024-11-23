@@ -45,7 +45,7 @@ const getHpProfile = async (req, res) => {
   const userId = req.params.userId;
   // console.log("User ID:", userId);
 
-  if (!userId) {
+  if (!userId || isNaN(userId)) {
     return res.status(400).json({ error: "User  ID is required" });
   }
 
@@ -69,14 +69,14 @@ const getHpProfile = async (req, res) => {
     if (userRole === "1" || userRole === "4") {
       // Query for general profile users
       profileQuery = `
-        SELECT id, user_id, age, gender, identification_card_number, date_of_birth, phone_number, address, 
+        SELECT id, user_id, username, age, gender,  date_of_birth, phone_number, address, 
         emergency_contact, core_qualifications, education
         FROM profile WHERE user_id = $1
       `;
     } else if (userRole === "2") {
       // Query for community organizer profile users
       profileQuery = `
-        SELECT id, user_id, age, gender, identification_card_number, date_of_birth, phone_number, address, 
+        SELECT id, user_id, age, gender, date_of_birth, phone_number, address, 
         emergency_contact, organizer_details
         FROM co_profile WHERE user_id = $1
       `;
@@ -109,6 +109,7 @@ const getHpProfile = async (req, res) => {
       email: user.email,
       phone_no: user.phone_no,
       identity_card: user.identity_card,
+      role: user.role,
       profile_image: profileImageBase64, // Send base64-encoded image
       // profile_image: profileData.profile_image
       //   ? `/uploads/${profileData.profile_image}`
@@ -128,6 +129,7 @@ const getHpProfile = async (req, res) => {
 const updateHpProfile = async (req, res) => {
   const userId = req.params.userId;
   // Using req.file to handle the uploaded file
+  // const userId = parseInt(req.params.userId, 10); // Ensure integer
 
   const {
     // full_name,
@@ -157,6 +159,7 @@ const updateHpProfile = async (req, res) => {
   // const profileImagePath = req.file ? req.file.path : null;
   // For binary data storage
   const profileImagePath = req.file ? req.file.path : null;
+  console.log(profileImagePath);
   let profileImageData = null;
   if (profileImagePath) {
     try {
@@ -173,6 +176,7 @@ const updateHpProfile = async (req, res) => {
     // Verify user existence and retrieve their role
     const roleQuery = "SELECT role FROM users WHERE id = $1";
     const roleResult = await pool.query(roleQuery, [userId]);
+
     console.log("Body:", req.body); // Logs text fields
     console.log("File:", req.file); // Logs file data
     // Check if file is present
@@ -187,58 +191,159 @@ const updateHpProfile = async (req, res) => {
     }
 
     const userRole = roleResult.rows[0].role;
-
+    console.log("User Role:", userRole);
     let profileTable, updateQuery, insertQuery, queryParams;
 
     if (userRole === "1" || userRole === "4") {
       // For general profile users
       profileTable = "profile";
-      updateQuery = `
-        UPDATE profile SET age = $1, gender = $2, identification_card_number = $3, date_of_birth = $4, 
-        phone_number = $5, address = $6, emergency_contact = $7, core_qualifications = $8, education = $9 
-        WHERE user_id = $10
+
+      if (profileImagePath === null) {
+        updateQuery = `
+        UPDATE profile 
+SET username = $1, age = $2, gender = $3, date_of_birth = $4, 
+    phone_number = $5, address = $6, emergency_contact = $7, 
+    core_qualifications = $8, education = $9 
+WHERE user_id = $10
       `;
-      insertQuery = `
-        INSERT INTO profile (user_id, age, gender, identification_card_number, date_of_birth, phone_number, 
-        address, emergency_contact, core_qualifications, education) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+        insertQuery = `
+       INSERT INTO profile 
+(user_id, username, age, gender, date_of_birth, phone_number, 
+ address, emergency_contact, core_qualifications, education) 
+VALUES ( $10,$1, $2, $3, $4, $5, $6, $7, $8, $9)
+ 
       `;
-      queryParams = [
-        age,
-        gender,
-        identity_card,
-        date_of_birth,
-        phone_number,
-        address,
-        emergency_contact,
-        core_qualifications,
-        education,
-        userId,
-      ];
+        queryParams = [
+          username,
+          age,
+          gender,
+          date_of_birth,
+          phone_number,
+          address,
+          emergency_contact,
+          core_qualifications,
+          education,
+          userId,
+        ];
+      } else {
+        updateQuery = `
+       UPDATE profile 
+    SET username = $1, age = $2, gender = $3, date_of_birth = $4, 
+        phone_number = $5, address = $6, emergency_contact = $7, 
+        core_qualifications = $8, education = $9, profile_image = $10 
+    WHERE user_id = $11
+      `;
+        insertQuery = `
+        INSERT INTO profile 
+    (user_id, username, age, gender, date_of_birth, phone_number, 
+     address, emergency_contact, core_qualifications, education, profile_image) 
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+      `;
+        queryParams = [
+          username,
+          age,
+          gender,
+          date_of_birth,
+          phone_number,
+          address,
+          emergency_contact,
+          core_qualifications,
+          education,
+          profileImageData,
+          // userId,
+        ];
+      }
     } else if (userRole === "2") {
       // For community organizer profile users
       profileTable = "co_profile";
-      updateQuery = `
+      if (profileImagePath === null) {
+        updateQuery = `
         UPDATE co_profile SET age = $1, gender = $2, identification_card_number = $3, date_of_birth = $4, 
         phone_number = $5, address = $6, emergency_contact = $7, organizer_details = $8 WHERE user_id = $9
       `;
-      insertQuery = `
+        insertQuery = `
         INSERT INTO co_profile (user_id, age, gender, identification_card_number, date_of_birth, phone_number, 
         address, emergency_contact, organizer_details) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
       `;
-      queryParams = [
-        age,
-        gender,
-        identity_card,
-        date_of_birth,
-        phone_number,
-        address,
-        emergency_contact,
-        organizer_details,
-      ];
+        queryParams = [
+          age,
+          gender,
+          identity_card,
+          date_of_birth,
+          phone_number,
+          address,
+          emergency_contact,
+          organizer_details,
+          userId,
+        ];
+      } else {
+        updateQuery = `
+        UPDATE co_profile SET age = $1, gender = $2, identification_card_number = $3, date_of_birth = $4, 
+        phone_number = $5, address = $6, emergency_contact = $7, organizer_details = $8, profile_image = $9 WHERE user_id = $10
+      `;
+        insertQuery = `
+        INSERT INTO co_profile (user_id, age, gender, identification_card_number, date_of_birth, phone_number, 
+        address, emergency_contact, organizer_details, profile_image) VALUES ($10, $1, $2, $3, $4, $5, $6, $7, $8, $9)
+      `;
+        queryParams = [
+          age,
+          gender,
+          identity_card,
+          date_of_birth,
+          phone_number,
+          address,
+          emergency_contact,
+          organizer_details,
+          profileImageData,
+          userId,
+        ];
+      }
     } else if (userRole === "3") {
       // For healthcare provider profile users
       profileTable = "hp_profile";
-      updateQuery = `
+      if (profileImagePath === null) {
+        updateQuery = `
+      UPDATE hp_profile SET username = $1, age = $2, gender = $3, 
+      date_of_birth = $4, phone_number = $5, email = $6, address = $7, emergency_contact = $8, 
+      summary = $9, education = $10, credentials = $11, languages = $12, services = $13, 
+      business_hours = $14, business_days = $15, experience = $16, specialist = $17, 
+      hospital = $18 WHERE user_id = $19
+    `;
+
+        // Modify the insert query to exclude identification_card_number
+        insertQuery = `
+      INSERT INTO hp_profile (user_id, username, age, gender, date_of_birth, 
+      phone_number, email, address, emergency_contact, summary, education, credentials, 
+      languages, services, business_hours, business_days, experience, specialist, hospital) 
+      VALUES 
+      ( $19, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)
+    `;
+
+        queryParams = [
+          username,
+          age,
+          gender,
+          date_of_birth,
+          phone_number,
+          email,
+          address,
+          emergency_contact,
+          summary,
+          education,
+          credentials,
+          languages,
+          services,
+          business_hours,
+          business_days,
+          experience,
+          specialist,
+          hospital,
+          // profileImageData, // Binary data of profile image
+          // profileImagePath,
+          userId,
+        ];
+      } else {
+        updateQuery = `
       UPDATE hp_profile SET username = $1, age = $2, gender = $3, 
       date_of_birth = $4, phone_number = $5, email = $6, address = $7, emergency_contact = $8, 
       summary = $9, education = $10, credentials = $11, languages = $12, services = $13, 
@@ -246,38 +351,39 @@ const updateHpProfile = async (req, res) => {
       hospital = $18, profile_image = $19 WHERE user_id = $20
     `;
 
-      // Modify the insert query to exclude identification_card_number
-      insertQuery = `
+        // Modify the insert query to exclude identification_card_number
+        insertQuery = `
       INSERT INTO hp_profile (user_id, username, age, gender, date_of_birth, 
       phone_number, email, address, emergency_contact, summary, education, credentials, 
       languages, services, business_hours, business_days, experience, specialist, hospital, profile_image) 
       VALUES 
-      ($20, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)
+      ( $20, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)
     `;
 
-      queryParams = [
-        username,
-        age,
-        gender,
-        date_of_birth,
-        phone_number,
-        email,
-        address,
-        emergency_contact,
-        summary,
-        education,
-        credentials,
-        languages,
-        services,
-        business_hours,
-        business_days,
-        experience,
-        specialist,
-        hospital,
-        profileImageData, // Binary data of profile image
-        // profileImagePath,
-        userId,
-      ];
+        queryParams = [
+          username,
+          age,
+          gender,
+          date_of_birth,
+          phone_number,
+          email,
+          address,
+          emergency_contact,
+          summary,
+          education,
+          credentials,
+          languages,
+          services,
+          business_hours,
+          business_days,
+          experience,
+          specialist,
+          hospital,
+          profileImageData, // Binary data of profile image
+          // profileImagePath,
+          userId,
+        ];
+      }
     } else {
       return res.status(400).json({ error: "Invalid user role" });
     }
@@ -291,11 +397,16 @@ const updateHpProfile = async (req, res) => {
     if (profileResult.rows.length > 0) {
       // Update existing profile data
       await pool.query(updateQuery, queryParams);
+      console.log("Query:", updateQuery);
+      console.log("Parameters:", queryParams);
     } else {
+      console.log("Query:", insertQuery);
+      console.log("Parameters:", queryParams);
       // Insert new profile data
       await pool.query(
         insertQuery,
-        [userId, ...queryParams]
+        queryParams
+        // [userId, ...queryParams]
         // queryParams
       );
     }
@@ -313,4 +424,44 @@ const updateHpProfile = async (req, res) => {
   }
 };
 
-module.exports = { getHpProfile, updateHpProfile, upload };
+const deleteAccount = async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    // Verify user exists
+    const userQuery = "SELECT role FROM users WHERE id = $1";
+    const userResult = await pool.query(userQuery, [userId]);
+
+    if (userResult.rows.length === 0) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const userRole = userResult.rows[0].role;
+
+    let profileTable;
+    if (userRole === "1" || userRole === "4") {
+      profileTable = "profile";
+    } else if (userRole === "2") {
+      profileTable = "co_profile";
+    } else if (userRole === "3") {
+      profileTable = "hp_profile";
+    } else {
+      return res.status(400).json({ error: "Invalid user role" });
+    }
+
+    // Delete profile data
+    const deleteProfileQuery = `DELETE FROM ${profileTable} WHERE user_id = $1`;
+    await pool.query(deleteProfileQuery, [userId]);
+
+    // Delete user account
+    const deleteUserQuery = "DELETE FROM users WHERE id = $1";
+    await pool.query(deleteUserQuery, [userId]);
+
+    res.status(200).json({ message: "Account deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting account:", error);
+    res.status(500).json({ error: "Failed to delete account" });
+  }
+};
+
+module.exports = { getHpProfile, updateHpProfile, upload, deleteAccount };

@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -17,24 +17,145 @@ import styles from "../../components/styles"; // Import shared styles
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import API_BASE_URL from "../../../config/config";
 import { AuthContext } from "../../../context/AuthProvider";
+import axios from "axios";
+import jwt_decode from "jwt-decode";
+import { Buffer } from "buffer";
+import { getUserIdFromToken } from "../../../services/authService";
 
 const HpProfilePage = () => {
   const { logout } = useContext(AuthContext); // Get logout from AuthContext
-  const [profileImage, setProfileImage] = useState(null);
+  const [profile_image, setProfile_image] = useState(null);
   const navigation = useNavigation();
+  const [userId, setUserId] = useState(null);
+  const [username, setUsername] = useState("");
 
-  // Function to pick an image from the gallery
-  const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 1,
-    });
+  const fetchUserId = async () => {
+    // try {
+    //   const token = await AsyncStorage.getItem("token");
+    //   console.log("token:", token);
+    //   if (!token) {
+    //     alert("No token found. Please log in.");
+    //     return;
+    //   }
 
-    if (!result.cancelled) {
-      setProfileImage(result.uri);
+    //   const decodedToken = jwt_decode(token);
+    //   const decodedUserId = decodedToken.id;
+    //   // console.log("decodeuserid:", decodedUserId);
+    //   if (decodedUserId) {
+    //     setUserId(decodedUserId);
+    //     fetchProfileData(decodedUserId);
+    //   } else {
+    //     alert("Failed to retrieve user ID from token.");
+    //   }
+    // } catch (error) {
+    //   console.error("Error decoding token:", error);
+    //   Alert.alert("Error", "Failed to decode token");
+    // }
+    const userId = await getUserIdFromToken();
+    console.log("userId:", userId);
+    if (userId) {
+      setUserId(userId);
+      fetchProfileData(userId);
     }
+  };
+
+  // Fetch the profile data, including the profile image
+  const fetchProfileData = async (userId) => {
+    if (!userId) {
+      console.error("User ID is missing");
+      return;
+    }
+    try {
+      console.log("Fetching profile data for user ID:", userId);
+      const token = await AsyncStorage.getItem("token");
+      if (!token) {
+        alert("No token found. Please log in.");
+        return;
+      }
+      console.log("Authorization token:", token); // Debugging log
+      const response = await axios.get(`${API_BASE_URL}/profile/${userId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      // const response = await fetch(`${API_BASE_URL}/profile/${userId}`);
+      // if (!response.ok) {
+      //   throw new Error("Failed to fetch profile data");
+      // }
+      if (response.data) {
+        const data = response.data;
+        setUsername(data.username || data.full_name || "");
+        // setProfileImage(data.profile_image || null); // Set base64 profile image or null
+        // Check if profile_image is a Buffer
+        if (data.profile_image && data.profile_image.type === "Buffer") {
+          const byteArray = data.profile_image.data; // Access the data property of the Buffer
+
+          // Use Buffer to convert to Base64
+          const base64String = Buffer.from(byteArray).toString("base64");
+          const imageUri = `data:image/jpeg;base64,${base64String}`;
+          // console.log("Profile Image URI:", imageUri);
+          setProfile_image(imageUri);
+        } else {
+          console.log("No valid profile image found.");
+          setProfile_image(null);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching profile data:", error);
+      Alert.alert("Error", "Failed to fetch profile data. Please try again.");
+    }
+  };
+
+  useEffect(() => {
+    fetchUserId();
+  }, []);
+
+  // Confirm and handle Delete Account
+  const handleDeleteAccount = () => {
+    Alert.alert(
+      "Confirm Delete Account",
+      "Are you sure you want to delete your account? This action cannot be undone.",
+      [
+        {
+          text: "Cancel", // User cancels
+          style: "cancel",
+        },
+        {
+          text: "Yes", // User confirms
+          onPress: async () => {
+            try {
+              const token = await AsyncStorage.getItem("token");
+              if (!token || !userId) {
+                Alert.alert("Error", "Unable to authenticate. Please log in.");
+                return;
+              }
+              const response = await axios.delete(
+                `${API_BASE_URL}/deleteAccount/${userId}`,
+                {
+                  headers: { Authorization: `Bearer ${token}` },
+                }
+              );
+              if (response.status === 200) {
+                Alert.alert(
+                  "Success",
+                  "Your account has been deleted successfully."
+                );
+                await logout(); // Log out and clear token
+                navigation.reset({
+                  index: 0,
+                  routes: [{ name: "LoginPage" }],
+                });
+              }
+            } catch (error) {
+              console.error("Error deleting account:", error);
+              Alert.alert(
+                "Error",
+                "Failed to delete account. Please try again."
+              );
+            }
+          },
+        },
+      ],
+      { cancelable: false } // Prevent closing the alert by tapping outside
+    );
   };
 
   // // Sign Out Function
@@ -65,7 +186,8 @@ const HpProfilePage = () => {
           text: "Yes", // User confirms
           onPress: async () => {
             try {
-              await logout(navigation); // Log out function from AuthContext
+              await logout(); // Log out function from AuthContext
+              navigation.navigate("LoginPage");
             } catch (error) {
               console.error("Error signing out:", error);
             }
@@ -75,6 +197,7 @@ const HpProfilePage = () => {
       { cancelable: false } // Prevent closing the alert by tapping outside
     );
   };
+
   return (
     <ImageBackground
       source={require("../../../assets/MainPage.png")}
@@ -92,18 +215,18 @@ const HpProfilePage = () => {
 
       <View style={styles.profileContainer}>
         {/* Profile Image */}
-        <TouchableOpacity onPress={pickImage}>
-          <Image
-            source={
-              profileImage
-                ? { uri: profileImage }
-                : require("../../../assets/defaultProfile.jpg")
-            }
-            style={styles.profileImage}
-          />
-        </TouchableOpacity>
-        <Text style={styles.userName}>John Doe</Text>
-        <Text style={styles.profileId}>ID: 78906</Text>
+        {/* <TouchableOpacity onPress={pickImage}> */}
+        <Image
+          source={
+            profile_image
+              ? { uri: profile_image }
+              : require("../../../assets/defaultProfile.jpg")
+          }
+          style={styles.profileImage}
+        />
+        {/* </TouchableOpacity> */}
+        <Text style={styles.userName}> {username} </Text>
+        <Text style={styles.profileId}>ID: {userId}</Text>
         <TouchableOpacity
           style={styles.editProfileButton}
           onPress={() => navigation.navigate("HpEditProfilePage")}
@@ -119,13 +242,19 @@ const HpProfilePage = () => {
             <Text style={styles.smallSectionTitle}>Security Settings</Text>
 
             {/* Change Password */}
-            <TouchableOpacity style={styles.optionContainer}>
+            <TouchableOpacity
+              style={styles.optionContainer}
+              onPress={() => navigation.navigate("ChangePassword")}
+            >
               <Text style={styles.optionText}>Change Password</Text>
               <Ionicons name="chevron-forward" size={20} color="#333" />
             </TouchableOpacity>
 
             {/* Delete Account */}
-            <TouchableOpacity style={styles.optionContainer}>
+            <TouchableOpacity
+              style={styles.optionContainer}
+              onPress={handleDeleteAccount}
+            >
               <Text style={styles.optionText}>Delete Account</Text>
               <Ionicons name="chevron-forward" size={20} color="#333" />
             </TouchableOpacity>
