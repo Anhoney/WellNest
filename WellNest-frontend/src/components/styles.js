@@ -74,7 +74,11 @@ export default StyleSheet.create({
   },
   icon: {
     marginRight: 10,
+    marginLeft: 10,
   },
+  // hpicon: {
+  //   marginRight: 10,
+  // },
   // Title text used on both pages
   title: {
     fontSize: 30, // Larger font size for readability
@@ -630,7 +634,7 @@ export default StyleSheet.create({
     left: 0, // Position the rectangle from the left
     right: 0, // Position the rectangle from the right
     zIndex: 1, // Ensure the rectangle is on top of other components
-    marginBottom: 40,
+    marginBottom: 45,
   },
   prescriptionContainer: {
     flex: 1,
@@ -989,7 +993,7 @@ export default StyleSheet.create({
   list: {
     paddingBottom: 16,
   },
-  appointmentContainer: {
+  hpAppointmentContainer: {
     backgroundColor: "#FFF",
     padding: 16,
     borderRadius: 8,

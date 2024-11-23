@@ -1,26 +1,28 @@
-// import React from "react";
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   View,
   Text,
-  Image,
   TouchableOpacity,
+  Image,
+  StyleSheet,
   ImageBackground,
+  ScrollView,
   Alert,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
-import Ionicons from "react-native-vector-icons/Ionicons";
-import styles from "../components/styles"; // Import shared styles
-import NavigationBar from "../components/NavigationBar"; // Import here
+import { Ionicons } from "@expo/vector-icons"; // For icons
 import { useNavigation } from "@react-navigation/native";
+import CoNavigationBar from "../../components/CoNavigationBar"; // Import here
+import styles from "../../components/styles"; // Import shared styles
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import API_BASE_URL from "../../config/config";
-import { AuthContext } from "../../context/AuthProvider";
+import API_BASE_URL from "../../../config/config";
+import { AuthContext } from "../../../context/AuthProvider";
 import axios from "axios";
-import { getUserIdFromToken } from "../../services/authService";
+import jwt_decode from "jwt-decode";
 import { Buffer } from "buffer";
+import { getUserIdFromToken } from "../../../services/authService";
 
-const SettingPage = () => {
+const CoProfilePage = () => {
   const { logout } = useContext(AuthContext); // Get logout from AuthContext
   const [profile_image, setProfile_image] = useState(null);
   const navigation = useNavigation();
@@ -28,6 +30,27 @@ const SettingPage = () => {
   const [username, setUsername] = useState("");
 
   const fetchUserId = async () => {
+    // try {
+    //   const token = await AsyncStorage.getItem("token");
+    //   console.log("token:", token);
+    //   if (!token) {
+    //     alert("No token found. Please log in.");
+    //     return;
+    //   }
+
+    //   const decodedToken = jwt_decode(token);
+    //   const decodedUserId = decodedToken.id;
+    //   // console.log("decodeuserid:", decodedUserId);
+    //   if (decodedUserId) {
+    //     setUserId(decodedUserId);
+    //     fetchProfileData(decodedUserId);
+    //   } else {
+    //     alert("Failed to retrieve user ID from token.");
+    //   }
+    // } catch (error) {
+    //   console.error("Error decoding token:", error);
+    //   Alert.alert("Error", "Failed to decode token");
+    // }
     const userId = await getUserIdFromToken();
     console.log("userId:", userId);
     if (userId) {
@@ -38,7 +61,6 @@ const SettingPage = () => {
 
   // Fetch the profile data, including the profile image
   const fetchProfileData = async (userId) => {
-    console.log("setting Fetching profile data for user ID:", userId);
     if (!userId) {
       console.error("User ID is missing");
       return;
@@ -54,7 +76,10 @@ const SettingPage = () => {
       const response = await axios.get(`${API_BASE_URL}/profile/${userId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-
+      // const response = await fetch(`${API_BASE_URL}/profile/${userId}`);
+      // if (!response.ok) {
+      //   throw new Error("Failed to fetch profile data");
+      // }
       if (response.data) {
         const data = response.data;
         setUsername(data.username || data.full_name || "");
@@ -83,31 +108,6 @@ const SettingPage = () => {
     fetchUserId();
   }, []);
 
-  const handleSignOut = () => {
-    Alert.alert(
-      "Confirm Sign Out",
-      "Are you sure you want to log out?",
-      [
-        {
-          text: "Cancel", // User cancels
-          style: "cancel",
-        },
-        {
-          text: "Yes", // User confirms
-          onPress: async () => {
-            try {
-              await logout(); // Log out function from AuthContext
-              navigation.navigate("LoginPage");
-              // await logout(navigation); // Log out function from AuthContext
-            } catch (error) {
-              console.error("Error signing out:", error);
-            }
-          },
-        },
-      ],
-      { cancelable: false } // Prevent closing the alert by tapping outside
-    );
-  };
   // Confirm and handle Delete Account
   const handleDeleteAccount = () => {
     Alert.alert(
@@ -157,7 +157,8 @@ const SettingPage = () => {
       { cancelable: false } // Prevent closing the alert by tapping outside
     );
   };
-  // Sign Out Function
+
+  // // Sign Out Function
   // const handleSignOut = async () => {
   //   try {
   //     // Remove token from AsyncStorage
@@ -171,10 +172,35 @@ const SettingPage = () => {
   //     console.error("Error signing out:", error);
   //   }
   // };
+  // Confirm and handle Sign Out
+  const handleSignOut = () => {
+    Alert.alert(
+      "Confirm Sign Out",
+      "Are you sure you want to log out?",
+      [
+        {
+          text: "Cancel", // User cancels
+          style: "cancel",
+        },
+        {
+          text: "Yes", // User confirms
+          onPress: async () => {
+            try {
+              await logout(); // Log out function from AuthContext
+              navigation.navigate("LoginPage");
+            } catch (error) {
+              console.error("Error signing out:", error);
+            }
+          },
+        },
+      ],
+      { cancelable: false } // Prevent closing the alert by tapping outside
+    );
+  };
 
   return (
     <ImageBackground
-      source={require("../../assets/MainPage.png")}
+      source={require("../../../assets/MainPage.png")}
       style={styles.background}
     >
       <View style={styles.smallHeaderContainer}>
@@ -184,58 +210,65 @@ const SettingPage = () => {
         >
           <Ionicons name="chevron-back" size={24} color="#000" />
         </TouchableOpacity>
-        <Text style={styles.title}>Setting</Text>
+        <Text style={styles.title}>Profile</Text>
       </View>
 
       <View style={styles.profileContainer}>
         {/* Profile Image */}
-        <TouchableOpacity>
-          <Image
-            source={
-              profile_image
-                ? { uri: profile_image }
-                : require("../../assets/defaultProfile.jpg")
-            }
-            style={styles.profileImage}
-          />
-        </TouchableOpacity>
-        <Text style={styles.userName}>{username}</Text>
+        {/* <TouchableOpacity onPress={pickImage}> */}
+        <Image
+          source={
+            profile_image
+              ? { uri: profile_image }
+              : require("../../../assets/defaultProfile.jpg")
+          }
+          style={styles.profileImage}
+        />
+        {/* </TouchableOpacity> */}
+        <Text style={styles.userName}> {username} </Text>
         <Text style={styles.profileId}>ID: {userId}</Text>
+        <TouchableOpacity
+          style={styles.editProfileButton}
+          onPress={() => navigation.navigate("HpEditProfilePage")}
+        >
+          <Text style={styles.editProfileText}>Edit Profile</Text>
+        </TouchableOpacity>
       </View>
 
-      <View style={styles.pageContainer}>
-        {/* Security Settings */}
-        <View style={styles.settingsContainer}>
-          <Text style={styles.smallSectionTitle}>Security Settings</Text>
+      <ScrollView contentContainerStyle={styles.pageContainer}>
+        <View style={styles.pageContainer}>
+          {/* Security Settings */}
+          <View style={styles.settingsContainer}>
+            <Text style={styles.smallSectionTitle}>Security Settings</Text>
 
-          {/* Change Password */}
-          <TouchableOpacity
-            style={styles.optionContainer}
-            onPress={() => navigation.navigate("ChangePassword")}
-          >
-            <Text style={styles.optionText}>Change Password</Text>
-            <Ionicons name="chevron-forward" size={20} color="#333" />
-          </TouchableOpacity>
+            {/* Change Password */}
+            <TouchableOpacity
+              style={styles.optionContainer}
+              onPress={() => navigation.navigate("ChangePassword")}
+            >
+              <Text style={styles.optionText}>Change Password</Text>
+              <Ionicons name="chevron-forward" size={20} color="#333" />
+            </TouchableOpacity>
 
-          {/* Delete Account */}
-          <TouchableOpacity
-            style={styles.optionContainer}
-            onPress={handleDeleteAccount}
-          >
-            <Text style={styles.optionText}>Delete Account</Text>
-            <Ionicons name="chevron-forward" size={20} color="#333" />
-          </TouchableOpacity>
+            {/* Delete Account */}
+            <TouchableOpacity
+              style={styles.optionContainer}
+              onPress={handleDeleteAccount}
+            >
+              <Text style={styles.optionText}>Delete Account</Text>
+              <Ionicons name="chevron-forward" size={20} color="#333" />
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
+      </ScrollView>
       {/* Sign Out Button */}
       <TouchableOpacity style={styles.signOutButton} onPress={handleSignOut}>
         <Text style={styles.signOutButtonText}>Sign Out</Text>
       </TouchableOpacity>
-
       {/* Navigation Bar */}
-      <NavigationBar navigation={navigation} activePage="ProfilePage" />
+      <CoNavigationBar navigation={navigation} activePage="CoProfilePage" />
     </ImageBackground>
   );
 };
 
-export default SettingPage;
+export default CoProfilePage;

@@ -11,13 +11,13 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons"; // Make sure you have Ionicons installed
 import styles from "../../components/styles"; // Assuming you have your styles.js setup
-import HpNavigationBar from "../../components/HpNavigationBar"; // Import here
+import CoNavigationBar from "../../components/CoNavigationBar"; // Import here
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import BlankSpacer from "react-native-blank-spacer";
 import axios from "axios";
 import API_BASE_URL from "../../../config/config";
 
-const HealthcareProviderMainPage = ({}) => {
+const CommunityOrganizerMainPage = ({}) => {
   const [userName, setUserName] = useState("");
   const navigation = useNavigation();
 
@@ -81,50 +81,64 @@ const HealthcareProviderMainPage = ({}) => {
       <View style={styles.pageContainer}>
         {/* Greeting Section */}
         <Text style={styles.hPGreeting}>Hello, {userName}!</Text>
-        <Text style={styles.hPTitle}>
-          Welcome to Healthcare Management Site.
-        </Text>
+        <Text style={styles.hPTitle}>Welcome to Events Management Site.</Text>
         <ScrollView>
           {/* Healthcare Services */}
           <View style={styles.sectionContainer}>
-            <Text style={styles.sectionTitle}>Healthcare Services</Text>
+            <Text style={styles.sectionTitle}>Events Management</Text>
             <View style={styles.hPModuleRow}>
               <TouchableOpacity
                 onPress={() =>
-                  navigation.navigate("HpAppointmentManagementPage")
+                  navigation.navigate("SocialEventsManagementPage")
                 }
               >
                 <Image
-                  source={require("../../../assets/AppointmentBooking.png")}
-                  // style={styles.icon}
+                  source={require("../../../assets/SocialEventsAndSupportGroups.png")}
+                  style={styles.icon}
                 />
                 <Text style={styles.iconText}>
-                  Appointment {"\n"} Booking {"\n"} Management
+                  Social Events {"\n"} and Support {"\n"} Groups
                 </Text>
               </TouchableOpacity>
 
               <TouchableOpacity
-                onPress={() => navigation.navigate("VirtualConsultation")}
+                onPress={() =>
+                  navigation.navigate("VolunteerOpportunitiesManagementPage")
+                }
               >
                 <Image
-                  source={require("../../../assets/VirtualConsultation.png")}
-                  // style={styles.icon}
+                  source={require("../../../assets/VolunteerOpportunities.png")}
+                  style={styles.icon}
                 />
                 <Text style={styles.iconText}>
-                  Virtual {"\n"} Consultation {"\n"} Management
+                  Volunteer {"\n"} Opportunities
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={() =>
+                  navigation.navigate("ElderlyAssessmentManagementPage")
+                }
+              >
+                <Image
+                  source={require("../../../assets/ElderlyAssessment.png")}
+                  style={styles.icon}
+                />
+                <Text style={styles.iconText}>
+                  Volunteer {"\n"} Opportunities
                 </Text>
               </TouchableOpacity>
             </View>
           </View>
         </ScrollView>
         {/* Navigation Bar */}
-        <HpNavigationBar
+        <CoNavigationBar
           navigation={navigation}
-          activePage="HealthcareProviderMainPage"
+          activePage="CommunityOrganizerMainPage"
         />
       </View>
     </ImageBackground>
   );
 };
 
-export default HealthcareProviderMainPage;
+export default CommunityOrganizerMainPage;

@@ -70,14 +70,14 @@ const getHpProfile = async (req, res) => {
       // Query for general profile users
       profileQuery = `
         SELECT id, user_id, username, age, gender,  date_of_birth, phone_number, address, 
-        emergency_contact, core_qualifications, education
+        emergency_contact, core_qualifications, education, profile_image
         FROM profile WHERE user_id = $1
       `;
     } else if (userRole === "2") {
       // Query for community organizer profile users
       profileQuery = `
-        SELECT id, user_id, age, gender, date_of_birth, phone_number, address, 
-        emergency_contact, organizer_details
+        SELECT id, user_id, username, age, gender, date_of_birth, phone_number, address, 
+        emergency_contact, organizer_details, profile_image
         FROM co_profile WHERE user_id = $1
       `;
     } else if (userRole === "3") {
@@ -237,7 +237,7 @@ VALUES ( $10,$1, $2, $3, $4, $5, $6, $7, $8, $9)
         INSERT INTO profile 
     (user_id, username, age, gender, date_of_birth, phone_number, 
      address, emergency_contact, core_qualifications, education, profile_image) 
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+    VALUES ($11, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
       `;
         queryParams = [
           username,
@@ -250,7 +250,7 @@ VALUES ( $10,$1, $2, $3, $4, $5, $6, $7, $8, $9)
           core_qualifications,
           education,
           profileImageData,
-          // userId,
+          userId,
         ];
       }
     } else if (userRole === "2") {
@@ -258,14 +258,15 @@ VALUES ( $10,$1, $2, $3, $4, $5, $6, $7, $8, $9)
       profileTable = "co_profile";
       if (profileImagePath === null) {
         updateQuery = `
-        UPDATE co_profile SET age = $1, gender = $2, identification_card_number = $3, date_of_birth = $4, 
+        UPDATE co_profile SET username = $1, age = $2, gender = $3,  date_of_birth = $4, 
         phone_number = $5, address = $6, emergency_contact = $7, organizer_details = $8 WHERE user_id = $9
       `;
         insertQuery = `
-        INSERT INTO co_profile (user_id, age, gender, identification_card_number, date_of_birth, phone_number, 
-        address, emergency_contact, organizer_details) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+        INSERT INTO co_profile (user_id, username, age, gender, date_of_birth, phone_number, 
+        address, emergency_contact, organizer_details) VALUES ($9,$1, $2, $3, $4, $5, $6, $7, $8)
       `;
         queryParams = [
+          username,
           age,
           gender,
           identity_card,
@@ -278,14 +279,15 @@ VALUES ( $10,$1, $2, $3, $4, $5, $6, $7, $8, $9)
         ];
       } else {
         updateQuery = `
-        UPDATE co_profile SET age = $1, gender = $2, identification_card_number = $3, date_of_birth = $4, 
+        UPDATE co_profile SET username = $1, age = $2, gender = $3, date_of_birth = $4, 
         phone_number = $5, address = $6, emergency_contact = $7, organizer_details = $8, profile_image = $9 WHERE user_id = $10
       `;
         insertQuery = `
-        INSERT INTO co_profile (user_id, age, gender, identification_card_number, date_of_birth, phone_number, 
+        INSERT INTO co_profile (user_id, username, age, gender, date_of_birth, phone_number, 
         address, emergency_contact, organizer_details, profile_image) VALUES ($10, $1, $2, $3, $4, $5, $6, $7, $8, $9)
       `;
         queryParams = [
+          username,
           age,
           gender,
           identity_card,

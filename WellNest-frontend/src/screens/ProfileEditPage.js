@@ -48,7 +48,7 @@ const ProfileEditPage = () => {
   const pickImage = async () => {
     try {
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaType.Images,
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
         aspect: [1, 1],
         quality: 1,
@@ -90,10 +90,8 @@ const ProfileEditPage = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       // console.log(response);
-
+      // console.log("Fetched profile data:", response.data);
       if (response.data) {
-        console.log("Fetched profile data:", response.data);
-
         const data = response.data;
         // Batch state updates
         setUsername(data.username || "");

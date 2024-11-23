@@ -94,7 +94,7 @@ const HpMyCreatedAppointments = () => {
   };
 
   const renderAppointment = ({ item }) => (
-    <View style={styles.appointmentContainer}>
+    <View style={styles.hpAppointmentContainer}>
       <View style={styles.appointmentHeader}>
         <Text style={styles.createdByText}>Created by:</Text>
         <TouchableOpacity onPress={() => handleDelete(item.id)}>

@@ -176,7 +176,7 @@ const MainPage = ({ medicineReminder }) => {
               >
                 <Image
                   source={require("../../assets/AppointmentBooking.png")}
-                  style={styles.icon}
+                  // style={styles.icon}
                 />
                 <Text style={styles.iconText}>Appointment {"\n"} Booking</Text>
               </TouchableOpacity>
@@ -186,7 +186,7 @@ const MainPage = ({ medicineReminder }) => {
               >
                 <Image
                   source={require("../../assets/VirtualConsultation.png")}
-                  style={styles.icon}
+                  // style={styles.icon}
                 />
                 <Text style={styles.iconText}>Virtual {"\n"} Consultation</Text>
               </TouchableOpacity>
