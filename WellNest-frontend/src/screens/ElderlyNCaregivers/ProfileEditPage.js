@@ -15,12 +15,12 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import { Pressable } from "react-native";
 import axios from "axios";
 import { useNavigation } from "@react-navigation/native";
-import NavigationBar from "../components/NavigationBar"; // Import here
-import styles from "../components/styles"; // Import shared styles
+import NavigationBar from "../../components/NavigationBar"; // Import here
+import styles from "../../components/styles"; // Import shared styles
 import { RadioButton } from "react-native-paper"; // For the radio button
-import API_BASE_URL from "../../config/config";
+import API_BASE_URL from "../../../config/config";
 import { Buffer } from "buffer"; // Import Buffer if you're using React Native
-import { getUserIdFromToken } from "../../services/authService";
+import { getUserIdFromToken } from "../../../services/authService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const ProfileEditPage = () => {
@@ -251,7 +251,7 @@ const ProfileEditPage = () => {
 
   return (
     <ImageBackground
-      source={require("../../assets/MainPage.png")}
+      source={require("../../../assets/MainPage.png")}
       style={styles.background}
     >
       <View style={styles.smallHeaderContainer}>
@@ -270,7 +270,7 @@ const ProfileEditPage = () => {
             source={
               profile_image
                 ? { uri: profile_image }
-                : require("../../assets/defaultProfile.jpg")
+                : require("../../../assets/defaultProfile.jpg")
             }
             style={styles.profileImage}
             onError={(error) =>

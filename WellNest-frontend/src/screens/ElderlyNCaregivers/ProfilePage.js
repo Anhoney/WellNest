@@ -10,14 +10,14 @@ import {
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { Ionicons } from "@expo/vector-icons"; // For icons
-import { useNavigation } from "@react-navigation/native";
-import NavigationBar from "../components/NavigationBar"; // Import here
-import styles from "../components/styles"; // Import shared styles
-import API_BASE_URL from "../../config/config";
-import { AuthContext } from "../../context/AuthProvider";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
+import NavigationBar from "../../components/NavigationBar"; // Import here
+import styles from "../../components/styles"; // Import shared styles
+import API_BASE_URL from "../../../config/config";
+import { AuthContext } from "../../../context/AuthProvider";
 import axios from "axios";
 import { Buffer } from "buffer";
-import { getUserIdFromToken } from "../../services/authService";
+import { getUserIdFromToken } from "../../../services/authService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const ProfilePage = () => {
@@ -91,13 +91,21 @@ const ProfilePage = () => {
     }
   };
 
-  useEffect(() => {
-    fetchUserId();
-  }, []);
+  // Refresh data when the screen comes into focus
+  useFocusEffect(
+    React.useCallback(() => {
+      console.log("Screen focused, refreshing data");
+      fetchUserId();
+    }, [])
+  );
+
+  // useEffect(() => {
+  //   fetchUserId();
+  // }, []);
 
   return (
     <ImageBackground
-      source={require("../../assets/MainPage.png")}
+      source={require("../../../assets/MainPage.png")}
       style={styles.background}
     >
       <View style={styles.smallHeaderContainer}>
@@ -117,7 +125,7 @@ const ProfilePage = () => {
             source={
               profile_image
                 ? { uri: profile_image }
-                : require("../../assets/defaultProfile.jpg")
+                : require("../../../assets/defaultProfile.jpg")
             }
             style={styles.profileImage}
           />
@@ -138,21 +146,21 @@ const ProfilePage = () => {
           <View style={styles.statusOptions}>
             <TouchableOpacity style={styles.statusCard}>
               <Image
-                source={require("../../assets/VirtualConsultation.png")}
+                source={require("../../../assets/VirtualConsultation.png")}
                 style={styles.statusIcon}
               />
               <Text style={styles.statusText}>Virtual Consultation</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.statusCard}>
               <Image
-                source={require("../../assets/AppointmentBooking.png")}
+                source={require("../../../assets/AppointmentBooking.png")}
                 style={styles.statusIcon}
               />
               <Text style={styles.statusText}>Appointment Booking</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.statusCard}>
               <Image
-                source={require("../../assets/RatingStar.png")}
+                source={require("../../../assets/RatingStar.png")}
                 style={styles.statusIcon}
               />
               <Text style={styles.statusText}>Rating</Text>
@@ -164,42 +172,42 @@ const ProfilePage = () => {
         <View style={styles.otherOptions}>
           <TouchableOpacity style={styles.optionCard}>
             <Image
-              source={require("../../assets/Favourite.png")}
+              source={require("../../../assets/Favourite.png")}
               style={styles.optionIcon}
             />
             <Text style={styles.statusText}>Favourite</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.optionCard}>
             <Image
-              source={require("../../assets/MedicalHistory.png")}
+              source={require("../../../assets/MedicalHistory.png")}
               style={styles.optionIcon}
             />
             <Text style={styles.statusText}>Medical History</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.optionCard}>
             <Image
-              source={require("../../assets/PrescriptionBottle.png")}
+              source={require("../../../assets/PrescriptionBottle.png")}
               style={styles.optionIcon}
             />
             <Text style={styles.statusText}>Prescription History</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.optionCard}>
             <Image
-              source={require("../../assets/ElderlyAssessment.png")}
+              source={require("../../../assets/ElderlyAssessment.png")}
               style={styles.optionIcon}
             />
             <Text style={styles.statusText}>Elderly Assessment</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.optionCard}>
             <Image
-              source={require("../../assets/CarePlanDevelopment.png")}
+              source={require("../../../assets/CarePlanDevelopment.png")}
               style={styles.optionIcon}
             />
             <Text style={styles.statusText}>Care Plan</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.optionCard}>
             <Image
-              source={require("../../assets/CaregiverInformation.png")}
+              source={require("../../../assets/CaregiverInformation.png")}
               style={styles.optionIcon}
             />
             <Text style={styles.statusText}>Caregiver Information</Text>

@@ -10,14 +10,14 @@ import {
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import Ionicons from "react-native-vector-icons/Ionicons";
-import styles from "../components/styles"; // Import shared styles
-import NavigationBar from "../components/NavigationBar"; // Import here
-import { useNavigation } from "@react-navigation/native";
+import styles from "../../components/styles"; // Import shared styles
+import NavigationBar from "../../components/NavigationBar"; // Import here
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import API_BASE_URL from "../../config/config";
-import { AuthContext } from "../../context/AuthProvider";
+import API_BASE_URL from "../../../config/config";
+import { AuthContext } from "../../../context/AuthProvider";
 import axios from "axios";
-import { getUserIdFromToken } from "../../services/authService";
+import { getUserIdFromToken } from "../../../services/authService";
 import { Buffer } from "buffer";
 
 const SettingPage = () => {
@@ -79,9 +79,17 @@ const SettingPage = () => {
     }
   };
 
-  useEffect(() => {
-    fetchUserId();
-  }, []);
+  // Refresh data when the screen comes into focus
+  useFocusEffect(
+    React.useCallback(() => {
+      console.log("Screen focused, refreshing data");
+      fetchUserId();
+    }, [])
+  );
+
+  // useEffect(() => {
+  //   fetchUserId();
+  // }, []);
 
   const handleSignOut = () => {
     Alert.alert(
@@ -174,7 +182,7 @@ const SettingPage = () => {
 
   return (
     <ImageBackground
-      source={require("../../assets/MainPage.png")}
+      source={require("../../../assets/MainPage.png")}
       style={styles.background}
     >
       <View style={styles.smallHeaderContainer}>
@@ -194,7 +202,7 @@ const SettingPage = () => {
             source={
               profile_image
                 ? { uri: profile_image }
-                : require("../../assets/defaultProfile.jpg")
+                : require("../../../assets/defaultProfile.jpg")
             }
             style={styles.profileImage}
           />

@@ -250,6 +250,7 @@ const HpEditProfilePage = () => {
         //   ? profile_image
         //   : `file://${profile_image}`; // Ensure correct URI format
         // const localUri = uri;
+        // console.log("Profile Image URI:", profile_image);
         const uri = normalizeFilePath(profile_image);
         const filename = uri.split("/").pop();
         const type = `image/${filename.split(".").pop()}`;
@@ -576,8 +577,9 @@ const HpEditProfilePage = () => {
                 multiline
               />
             </View>
+          </View>
 
-            <Text style={styles.question}>Business Days</Text>
+          {/* <Text style={styles.question}>Business Days</Text>
             <View style={styles.underline} />
             <View style={styles.inputContainer}>
               <TextInput
@@ -587,9 +589,47 @@ const HpEditProfilePage = () => {
                 style={styles.input}
                 multiline
               />
-            </View>
+            </View> */}
 
-            <Text style={styles.question}>Working Experience</Text>
+          <Text style={styles.question}>Business Days</Text>
+          <View style={styles.underline} />
+          <RadioButton.Group
+            onValueChange={setBusiness_days}
+            value={business_days}
+          >
+            <View style={styles.genderRadioButtonContainer}>
+              <RadioButton.Item
+                label="Weekday"
+                value="Weekday"
+                mode="android"
+                position="leading"
+                color={styles.radioButtonColor.color}
+                labelStyle={styles.radioLabel}
+              />
+            </View>
+            <View style={styles.genderRadioButtonContainer}>
+              <RadioButton.Item
+                label="Weekend"
+                value="Weekend"
+                mode="android"
+                position="leading"
+                color={styles.radioButtonColor.color}
+                labelStyle={styles.radioLabel}
+              />
+            </View>
+            <View style={styles.genderRadioButtonContainer}>
+              <RadioButton.Item
+                label="Everyday"
+                value="Everyday"
+                mode="android"
+                position="leading"
+                color={styles.radioButtonColor.color}
+                labelStyle={styles.radioLabel}
+              />
+            </View>
+          </RadioButton.Group>
+          <View style={styles.container}>
+            <Text style={styles.question}>Working Experience (Years)</Text>
             <View style={styles.underline} />
             <View style={styles.inputContainer}>
               <TextInput

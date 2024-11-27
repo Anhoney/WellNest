@@ -498,6 +498,7 @@ export default StyleSheet.create({
     flex: 1,
     // padding: 20,
     marginTop: 75,
+    padding: 10,
   },
   // Enlarged subtitle
   smallTitle: {
@@ -687,11 +688,11 @@ export default StyleSheet.create({
   healthBookingStatus: {
     marginBottom: 20,
   },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 10,
-  },
+  // sectionTitle: {
+  //   fontSize: 18,
+  //   fontWeight: "bold",
+  //   marginBottom: 10,
+  // },
   statusOptions: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -786,6 +787,11 @@ export default StyleSheet.create({
     alignItems: "center",
     borderRadius: 8,
     margin: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.8,
+    shadowRadius: 2,
+    elevation: 5, // Add hover effect on Android
   },
   signOutButtonText: {
     fontSize: 18,
@@ -965,6 +971,22 @@ export default StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
+  deleteButton: {
+    backgroundColor: "#FF0000", // Red color for delete button
+    // padding: 10,
+    // borderRadius: 5,
+    marginTop: 10,
+    // alignItems: "center",
+    paddingVertical: 15,
+    borderRadius: 10,
+    alignItems: "center",
+    marginVertical: 20,
+  },
+  deleteButtonText: {
+    color: "#FFFFFF", // White text color
+    fontSize: 16,
+    fontWeight: "bold",
+  },
   timeSlotContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -1015,7 +1037,7 @@ export default StyleSheet.create({
   appointmentDate: {
     fontSize: 16,
     color: "green",
-    marginBottom: 16,
+    // marginBottom: 16,
   },
   hpAbuttonContainer: {
     flexDirection: "row",
@@ -1036,6 +1058,12 @@ export default StyleSheet.create({
     backgroundColor: "#D3D3D3",
     padding: 16,
   },
+  category: {
+    fontSize: 14,
+    color: "#777",
+    // marginVertical: 5,
+    marginBottom: 16,
+  },
   //changePassword
   changePwdContainer: {
     flex: 1,
@@ -1050,5 +1078,193 @@ export default StyleSheet.create({
     marginBottom: 70,
     alignItems: "center", // Center buttons
     justifyContent: "space-between", // Adjust spacing between buttons if needed
+  },
+  //AppointmentPage
+  doctorCard: {
+    flexDirection: "row",
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    padding: 15,
+    marginVertical: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  doctorImage: {
+    width: 75,
+    height: 75,
+    borderRadius: 35,
+    marginRight: 15,
+  },
+  doctorInfo: {
+    flex: 1,
+  },
+  doctorName: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#333",
+    marginBottom: 2,
+  },
+  doctorCategory: {
+    fontSize: 14,
+    color: "#777",
+    // marginVertical: 5,
+  },
+  doctorRating: {
+    fontSize: 14,
+    color: "#f39c12",
+    // marginVertical: 5,
+    marginTop: 5,
+  },
+  activeCategory: {
+    backgroundColor: "#007BFF",
+    borderColor: "#0056b3",
+  },
+  noDataText: {
+    fontSize: 16,
+    color: "#555",
+    textAlign: "center",
+    marginTop: 20,
+  },
+  favoriteIcon: {
+    position: "absolute",
+    top: 10,
+    right: 10,
+    zIndex: 10,
+  },
+  //AppointmentDoctorDetails.js
+  transDoctorCard: {
+    flexDirection: "row",
+    borderRadius: 10,
+    padding: 15,
+    marginVertical: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+    marginBottom: -25,
+  },
+  uAcontainer: {
+    // flexGrow: 1,
+    padding: 16,
+    flex: 1,
+  },
+  scrollViewContent: {
+    flexGrow: 1,
+    paddingBottom: 20,
+  },
+  infoContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginVertical: 3,
+    padding: 10,
+    backgroundColor: "#f9f9f9",
+    borderRadius: 10,
+    marginBottom: 10,
+  },
+  infoText: {
+    flex: 1,
+    fontSize: 14,
+    color: "#333",
+    // fontWeight: "bold",
+  },
+  profileButton: {
+    backgroundColor: "#4CAF50",
+    borderRadius: 20,
+    padding: 10,
+    alignItems: "center",
+    marginVertical: 10,
+    margin: 70,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.8,
+    shadowRadius: 2,
+    elevation: 5, // Add hover effect on Android
+  },
+  profileButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 17,
+  },
+  aSectionTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginVertical: 10,
+    color: "#333",
+  },
+  sectionContent: {
+    fontSize: 16,
+    color: "#000000",
+    marginBottom: 10,
+  },
+  datePickerButton: {
+    backgroundColor: "#E0E0E0",
+    padding: 10,
+    borderRadius: 10,
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  datePickerText: {
+    fontSize: 14,
+    color: "#333",
+  },
+  timeSlot: {
+    padding: 10,
+    margin: 5,
+    borderRadius: 10,
+    backgroundColor: "#f0f0f0",
+    alignItems: "center",
+  },
+  selectedTimeSlot: {
+    backgroundColor: "#4CAF50",
+  },
+  bookButton: {
+    backgroundColor: "#4CAF50",
+    borderRadius: 10,
+    padding: 15,
+    alignItems: "center",
+    marginTop: 20,
+  },
+  buttonText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 16,
+  },
+  fixedDoctorCard: {
+    position: "absolute",
+    top: 120,
+    left: 0,
+    right: 0,
+    zIndex: 1,
+    // backgroundColor: "white", // or any color that fits your design
+    padding: 16,
+  },
+  scrollableContent: {
+    marginTop: 150, // Adjust based on the height of your fixed card
+    // flex: 1,
+  },
+  displayUnderline: {
+    height: 2, // Height of the underline
+    backgroundColor: "#D3D3D3", // Color of the underline
+    width: "100%", // Width of the underline
+    alignSelf: "center", // Center the underline horizontally
+    marginBottom: 10,
+    marginTop: -5,
+    // marginVertical: 0, // Margin above and below
+  },
+  whiteBackground: {
+    backgroundColor: "#fff",
+    padding: 10,
+    borderRadius: 10,
+    marginVertical: 10,
+  },
+  uAContainer: {
+    // marginTop: -25,
+    padding: 16,
+    // backgroundColor: "#ffffff",
   },
 });

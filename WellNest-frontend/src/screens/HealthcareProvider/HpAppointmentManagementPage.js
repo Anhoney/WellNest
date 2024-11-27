@@ -44,7 +44,7 @@ const HpAppointmentManagementPage = ({}) => {
             onPress={() => navigation.navigate("HpAppointmentCreationPage")}
           >
             <Text style={styles.hpButtonText}>
-              Create Physical Appointments
+              Create or Edit Physical Appointments
             </Text>
           </TouchableOpacity>
 

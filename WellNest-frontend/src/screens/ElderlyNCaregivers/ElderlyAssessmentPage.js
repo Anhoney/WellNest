@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
-import API_BASE_URL from "../../config/config";
+import API_BASE_URL from "../../../config/config";
 
 const ElderlyAssessmentPage = () => {
   const [userData, setUserData] = useState({ name: "", gender: "", age: "" });

@@ -2,15 +2,34 @@
 const pool = require("../config/db");
 
 const createAppointment = async (req, res) => {
-  const { description, location, availableDays, availableTimes, category } =
-    req.body;
+  const {
+    description,
+    location,
+    hospitalAdds,
+    availableDays,
+    availableTimes,
+    category,
+  } = req.body;
   const userId = req.userId; // Get user ID from request
   console.log("Appointment data received:", req.body);
 
   try {
+    // Check if an appointment with the same category already exists for the user
+    // const existingAppointment = await pool.query(
+    //   "SELECT id FROM hp_availability WHERE user_id = $1 AND category = $2",
+    //   [userId, category]
+    // );
+
+    // if (existingAppointment.rows.length > 0) {
+    //   return res.status(400).json({
+    //     error: `You have already created an appointment for the category "${category}".`,
+    //   });
+    // }
+
+    // Insert the new appointment if no conflict exists
     const query = `
-      INSERT INTO hp_availability (description, location, available_days, available_times, category, user_id)
-      VALUES ($1, $2, $3, $4::text[], $5, $6) RETURNING *;
+      INSERT INTO hp_availability (description, location, available_days, available_times, category, hospital_address, user_id)
+      VALUES ($1, $2, $3, $4::text[], $5, $6, $7) RETURNING *;
     `;
     console.log("Pool object:", pool);
     const result = await pool.query(query, [
@@ -19,6 +38,7 @@ const createAppointment = async (req, res) => {
       availableDays,
       availableTimes,
       category,
+      hospitalAdds,
       userId,
     ]);
     console.log(result.data);
@@ -32,13 +52,13 @@ const createAppointment = async (req, res) => {
 // Function to fetch appointments for a specific user
 const getAppointments = async (req, res) => {
   const { userId } = req.params;
-
+  console.log("User ID:", userId);
   try {
     const result = await pool.query(
-      "SELECT id, description, location, available_days, available_times, category, created_at FROM hp_availability WHERE user_id = $1",
+      "SELECT id, description, location, hospital_address,available_days, available_times, category, created_at FROM hp_availability WHERE user_id = $1",
       [userId]
     );
-    res.status(200).json(result.rows);
+    res.status(200).json(result.rows[0]);
   } catch (error) {
     console.error("Error fetching appointments:", error);
     res.status(500).json({ error: "Failed to fetch appointments" });
@@ -59,15 +79,29 @@ const deleteAppointment = async (req, res) => {
 // Function to update an appointment
 const updateAppointment = async (req, res) => {
   const { id } = req.params;
-  const { description, location, available_days, available_times, category } =
-    req.body;
+  const {
+    description,
+    location,
+    hospital_address,
+    available_days,
+    available_times,
+    category,
+  } = req.body;
 
   try {
     await pool.query(
       `UPDATE hp_availability
-       SET description = $1, location = $2, available_days = $3, available_times = $4, category = $5
-       WHERE id = $6`,
-      [description, location, available_days, available_times, category, id]
+       SET description = $1, location = $2, available_days = $3, available_times = $4, category = $5, hospital_address = $6
+       WHERE id = $7`,
+      [
+        description,
+        location,
+        available_days,
+        available_times,
+        category,
+        hospital_address,
+        id,
+      ]
     );
     res.json({ message: "Appointment updated successfully" });
   } catch (error) {

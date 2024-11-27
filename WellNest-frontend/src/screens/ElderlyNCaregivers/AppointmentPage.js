@@ -1,27 +1,279 @@
 //AppointmentPage.js
-import React, { useState } from "react"; // <-- Add useState here
+import React, { useState, useEffect, useCallback } from "react"; // <-- Add useState here
 import {
   View,
   Text,
   ImageBackground,
   TextInput,
+  FlatList,
   TouchableOpacity,
   ScrollView,
+  Image,
 } from "react-native";
-import styles from "../components/styles"; // Import shared styles
+import styles from "../../components/styles"; // Import shared styles
 import { Ionicons } from "@expo/vector-icons"; // Import icons from Expo
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import DateTimePickerModal from "react-native-modal-datetime-picker"; // Ensure this is imported
-import NavigationBar from "../components/NavigationBar"; // Import your custom navigation bar component
-import API_BASE_URL from "../../config/config";
+import NavigationBar from "../../components/NavigationBar"; // Import your custom navigation bar component
+import API_BASE_URL from "../../../config/config";
+import axios from "axios";
+import { FontAwesome } from "@expo/vector-icons";
+import { Buffer } from "buffer";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getUserIdFromToken } from "../../../services/authService";
+
 const AppointmentPage = () => {
   const navigation = useNavigation();
   const [date, setDate] = useState(new Date());
   const [open, setOpen] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState("relevance");
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [location, setLocation] = useState("");
+  const [categories, setCategories] = useState([]);
+  const [doctors, setDoctors] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [favoriteDoctors, setFavoriteDoctors] = useState([]);
+  const [favorites, setFavorites] = useState([]);
+  const [selectedDoctor, setSelectedDoctor] = useState(null); // <-- Add this line
+  const [selectedTime, setSelectedTime] = useState(null); // <-- Add this line for selected time
+  const [userId, setUserId] = useState(null);
+
   // const [isDatePickerOpen, setDatePickerOpen] = useState(false);
+
+  // Fetch categories from API
+  useFocusEffect(
+    useCallback(() => {
+      const fetchUserId = async () => {
+        const userId = await getUserIdFromToken();
+        // console.log("userId:", userId);
+        if (userId) {
+          setUserId(userId);
+        }
+      };
+
+      const fetchCategories = async () => {
+        try {
+          const response = await axios.get(`${API_BASE_URL}/categories`);
+          setCategories(response.data);
+        } catch (error) {
+          console.error("Error fetching categories:", error);
+        }
+      };
+
+      const fetchFavoriteDoctors = async () => {
+        try {
+          const token = await AsyncStorage.getItem("token");
+          // console.log("Token:", token); // Log the token
+
+          if (!token) {
+            console.error("No token found");
+            return;
+          }
+
+          const response = await axios.get(`${API_BASE_URL}/getFavorites`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+
+          // console.log("Favorite Doctors Response:", response.data); // Log the response from the backend
+
+          // Extract the IDs for easier management
+          const favoriteIds = response.data.map(
+            (doctor) => doctor.availability_id
+          );
+          setFavoriteDoctors(response.data || []);
+          setFavorites(favoriteIds);
+        } catch (error) {
+          console.error("Error fetching favorite doctors:", error);
+        }
+      };
+      fetchUserId();
+      fetchCategories();
+      fetchFavoriteDoctors();
+    }, [])
+  );
+
+  // Function to toggle favorites
+  const toggleFavorite = async (doctorId) => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+
+      console.log("Token:", token); // Log the token to ensure it's being retrieved correctly
+      console.log("Doctor ID:", doctorId); // Log the doctor ID being passed
+
+      if (!token) {
+        console.error("No token found");
+        return;
+      }
+
+      const response = await axios.post(
+        `${API_BASE_URL}/toggleFavorite`,
+        { availabilityId: doctorId },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      console.log("Toggle Favorite Response:", response.data); // Log the response from the backend
+
+      if (response.data.success) {
+        setFavorites((prevFavorites) => {
+          const newFavorites = prevFavorites.includes(doctorId)
+            ? prevFavorites.filter((id) => id !== doctorId)
+            : [...prevFavorites, doctorId];
+
+          // Update favorites in AsyncStorage
+          AsyncStorage.setItem("favorites", JSON.stringify(newFavorites));
+          return newFavorites;
+        });
+      } else {
+        console.error("Failed to update favorite status.");
+      }
+    } catch (error) {
+      console.error("Error toggling favorite:", error);
+    }
+  };
+
+  const renderFavoriteCard = ({ item }) => {
+    const isFavorite = favorites.includes(item.availability_id);
+    let imageUri = item.profile_image
+      ? item.profile_image // Base64 string returned from the backend
+      : "https://via.placeholder.com/150";
+
+    return (
+      <View style={styles.doctorCard}>
+        <Image source={{ uri: imageUri }} style={styles.doctorImage} />
+        <View style={styles.doctorInfo}>
+          <Text style={styles.doctorName}>{item.username}</Text>
+          <Text style={styles.doctorCategory}>{item.category}</Text>
+          <Text style={styles.doctorCategory}>{item.location}</Text>
+          <Text style={styles.doctorRating}>⭐ {item.rating || "N/A"}</Text>
+        </View>
+        <TouchableOpacity
+          onPress={() => toggleFavorite(item.availability_id)}
+          style={styles.favoriteIcon}
+        >
+          <FontAwesome
+            name={isFavorite ? "heart" : "heart-o"}
+            size={24}
+            color={isFavorite ? "red" : "gray"}
+          />
+        </TouchableOpacity>
+      </View>
+    );
+  };
+
+  const handleSearch = async () => {
+    // Log the search parameters before making the API call
+    console.log("Search Params:", {
+      searchQuery,
+      location,
+      date: date.toISOString().split("T")[0], // Format date as 'YYYY-MM-DD'
+    });
+
+    const searchParams = {
+      searchQuery,
+      location,
+      date: date.toISOString().split("T")[0], // Format date as 'YYYY-MM-DD'
+    };
+
+    // Log the parameters to ensure they are correct
+    console.log("Formatted Search Params:", searchParams);
+
+    navigation.navigate("CategoryDoctors", { searchParams });
+    // const response = await axios.post(`${API_BASE_URL}/search`, {
+    //   searchQuery,
+    //   location,
+    //   date,
+    // });
+    // setDoctors(response.data); // Update the doctor list
+  };
+
+  const handleDoctorSelect = async (doctorId) => {
+    // Log the doctor ID and date to verify the request
+    console.log("Fetching available times for Doctor ID:", doctorId);
+    console.log("For Date:", date.toISOString().split("T")[0]);
+
+    // Set the selected doctor
+    setSelectedDoctor(doctorId);
+    // Fetch available times for the selected doctor
+    const response = await axios.get(`${API_BASE_URL}/availableTimes`, {
+      params: { doctorId, date: date.toISOString().split("T")[0] }, // Sending date as 'YYYY-MM-DD'
+    });
+    setAvailableTimes(response.data);
+  };
+
+  const handleTimeSelect = (time) => {
+    setSelectedTime(time);
+  };
+
+  // const handleTimeSelect = async (time) => {
+  //   // Set the selected time
+  //   setSelectedTime(time);
+  //   // Book the appointment
+  //   const response = await axios.post(`${API_BASE_URL}/book`, {
+  //     doctorId: selectedDoctor,
+  //     time,
+  //     date: date.toISOString().split("T")[0], // Sending date as 'YYYY-MM-DD'
+  //   });
+  //   navigation.navigate("AppointmentSuccess", { response });
+  // };
+  const handleCategoryClick = async (category) => {
+    navigation.navigate("CategoryDoctors", { category });
+    // setSelectedCategory(category); // Set selected category for UI feedback
+    // try {
+    //   const response = await axios.get(`${API_BASE_URL}/searchByCategory`, {
+    //     params: { category },
+    //   });
+    //   console.log("Selected category:", category);
+    //   setDoctors(response.data); // Update the doctors list
+    // } catch (error) {
+    //   console.error("Error fetching doctors:", error);
+    // }
+
+    // const response = await axios.get(`${API_BASE_URL}/searchByCategory`, {
+    //   params: { category },
+    // });
+    // setDoctors(response.data); // Update the doctor list
+  };
+
+  // Render each doctor card
+  const renderDoctorCard = ({ item }) => (
+    <View style={styles.doctorCard}>
+      <Image source={{ uri: item.profile_image }} style={styles.doctorImage} />
+      <View style={styles.doctorInfo}>
+        <Text style={styles.doctorName}>{item.username}</Text>
+        <Text style={styles.doctorCategory}>{item.specialist}</Text>
+        <Text style={styles.doctorRating}>⭐ {item.rating || "N/A"}</Text>
+      </View>
+    </View>
+  );
+
+  const handleBookAppointment = async () => {
+    if (!selectedDoctor || !selectedTime) {
+      alert("Please select both a doctor and a time.");
+      return;
+    }
+    console.log("Booking Appointment with Data:", {
+      doctorId: selectedDoctor,
+      date: date.toISOString().split("T")[0], // Sending date as 'YYYY-MM-DD'
+      time: selectedTime,
+    });
+
+    const response = await axios.post(`${API_BASE_URL}/bookAppointment`, {
+      doctorId: selectedDoctor,
+      date: date.toISOString().split("T")[0], // Send date as 'YYYY-MM-DD'
+      time: selectedTime,
+    });
+
+    console.log("Appointment Response:", response.data); // Log the response to check success
+
+    if (response.data.success) {
+      alert("Appointment booked successfully!");
+      // Optionally, navigate to another screen or reset state
+    } else {
+      alert("Failed to book appointment.");
+    }
+  };
 
   // Functions to handle date picker
   const showDatePicker = () => {
@@ -35,6 +287,10 @@ const AppointmentPage = () => {
   const handleConfirm = (selectedDate) => {
     setDate(selectedDate);
     hideDatePicker();
+    // Fetch available times for the newly selected date
+    if (selectedDoctor) {
+      handleDoctorSelect(selectedDoctor);
+    }
   };
 
   // Get today's date
@@ -52,7 +308,7 @@ const AppointmentPage = () => {
 
   return (
     <ImageBackground
-      source={require("../../assets/AppointmentPage.png")}
+      source={require("../../../assets/AppointmentPage.png")}
       style={styles.background}
     >
       {/* Title Section with Back chevron-back */}
@@ -70,12 +326,14 @@ const AppointmentPage = () => {
         <Text style={styles.smallTitle}>Find Your Doctor</Text>
 
         <View style={styles.searchContainer}>
-          <TouchableOpacity style={styles.searchButton}>
+          <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
             <Icon name="search" size={20} color="white" />
           </TouchableOpacity>
           <TextInput
             style={styles.searchInput}
             placeholder="Search Doctor..."
+            value={searchQuery}
+            onChangeText={setSearchQuery}
           />
         </View>
 
@@ -90,6 +348,8 @@ const AppointmentPage = () => {
             <TextInput
               style={styles.searchInputWithIcon}
               placeholder="Location"
+              value={location}
+              onChangeText={setLocation}
             />
           </View>
 
@@ -115,6 +375,7 @@ const AppointmentPage = () => {
             onCancel={hideDatePicker}
             date={date}
             minimumDate={today} // Disallow future dates by setting maximum date to today
+            // onDateChange={(selectedDate) => setDate(selectedDate)}
           />
         </View>
 
@@ -167,31 +428,32 @@ const AppointmentPage = () => {
         {/* White Underline */}
         <View style={styles.singleUnderline}></View>
 
-        {/* ScrollView for relevant or favorite specialists */}
-        <ScrollView style={styles.specialtyContainer}>
-          {selectedFilter === "relevance"
-            ? [
-                "Cardiology",
-                "Dermatology",
-                "General Medicine",
-                "Gynecology",
-                "Odontology",
-                "Oncology",
-                "Ophthalmology",
-                "Orthopedics",
-              ].map((specialty, index) => (
-                <TouchableOpacity key={index} style={styles.specialtyButton}>
-                  <Text style={styles.specialtyText}>{specialty}</Text>
-                </TouchableOpacity>
-              ))
-            : ["Saved Specialist 1", "Saved Specialist 2"].map(
-                (specialist, index) => (
-                  <TouchableOpacity key={index} style={styles.specialtyButton}>
-                    <Text style={styles.specialtyText}>{specialist}</Text>
-                  </TouchableOpacity>
-                )
-              )}
-        </ScrollView>
+        {selectedFilter === "favourite" ? (
+          <FlatList
+            data={favoriteDoctors}
+            keyExtractor={(item) => item.availability_id.toString()}
+            renderItem={renderFavoriteCard}
+            ListEmptyComponent={
+              <Text style={styles.noDataText}>No favorites yet</Text>
+            }
+          />
+        ) : (
+          <ScrollView style={styles.specialtyContainer}>
+            {categories.map((item, index) => (
+              <TouchableOpacity
+                key={index}
+                style={styles.specialtyButton}
+                onPress={() =>
+                  navigation.navigate("CategoryDoctors", {
+                    category: item.category,
+                  })
+                }
+              >
+                <Text style={styles.specialtyText}>{item.category}</Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        )}
       </View>
 
       <NavigationBar navigation={navigation} activePage="" />

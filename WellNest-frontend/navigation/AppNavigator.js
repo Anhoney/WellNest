@@ -11,15 +11,17 @@ import RegisterPage from "../src/screens/RegisterPage";
 import ChangePassword from "../src/screens/ChangePassword";
 
 // Elderly and caregivers
-import MainPage from "../src/screens/MainPage";
-import AppointmentPage from "../src/screens/AppointmentPage";
-import VirtualConsultationPage from "../src/screens/VirtualConsultationPage";
-import PrescriptionHistoryPage from "../src/screens/PrescriptionHistoryPage";
-import ProfilePage from "../src/screens/ProfilePage";
-import SettingPage from "../src/screens/SettingPage";
-import ProfileEditPage from "../src/screens/ProfileEditPage";
-import MedicationReminderPage from "../src/screens/MedicationReminderPage";
-import ElderlyAssessmentPage from "../src/screens/ElderlyAssessmentPage";
+import MainPage from "../src/screens/ElderlyNCaregivers/MainPage";
+import AppointmentPage from "../src/screens/ElderlyNCaregivers/AppointmentPage";
+import VirtualConsultationPage from "../src/screens/ElderlyNCaregivers/VirtualConsultationPage";
+import PrescriptionHistoryPage from "../src/screens/ElderlyNCaregivers/PrescriptionHistoryPage";
+import ProfilePage from "../src/screens/ElderlyNCaregivers/ProfilePage";
+import SettingPage from "../src/screens/ElderlyNCaregivers/SettingPage";
+import ProfileEditPage from "../src/screens/ElderlyNCaregivers/ProfileEditPage";
+import MedicationReminderPage from "../src/screens/ElderlyNCaregivers/MedicationReminderPage";
+import ElderlyAssessmentPage from "../src/screens/ElderlyNCaregivers/ElderlyAssessmentPage";
+import AppointmentDoctorDetails from "../src/screens/ElderlyNCaregivers/AppointmentDoctorDetails";
+import CategoryDoctorsScreen from "../src/screens/ElderlyNCaregivers/CategoryDoctorsScreen";
 
 // Healthcare Provider screens
 import HealthcareProviderMainPage from "../src/screens/HealthcareProvider/HealthcareProviderMainPage";
@@ -147,6 +149,12 @@ const AppNavigator = () => (
         component={CoEditProfilePage}
         options={{ title: "CoEditProfilePage" }}
       />
+      <Stack.Screen
+        name="DoctorDetails"
+        component={AppointmentDoctorDetails}
+        options={{ title: "DoctorDetails" }}
+      />
+      <Stack.Screen name="CategoryDoctors" component={CategoryDoctorsScreen} />
     </Stack.Navigator>
   </NavigationContainer>
 );

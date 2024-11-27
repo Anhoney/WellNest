@@ -34,7 +34,7 @@ const CoEditProfilePage = () => {
   const [email, setEmail] = useState("");
   const [address, setAddress] = useState("");
   const [emergency_contact, setEmergency_contact] = useState("");
-  const [summary, setSummary] = useState("");
+  const [organizerDetails, setOrganizerDetails] = useState("");
   const [education, setEducation] = useState("");
   const [credentials, setCredentials] = useState("");
   const [languages, setLanguages] = useState("");
@@ -146,16 +146,8 @@ const CoEditProfilePage = () => {
         setEmail(data.email || "");
         setAddress(data.address || "");
         setEmergency_contact(data.emergency_contact || "");
-        setSummary(data.summary || "");
-        setEducation(data.education || "");
-        setCredentials(data.credentials || "");
-        setLanguages(data.languages || "");
-        setServices(data.services || "");
-        setBusiness_hours(data.business_hours || "");
-        setBusiness_days(data.business_days || "");
-        setHospital(data.hospital || "");
-        setExperience(data.experience || "");
-        setSpecialist(data.specialist || "");
+        setOrganizerDetails(data.organizer_details || "");
+
         // console.log("data", data);
 
         // Check if profile_image is a Buffer
@@ -211,16 +203,7 @@ const CoEditProfilePage = () => {
       formData.append("email", email);
       formData.append("address", address);
       formData.append("emergency_contact", emergency_contact.toString());
-      formData.append("summary", summary);
-      formData.append("education", education);
-      formData.append("credentials", credentials);
-      formData.append("languages", languages);
-      formData.append("services", services);
-      formData.append("business_hours", business_hours);
-      formData.append("business_days", business_days);
-      formData.append("experience", experience.toString());
-      formData.append("specialist", specialist);
-      formData.append("hospital", hospital);
+      formData.append("organizer_details", organizerDetails);
 
       // // Add profile image if selected
       // if (profileImage) {
@@ -495,6 +478,19 @@ const CoEditProfilePage = () => {
               />
             </View>
 
+            <Text style={styles.question}>Role</Text>
+            <View style={styles.underline} />
+            <View style={styles.inputContainer}>
+              <TextInput
+                // value="Elderly"
+                value="Community Organizer"
+                editable={false}
+                style={styles.input}
+              />
+
+              {/* <TextInput value={role} editable={false} style={styles.input} /> */}
+            </View>
+
             <Text style={styles.question}>Emergency Contact</Text>
             <View style={styles.underline} />
             <View style={styles.inputContainer}>
@@ -506,120 +502,13 @@ const CoEditProfilePage = () => {
               />
             </View>
 
-            <Text style={styles.question}>Summary</Text>
+            <Text style={styles.question}>Organizer Details</Text>
             <View style={styles.underline} />
             <View style={styles.inputContainer}>
               <TextInput
-                placeholder="Summary"
-                value={summary}
-                onChangeText={setSummary}
-                style={styles.input}
-              />
-            </View>
-
-            <Text style={styles.question}>Education</Text>
-            <View style={styles.underline} />
-            <View style={styles.inputContainer}>
-              <TextInput
-                placeholder="Education"
-                value={education}
-                onChangeText={setEducation}
-                style={styles.input}
-                multiline
-              />
-            </View>
-
-            <Text style={styles.question}>Credentials</Text>
-            <View style={styles.underline} />
-            <View style={styles.inputContainer}>
-              <TextInput
-                placeholder="credentials"
-                value={credentials}
-                onChangeText={setCredentials}
-                style={styles.input}
-                multiline
-              />
-            </View>
-
-            <Text style={styles.question}>Languages</Text>
-            <View style={styles.underline} />
-            <View style={styles.inputContainer}>
-              <TextInput
-                placeholder="Languages"
-                value={languages}
-                onChangeText={setLanguages}
-                style={styles.input}
-                multiline
-              />
-            </View>
-
-            <Text style={styles.question}>Services</Text>
-            <View style={styles.underline} />
-            <View style={styles.inputContainer}>
-              <TextInput
-                placeholder="Services"
-                value={services}
-                onChangeText={setServices}
-                style={styles.input}
-                multiline
-              />
-            </View>
-
-            <Text style={styles.question}>Business Hours</Text>
-            <View style={styles.underline} />
-            <View style={styles.inputContainer}>
-              <TextInput
-                placeholder="Bussiness hours"
-                value={business_hours}
-                onChangeText={setBusiness_hours}
-                style={styles.input}
-                multiline
-              />
-            </View>
-
-            <Text style={styles.question}>Business Days</Text>
-            <View style={styles.underline} />
-            <View style={styles.inputContainer}>
-              <TextInput
-                placeholder="Business days"
-                value={business_days}
-                onChangeText={setBusiness_days}
-                style={styles.input}
-                multiline
-              />
-            </View>
-
-            <Text style={styles.question}>Working Experience</Text>
-            <View style={styles.underline} />
-            <View style={styles.inputContainer}>
-              <TextInput
-                placeholder="Working experience"
-                value={experience}
-                onChangeText={setExperience}
-                style={styles.input}
-                multiline
-              />
-            </View>
-
-            <Text style={styles.question}>Specialist</Text>
-            <View style={styles.underline} />
-            <View style={styles.inputContainer}>
-              <TextInput
-                placeholder="Specialist"
-                value={specialist}
-                onChangeText={setSpecialist}
-                style={styles.input}
-                multiline
-              />
-            </View>
-
-            <Text style={styles.question}>Hospital</Text>
-            <View style={styles.underline} />
-            <View style={styles.inputContainer}>
-              <TextInput
-                placeholder="Hospital"
-                value={hospital}
-                onChangeText={setHospital}
+                placeholder="Organizer Details"
+                value={organizerDetails}
+                onChangeText={setOrganizerDetails}
                 style={styles.input}
                 multiline
               />

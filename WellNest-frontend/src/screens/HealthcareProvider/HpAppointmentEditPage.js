@@ -1,4 +1,4 @@
-//HpMyCreatedAppointments.js
+//HpAppointmentEditPage.js
 import React, { useEffect, useState } from "react";
 import {
   View,
@@ -197,7 +197,7 @@ const HpAppointmentEditPage = () => {
           </RadioButton.Group>
 
           {/* Categories Field */}
-          <Text style={styles.label}>Categories</Text>
+          {/* <Text style={styles.label}>Categories</Text>
           <RadioButton.Group onValueChange={setCategory} value={category}>
             <View style={styles.hpradioButtonContainer}>
               <RadioButton.Item
@@ -280,17 +280,28 @@ const HpAppointmentEditPage = () => {
                 position="leading"
               />
             </View>
-          </RadioButton.Group>
+          </RadioButton.Group> */}
 
           {/* Custom Category Input if "Others" is selected */}
-          {category === "Others" && (
+          {/* {category === "Others" && (
             <TextInput
               style={styles.hpInput}
               value={otherCategory}
               onChangeText={setOtherCategory}
               placeholder="Please specify your category"
             />
-          )}
+          )} */}
+
+          {/* Display Category */}
+          <Text style={styles.label}>Category</Text>
+          <View style={styles.hpInput}>
+            <Text style={styles.hpNonEditableText}>
+              {/* {category === "Others" && otherCategory
+                ? otherCategory
+                : category} */}
+              {category}
+            </Text>
+          </View>
 
           <Text style={styles.label}>Available Times</Text>
           <View>

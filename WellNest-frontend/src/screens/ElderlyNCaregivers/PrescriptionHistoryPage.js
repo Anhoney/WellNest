@@ -11,10 +11,10 @@ import {
 } from "react-native";
 import axios from "axios";
 import { useNavigation } from "@react-navigation/native";
-import styles from "../components/styles"; // Import shared styles
+import styles from "../../components/styles"; // Import shared styles
 import { Ionicons } from "@expo/vector-icons"; // Import icons from Expo
 import Icon from "react-native-vector-icons/FontAwesome";
-import API_BASE_URL from "../../config/config";
+import API_BASE_URL from "../../../config/config";
 
 const PrescriptionHistoryPage = () => {
   const [prescriptions, setPrescriptions] = useState([]);
@@ -37,7 +37,7 @@ const PrescriptionHistoryPage = () => {
 
   return (
     <ImageBackground
-      source={require("../../assets/PlainGrey.png")}
+      source={require("../../../assets/PlainGrey.png")}
       style={styles.background}
     >
       <View style={styles.smallHeaderContainer}>
@@ -97,7 +97,7 @@ const PrescriptionHistoryPage = () => {
               No latest prescriptions
             </Text>
             <Image
-              source={require("../../assets/NothingCat.png")}
+              source={require("../../../assets/NothingCat.png")}
               style={styles.noPrescriptionImage}
             />
           </View>
@@ -143,7 +143,7 @@ const PrescriptionHistoryPage = () => {
               No history prescriptions
             </Text>
             <Image
-              source={require("../../assets/NothingCat.png")}
+              source={require("../../../assets/NothingCat.png")}
               style={styles.noPrescriptionImage}
             />
           </View>

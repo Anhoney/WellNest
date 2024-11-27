@@ -61,6 +61,8 @@ const authRoutes = require("./routes/authRoutes");
 const registerRoute = require("./routes/registerRoute");
 const appointmentsRoute = require("./routes/appointmentsRoute");
 const profileRoutes = require("./routes/profileRoutes");
+const userAppointmentsRoutes = require("./routes/userAppointmentsRoutes");
+const favoriteRoutes = require("./routes/favoriteRoutes");
 // const usersRoute = require("./routes/usersRoute");
 
 require("dotenv").config();
@@ -83,6 +85,11 @@ app.use("/api/auth", authRoutes);
 app.use("/api", appointmentsRoute);
 
 app.use("/api", profileRoutes);
+
+// User-specific routes
+app.use("/api", userAppointmentsRoutes);
+
+app.use("/api", favoriteRoutes);
 
 // app.use("/api", usersRoute);
 

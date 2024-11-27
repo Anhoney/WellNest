@@ -28,7 +28,7 @@ const upload = multer({
   limits: { fileSize: 5 * 1024 * 1024 }, // Limit file size to 5MB
   fileFilter: (req, file, cb) => {
     // Only allow certain file types (jpg, png, jpeg)
-    const fileTypes = /jpeg|avif|jpg|png/;
+    const fileTypes = /jpeg|avif|jpg|png|webp/;
     const extname = fileTypes.test(
       path.extname(file.originalname).toLowerCase()
     );
@@ -210,7 +210,7 @@ WHERE user_id = $10
        INSERT INTO profile 
 (user_id, username, age, gender, date_of_birth, phone_number, 
  address, emergency_contact, core_qualifications, education) 
-VALUES ( $10,$1, $2, $3, $4, $5, $6, $7, $8, $9)
+VALUES ( $10, $1, $2, $3, $4, $5, $6, $7, $8, $9)
  
       `;
         queryParams = [
@@ -269,7 +269,6 @@ VALUES ( $10,$1, $2, $3, $4, $5, $6, $7, $8, $9)
           username,
           age,
           gender,
-          identity_card,
           date_of_birth,
           phone_number,
           address,
@@ -290,7 +289,6 @@ VALUES ( $10,$1, $2, $3, $4, $5, $6, $7, $8, $9)
           username,
           age,
           gender,
-          identity_card,
           date_of_birth,
           phone_number,
           address,

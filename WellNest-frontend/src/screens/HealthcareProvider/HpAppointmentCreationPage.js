@@ -1,5 +1,5 @@
 //HpAppointmentCreationPage.js
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -8,6 +8,7 @@ import {
   StyleSheet,
   ScrollView,
   ImageBackground,
+  Alert,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons"; // Import icons from Expo
 import styles from "../../components/styles"; // Import shared styles
@@ -22,10 +23,12 @@ import {
   getInputStyle,
 } from "../../components/validationUtils"; // Import validation functions
 import API_BASE_URL from "../../../config/config";
+import { getUserIdFromToken } from "../../../services/authService";
 
 const HpAppointmentCreationPage = () => {
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState("");
+  const [hospitalAdds, setHospitalAdds] = useState("");
   const [availableDays, setAvailableDays] = useState("Everyday");
   const [availableTimes, setAvailableTimes] = useState([]);
   const [newTime, setNewTime] = useState(new Date());
@@ -34,6 +37,121 @@ const HpAppointmentCreationPage = () => {
   const navigation = useNavigation();
   const [category, setCategory] = useState("Cardiology"); // New state for category
   const [otherCategory, setOtherCategory] = useState(""); // For custom category
+  const [loading, setLoading] = useState(true); // Loading state
+  const [userId, setUserId] = useState(null);
+  const [appointmentId, setAppointmentId] = useState([]);
+  const [existingAppointment, setExistingAppointment] = useState(null); // State to hold existing appointment
+
+  useEffect(() => {
+    const initializeData = async () => {
+      try {
+        // Fetch userId
+        const fetchedUserId = await getUserIdFromToken();
+        if (fetchedUserId) {
+          setUserId(fetchedUserId);
+          console.log(fetchedUserId);
+          // Fetch appointments for the user
+          const token = await AsyncStorage.getItem("token");
+          if (!token) {
+            throw new Error("No token found. Please log in.");
+          }
+
+          const response = await axios.get(
+            `${API_BASE_URL}/appointments/user/${fetchedUserId}`,
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
+          console.log(`${API_BASE_URL}/appointments/user/${fetchedUserId}`);
+          const appointment = response.data;
+
+          // Set existing appointment if found
+          if (appointment) {
+            setExistingAppointment(appointment); // Store the existing appointment
+            setAppointmentId(appointment.id);
+            setDescription(appointment.description || "");
+            setLocation(appointment.location || "");
+            setHospitalAdds(appointment.hospital_address || "");
+            setAvailableDays(appointment.available_days || "Everyday");
+            setCategory(appointment.category || "Cardiology");
+            setAvailableTimes(
+              Array.isArray(appointment.available_times)
+                ? appointment.available_times
+                : []
+            );
+          }
+          console.log("AppointmentId:", appointmentId);
+          console.log("Fetched appointment data:", appointment);
+        } else {
+          throw new Error("Failed to fetch userId.");
+        }
+      } catch (error) {
+        console.error("Error initializing data:", error);
+        alert("Failed to load appointment data. Please try again later.");
+      } finally {
+        setLoading(false); // Ensure loading state is updated
+      }
+    };
+
+    initializeData();
+  }, []);
+
+  // const fetchUserId = async () => {
+  //   const userId = await getUserIdFromToken();
+  //   // console.log("userId:", userId);
+  //   if (userId) {
+  //     setUserId(userId);
+  //     fetchProfileData(userId);
+  //   }
+  // };
+  // // Function to fetch appointments for a specific user
+  // const fetchAppointments = async (userId) => {
+  //   try {
+  //     const token = await AsyncStorage.getItem("token");
+  //     console.log("Token:", token); // Log the token to verify it's correct
+  //     console.log("userId:", userId);
+  //     // setLoading(true);
+  //     // setError(null);
+  //     const response = await axios.get(
+  //       `${API_BASE_URL}/api/appointments/user/${userId}`,
+  //       {
+  //         headers: { Authorization: `Bearer ${token}` },
+  //       }
+  //     );
+  //     console.log("Appointments:", response.data);
+  //     const appointment = response.data;
+  //     console.log(response.data);
+  //     console.log("Fetched appointment:", appointment); // Log the entire appointment object
+  //     setDescription(appointment.description);
+  //     setLocation(appointment.location);
+  //     setAvailableDays(appointment.available_days);
+  //     console.log("Available days:", appointment.available_days);
+  //     setCategory(appointment.category);
+  //     // Safely set availableTimes only if it's an array
+  //     setAvailableTimes(
+  //       Array.isArray(appointment.available_times)
+  //         ? appointment.available_times
+  //         : []
+  //     );
+  //     // setAppointments(response.data);
+  //   } catch (err) {
+  //     console.error("Error fetching appointments:", err);
+  //     setError("Failed to fetch appointments");
+  //   }
+  //   // finally {
+  //   //   setLoading(false);
+  //   // }
+  // };
+
+  // useEffect(() => {
+  //   fetchUserId();
+  //   fetchAppointments(userId);
+  // }, [userId]);
+  // useEffect(() => {
+  //   if (userId) {
+  //     fetchAppointments(userId);
+  //   }
+  // }, [userId]);
 
   const handleAddTime = () => {
     const timeString = newTime.toLocaleTimeString([], {
@@ -57,6 +175,7 @@ const HpAppointmentCreationPage = () => {
     const fieldsToValidate = {
       description,
       location,
+      hospitalAdds,
     };
 
     // Validate fields and set errors if any
@@ -80,6 +199,8 @@ const HpAppointmentCreationPage = () => {
         alert("Please enter a description.");
       } else if (!location.trim()) {
         alert("Please enter a location.");
+      } else if (!hospitalAdds.trim()) {
+        alert("Please enter a hospital address.");
       } else if (availableTimes.length === 0) {
         alert("Please select at least one available time.");
       }
@@ -87,66 +208,117 @@ const HpAppointmentCreationPage = () => {
     }
     // Clear errors and proceed with form submission
     setErrors({});
-    // Validate that all fields are filled
-    // if (!description.trim()) {
-    //   alert("Please enter a description.");
-    //   return;
-    // }
-
-    // if (!location.trim()) {
-    //   alert("Please enter a location.");
-    //   return;
-    // }
-
-    // if (availableTimes.length === 0) {
-    //   alert("Please select at least one available time.");
-    //   return;
-    // }
 
     try {
       const token = await AsyncStorage.getItem("token"); // Retrieve token from AsyncStorage or other storage
-      // console.log("Token:", token); // Log the token
 
-      // if (token) {
-      //   const decoded = jwt_decode(token);
-      //   console.log("Decoded Token:", decoded); // Log the decoded token
-      //   // Check if the token is expired
-      //   if (decoded.exp * 1000 < Date.now()) {
-      //     alert("Token has expired. Please log in again.");
-      //     return;
-      //   }
-      // } else {
-      //   alert("No token found. Please log in.");
-      //   return;
-      // }
       if (!token) {
         alert("No token found. Please log in.");
         return;
       }
 
-      const response = await axios.post(
-        `${API_BASE_URL}/appointments`,
-        {
-          description,
-          location,
-          availableDays,
-          availableTimes,
-          category: finalCategory, // Add category to the request body
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
+      if (existingAppointment) {
+        // Update existing appointment
+        const response = await axios.put(
+          `${API_BASE_URL}/appointments/${appointmentId}`, // Use the ID of the existing appointment
+          {
+            description,
+            location,
+            hospital_address: hospitalAdds,
+            available_days: availableDays,
+            available_times: availableTimes,
+            category: finalCategory,
+          },
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
+        if (response.status === 200) {
+          alert("Appointment updated successfully!");
+          navigation.goBack();
         }
-      );
-      console.log(response);
-      if (response.status === 200) {
-        alert("Appointment created successfully!");
-        navigation.goBack(); // Navigate back to previous page after submission
+      } else {
+        const response = await axios.post(
+          `${API_BASE_URL}/appointments`,
+          {
+            description,
+            location,
+            hospitalAdds,
+            availableDays,
+            availableTimes,
+            category: finalCategory, // Add category to the request body
+          },
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        // console.log(response);
+        if (response.status === 200) {
+          alert("Appointment created successfully!");
+          navigation.goBack(); // Navigate back to previous page after submission
+        }
       }
     } catch (error) {
-      console.error("Error creating appointment:", error);
-      alert("Failed to create appointment.");
+      if (error.response && error.response.status === 400) {
+        // Handle duplicate category error
+        alert(error.response.data.error);
+      } else {
+        console.error("Error creating appointment:", error);
+        alert("Failed to create appointment.");
+      }
+      // console.error("Error creating appointment:", error);
+      // alert("Failed to create appointment.");
     }
   };
+
+  const handleDelete = async () => {
+    Alert.alert(
+      "Confirm Delete",
+      "Are you sure you want to delete this appointment?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Delete",
+          onPress: async () => {
+            try {
+              const token = await AsyncStorage.getItem("token");
+              if (!token) {
+                alert("No token found. Please log in.");
+                return;
+              }
+
+              await axios.delete(
+                `${API_BASE_URL}/appointments/${appointmentId}`,
+                {
+                  headers: { Authorization: `Bearer ${token}` },
+                }
+              );
+              alert("Appointment deleted successfully!");
+              navigation.goBack(); // Navigate back after deletion
+            } catch (error) {
+              console.error("Error deleting appointment:", error);
+              alert("Failed to delete appointment.");
+            }
+          },
+        },
+      ],
+      { cancelable: false }
+    );
+  };
+
+  if (loading) {
+    return (
+      <View style={styles.centeredContainer}>
+        <Text style={styles.loadingText}>
+          Checking existing appointments...
+        </Text>
+      </View>
+    );
+  }
 
   return (
     <ImageBackground
@@ -189,7 +361,7 @@ const HpAppointmentCreationPage = () => {
             multiline
           />
 
-          <Text style={styles.label}>Location</Text>
+          <Text style={styles.label}>Hospital Name / Location</Text>
           <TextInput
             // style={styles.hpInput}
             // value={location}
@@ -200,6 +372,21 @@ const HpAppointmentCreationPage = () => {
               setLocation(text);
               setErrors((prev) => ({ ...prev, location: false }));
             }}
+          />
+
+          <Text style={styles.label}>Hospital Address</Text>
+          <TextInput
+            // style={styles.hpInput}
+            // value={description}
+            // onChangeText={setDescription}
+            // multiline
+            style={getInputStyle(!errors.hospitalAdds)}
+            value={hospitalAdds}
+            onChangeText={(text) => {
+              setHospitalAdds(text);
+              setErrors((prev) => ({ ...prev, hospitalAdds: false }));
+            }}
+            multiline
           />
 
           <Text style={styles.label}>Available Days</Text>
@@ -335,69 +522,6 @@ const HpAppointmentCreationPage = () => {
             />
           )}
 
-          {/* <Text style={styles.label}>Available Time</Text>
-          <View style={styles.timeContainer}>
-            {availableTimes.map((time, index) => (
-              <Text key={index} style={styles.timeSlot}>
-                {time}
-              </Text>
-            ))}
-          </View>
-          <TouchableOpacity onPress={() => setShowPicker(true)}>
-            <Text style={styles.addTimeText}>Select Time</Text>
-          </TouchableOpacity>
-          {showPicker && (
-            <DateTimePicker
-              value={newTime}
-              mode="time"
-              is24Hour={false}
-              display="default"
-              onChange={(event, selectedDate) => {
-                const currentDate = selectedDate || newTime;
-                setNewTime(currentDate);
-                handleAddTime(); // Automatically add time when selected
-              }}
-            />
-          )} */}
-
-          {/*almost prefect*/}
-          {/* <Text style={styles.label}>Available Times</Text>
-          <View style={styles.timeContainer}>
-            {availableTimes.map((time, index) => (
-              <View key={index} style={styles.timeSlotContainer}>
-                <TouchableOpacity onPress={() => handleEditTime(index)}>
-                  <Text style={styles.timeSlot}>{time}</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => handleRemoveTime(index)}>
-                  <Ionicons name="close-circle" size={20} color="#FF0000" />
-                </TouchableOpacity>
-              </View>
-            ))}
-          </View>
-          <TouchableOpacity onPress={() => setShowPicker(true)}>
-            <Text style={styles.addTimeText}>Select Time</Text>
-          </TouchableOpacity>
-          {showPicker && (
-            <DateTimePicker
-              value={newTime}
-              mode="time"
-              is24Hour={false}
-              display="default"
-              onChange={(event, selectedDate) => {
-                if (event.type === "set") {
-                  setNewTime(selectedDate || newTime);
-                }
-              }}
-              onTouchCancel={() => setShowPicker(false)} // Close picker without changes
-            />
-          )}
-          {showPicker && (
-            <TouchableOpacity onPress={handleAddOrUpdateTime}>
-              <Text style={styles.confirmButton}>Confirm Time</Text>
-            </TouchableOpacity>
-          )} */}
-          {/*almost prefect*/}
-
           <Text style={styles.label}>Available Time</Text>
           <View>
             {availableTimes.map((time, index) => (
@@ -433,29 +557,22 @@ const HpAppointmentCreationPage = () => {
               </TouchableOpacity>
             </View>
           )}
-
-          {/* <Text style={styles.label}>Available Time</Text>
-          <View style={styles.timeContainer}>
-            {availableTimes.map((time, index) => (
-              <Text key={index} style={styles.timeSlot}>
-                {time}
-              </Text>
-            ))}
-          </View>
-          <TextInput
-            style={styles.timeInput}
-            value={newTime}
-            placeholder="Add time (e.g., 09:00 AM)"
-            onChangeText={setNewTime}
-          />
-          <TouchableOpacity onPress={handleAddTime}>
-            <Text style={styles.addTimeText}>add time +</Text>
-          </TouchableOpacity> */}
+          <Text style={styles.uploadPrecautions}>
+            {"\n"}Complete your profile details to create a more informative
+            appointment listing and attract more patients. Head over to the
+            profile screen now!
+          </Text>
         </View>
 
         <TouchableOpacity style={styles.doneButton} onPress={handleSubmit}>
           <Text style={styles.doneButtonText}>Done</Text>
         </TouchableOpacity>
+
+        {existingAppointment && ( // Conditionally render the delete button
+          <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
+            <Text style={styles.deleteButtonText}>Delete Appointment</Text>
+          </TouchableOpacity>
+        )}
       </ScrollView>
       {/* Navigation Bar */}
       <HpNavigationBar navigation={navigation} />

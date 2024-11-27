@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { Ionicons } from "@expo/vector-icons"; // For icons
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import CoNavigationBar from "../../components/CoNavigationBar"; // Import here
 import styles from "../../components/styles"; // Import shared styles
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -30,27 +30,6 @@ const CoProfilePage = () => {
   const [username, setUsername] = useState("");
 
   const fetchUserId = async () => {
-    // try {
-    //   const token = await AsyncStorage.getItem("token");
-    //   console.log("token:", token);
-    //   if (!token) {
-    //     alert("No token found. Please log in.");
-    //     return;
-    //   }
-
-    //   const decodedToken = jwt_decode(token);
-    //   const decodedUserId = decodedToken.id;
-    //   // console.log("decodeuserid:", decodedUserId);
-    //   if (decodedUserId) {
-    //     setUserId(decodedUserId);
-    //     fetchProfileData(decodedUserId);
-    //   } else {
-    //     alert("Failed to retrieve user ID from token.");
-    //   }
-    // } catch (error) {
-    //   console.error("Error decoding token:", error);
-    //   Alert.alert("Error", "Failed to decode token");
-    // }
     const userId = await getUserIdFromToken();
     console.log("userId:", userId);
     if (userId) {
@@ -104,9 +83,17 @@ const CoProfilePage = () => {
     }
   };
 
-  useEffect(() => {
-    fetchUserId();
-  }, []);
+  // Refresh data when the screen comes into focus
+  useFocusEffect(
+    React.useCallback(() => {
+      console.log("Screen focused, refreshing data");
+      fetchUserId();
+    }, [])
+  );
+
+  //   useEffect(() => {
+  //     fetchUserId();
+  //   }, []);
 
   // Confirm and handle Delete Account
   const handleDeleteAccount = () => {
@@ -229,7 +216,7 @@ const CoProfilePage = () => {
         <Text style={styles.profileId}>ID: {userId}</Text>
         <TouchableOpacity
           style={styles.editProfileButton}
-          onPress={() => navigation.navigate("HpEditProfilePage")}
+          onPress={() => navigation.navigate("CoEditProfilePage")}
         >
           <Text style={styles.editProfileText}>Edit Profile</Text>
         </TouchableOpacity>

@@ -96,7 +96,7 @@ const HpMyCreatedAppointments = () => {
   const renderAppointment = ({ item }) => (
     <View style={styles.hpAppointmentContainer}>
       <View style={styles.appointmentHeader}>
-        <Text style={styles.createdByText}>Created by:</Text>
+        <Text style={styles.createdByText}>Created by: </Text>
         <TouchableOpacity onPress={() => handleDelete(item.id)}>
           <FontAwesome name="trash" size={20} color="black" />
         </TouchableOpacity>
@@ -110,6 +110,9 @@ const HpMyCreatedAppointments = () => {
           minute: "2-digit",
           hour12: true,
         })}
+      </Text>
+      <Text style={styles.category}>
+        Category: {item.category || "N/A"} {/* Display category */}
       </Text>
       <View style={styles.hpAbuttonContainer}>
         <TouchableOpacity

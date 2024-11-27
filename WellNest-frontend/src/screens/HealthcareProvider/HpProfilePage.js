@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { Ionicons } from "@expo/vector-icons"; // For icons
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import HpNavigationBar from "../../components/HpNavigationBar"; // Import here
 import styles from "../../components/styles"; // Import shared styles
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -104,9 +104,17 @@ const HpProfilePage = () => {
     }
   };
 
-  useEffect(() => {
-    fetchUserId();
-  }, []);
+  // Refresh data when the screen comes into focus
+  useFocusEffect(
+    React.useCallback(() => {
+      console.log("Screen focused, refreshing data");
+      fetchUserId();
+    }, [])
+  );
+
+  // useEffect(() => {
+  //   fetchUserId();
+  // }, []);
 
   // Confirm and handle Delete Account
   const handleDeleteAccount = () => {
