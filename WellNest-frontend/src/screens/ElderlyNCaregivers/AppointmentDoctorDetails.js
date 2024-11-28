@@ -338,6 +338,7 @@ import {
 import DateTimePickerModal from "react-native-modal-datetime-picker"; // Ensure this is imported
 import styles from "../../components/styles"; // Assuming you have a styles file
 import axios from "axios";
+import { useRoute } from "@react-navigation/native";
 import NavigationBar from "../../components/NavigationBar"; // Import here
 import { Ionicons } from "@expo/vector-icons"; // Import icons from Expo
 import { FontAwesome } from "@expo/vector-icons"; // Import FontAwesome for the heart icon
@@ -345,18 +346,23 @@ import API_BASE_URL from "../../../config/config";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const AppointmentDoctorDetails = ({ route, navigation }) => {
-  const { doctorId } = route.params;
+  const { doctorId, selectedDate } = route.params;
   const [doctor, setDoctor] = useState({});
-  const [selectedDate, setSelectedDate] = useState("");
+  //   const [selectedDate, setSelectedDate] = useState("");
   const [availableTimes, setAvailableTimes] = useState([]);
   const [selectedTime, setSelectedTime] = useState("");
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false); // Date picker visibility state
   const [favorites, setFavorites] = useState([]);
   const isFavorite = favorites.includes(doctorId);
+  //   const route = useRoute();
 
   const imageUri = doctor.profile_image
     ? `data:image/png;base64,${doctor.profile_image}`
     : "https://via.placeholder.com/150";
+
+  // Set the selected date from the route params
+  const [date, setDate] = useState(selectedDate || ""); // Initialize with selectedDate
+  const today = new Date();
 
   useEffect(() => {
     const fetchDoctorDetails = async () => {
@@ -389,9 +395,52 @@ const AppointmentDoctorDetails = ({ route, navigation }) => {
       }
     };
 
+    // Fetch available times for the selected date when the component mounts
+    if (selectedDate) {
+      fetchAvailableTimes(selectedDate);
+    }
+
     fetchDoctorDetails();
     fetchFavorites();
-  }, [doctorId]);
+  }, [doctorId, selectedDate]);
+
+  const fetchAvailableTimes = async (date) => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/availableTimes`, {
+        params: { doctorId, date },
+      });
+
+      // Check if slots are returned and filter out booked ones
+      const filteredTimes = response.data
+        ? response.data.filter((timeSlot) => !timeSlot.booked)
+        : [];
+
+      setAvailableTimes(filteredTimes);
+
+      if (filteredTimes.length === 0) {
+        Alert.alert(
+          "No Available Times",
+          "No available time slots for this date."
+        );
+      }
+
+      // if (response.data.length === 0) {
+      //   Alert.alert(
+      //     "No Available Times",
+      //     "No available time slots for this date."
+      //   );
+      // } else {
+      //   // Filter out the booked or occupied slots
+      //   const filteredTimes = response.data.filter(
+      //     (timeSlot) => !timeSlot.booked
+      //   );
+      //   setAvailableTimes(filteredTimes); // Update available times with fetched data
+      // }
+    } catch (error) {
+      Alert.alert("Error", "Failed to fetch available times.");
+      console.error(error);
+    }
+  };
 
   const toggleFavorite = async () => {
     try {
@@ -427,187 +476,81 @@ const AppointmentDoctorDetails = ({ route, navigation }) => {
   };
 
   // Handle the selected date
-  const handleConfirmDate = async (date) => {
-    const formattedDate = date.toISOString().split("T")[0]; // Format to YYYY-MM-DD
-    setSelectedDate(formattedDate);
+  const handleConfirmDate = async (selectedDate) => {
+    const formattedDate = selectedDate.toISOString().split("T")[0]; // Format to YYYY-MM-DD
+    setDate(formattedDate); // Update the date state
     setDatePickerVisibility(false);
 
-    try {
-      const response = await axios.get(`${API_BASE_URL}/availableTimes`, {
-        params: { doctorId, date: formattedDate },
-      });
-      setAvailableTimes(response.data);
-    } catch (error) {
-      Alert.alert("Error", "Failed to fetch available times.");
-      console.error(error);
-    }
+    // Log the selected date for debugging
+    console.log("Selected Date:", formattedDate);
+
+    // Fetch available times for the newly selected date
+    await fetchAvailableTimes(formattedDate);
+
+    // try {
+    //   const response = await axios.get(`${API_BASE_URL}/availableTimes`, {
+    //     params: { doctorId, date: formattedDate },
+    //   });
+    //   //   setAvailableTimes(response.data);
+
+    //   // Log the API response to ensure we're getting the correct data
+    //   console.log("Available Times Response:", response.data);
+
+    //   if (response.data.length === 0) {
+    //     Alert.alert(
+    //       "No Available Times",
+    //       "No available time slots for this date."
+    //     );
+    //   } else {
+    //     setAvailableTimes(response.data); // Update available times with filtered data
+    //   }
+    // } catch (error) {
+    //   Alert.alert("Error", "Failed to fetch available times.");
+    //   console.error(error);
+    // }
+  };
+  // Function to format the date with commas
+  const formatDate = (dateToFormat) => {
+    if (!dateToFormat) return ""; // Fallback if date is undefined
+    return new Date(dateToFormat).toLocaleDateString("en-US", {
+      weekday: "short",
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
   };
 
   const handleBookAppointment = async () => {
-    if (!selectedDate || !selectedTime) {
+    if (!date || !selectedTime) {
       Alert.alert("Error", "Please select a date and time.");
       return;
     }
 
     try {
-      await axios.post(`${API_BASE_URL}/bookAppointment`, {
-        doctorId,
-        date: selectedDate,
-        time: selectedTime,
-      });
+      const token = await AsyncStorage.getItem("token");
+      if (!token) {
+        console.error("No token found");
+        return;
+      }
+
+      await axios.post(
+        `${API_BASE_URL}/bookAppointment`,
+        {
+          doctorId,
+          date: date,
+          time: selectedTime,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       Alert.alert("Success", "Appointment booked successfully.");
-      navigation.navigate("Home"); // Navigate back to Home
+      navigation.navigate("MainPage"); // Navigate back to Home
     } catch (error) {
       Alert.alert("Error", "Failed to book appointment.");
       console.error(error);
     }
   };
-
-  //   const renderItem = ({ item }) => {
-  // if (item.type === "experience") {
-  //   return (
-  //     <View style={styles.infoContainer}>
-  //       <Text style={styles.infoText}>
-  //         Experience: {doctor.experience || "N/A"}
-  //       </Text>
-  //     </View>
-  //   );
-  // }
-  // if (item.type === "businessHours") {
-  //   return (
-  //     <View style={styles.infoContainer}>
-  //       <Text style={styles.infoText}>
-  //         Business Hours: {doctor.business_hours || "N/A"}
-  //         {getBusinessDays(doctor.business_days)}
-  //       </Text>
-  //     </View>
-  //   );
-  // }
-  //     if (item.type === "experience" || item.type === "businessHours") {
-  //       return (
-  //         <View style={styles.infoContainer}>
-  //           {item.type === "experience" && (
-  //             <View
-  //               style={{ flexDirection: "row", alignItems: "center", flex: 1 }}
-  //             >
-  //               <FontAwesome
-  //                 name="briefcase"
-  //                 size={16}
-  //                 color="#e67e22"
-  //                 style={{ marginRight: 5 }}
-  //               />
-  //               <Text style={styles.infoText}>
-  //                 {doctor.experience || "N/A"} years experience
-  //               </Text>
-  //             </View>
-  //           )}
-  //           {item.type === "businessHours" && (
-  //             <View
-  //               style={{ flexDirection: "row", alignItems: "center", flex: 1 }}
-  //             >
-  //               <FontAwesome
-  //                 name="clock-o"
-  //                 size={16}
-  //                 color="#e67e22"
-  //                 style={{ marginRight: 5 }}
-  //               />
-  //               <Text style={styles.infoText}>
-  //                 {doctor.business_hours || "N/A"} / {""}
-  //                 {getBusinessDays(doctor.business_days) || "N/A"}
-  //               </Text>
-  //             </View>
-  //           )}
-  //         </View>
-  //       );
-  //     }
-  //     if (item.type === "description") {
-  //       return (
-  //         <View style={styles.whiteBackground}>
-  //           <Text style={styles.aSectionTitle}>Descriptions</Text>
-  //           <View style={styles.displayUnderline} />
-  //           <Text style={styles.sectionContent}>{doctor.description}</Text>
-  //         </View>
-  //       );
-  //     }
-  //     if (item.type === "about") {
-  //       return (
-  //         <View style={styles.whiteBackground}>
-  //           <Text style={styles.aSectionTitle}>About</Text>
-  //           <View style={styles.displayUnderline} />
-  //           <Text style={styles.sectionContent}>
-  //             📞 {doctor.phone_number || "N/A"}
-  //           </Text>
-  //           <Text style={styles.sectionContent}>
-  //             📍 {doctor.hospital_address || "N/A"}
-  //           </Text>
-  //         </View>
-  //       );
-  //     }
-  //     if (item.type === "dateSelection") {
-  //       return (
-  //         <View style={styles.whiteBackground}>
-  //           <Text style={styles.aSectionTitle}>Select Date</Text>
-  //           <View style={styles.displayUnderline} />
-  //           <TouchableOpacity
-  //             style={styles.datePickerButton}
-  //             onPress={() => setDatePickerVisibility(true)}
-  //           >
-  //             <Text style={styles.datePickerText}>
-  //               {selectedDate || "Select a Date"}
-  //             </Text>
-  //           </TouchableOpacity>
-  //           <DateTimePickerModal
-  //             isVisible={isDatePickerVisible}
-  //             mode="date"
-  //             onConfirm={handleConfirmDate}
-  //             onCancel={() => setDatePickerVisibility(false)}
-  //             minimumDate={new Date()}
-  //           />
-  //         </View>
-  //       );
-  //     }
-  //     if (item.type === "timeSelection") {
-  //       return (
-  //         <View style={styles.whiteBackground}>
-  //           <Text style={styles.aSectionTitle}>Select Time</Text>
-  //           <View style={styles.displayUnderline} />
-  //           <FlatList
-  //             data={availableTimes}
-  //             keyExtractor={(item) => item}
-  //             renderItem={({ item }) => (
-  //               <TouchableOpacity
-  //                 onPress={() => setSelectedTime(item)}
-  //                 style={[
-  //                   styles.timeSlot,
-  //                   item === selectedTime ? styles.selectedTimeSlot : null,
-  //                 ]}
-  //               >
-  //                 <Text>{item}</Text>
-  //               </TouchableOpacity>
-  //             )}
-  //             ListEmptyComponent={
-  //               selectedDate && (
-  //                 <Text style={styles.noTimesText}>
-  //                   No available times for the selected date.
-  //                 </Text>
-  //               )
-  //             }
-  //           />
-  //         </View>
-  //       );
-  //     }
-  //     if (item.type === "bookButton") {
-  //       return (
-  //         <TouchableOpacity
-  //           style={styles.bookButton}
-  //           onPress={handleBookAppointment}
-  //         >
-  //           <Text style={styles.buttonText}>Book Appointment</Text>
-  //         </TouchableOpacity>
-  //       );
-  //     }
-  //     return null;
-  //   };
 
   const getBusinessDays = (businessDays) => {
     switch (businessDays) {
@@ -633,51 +576,6 @@ const AppointmentDoctorDetails = ({ route, navigation }) => {
   ];
 
   return (
-    //     <ImageBackground
-    //       source={require("../../../assets/DoctorDetails.png")}
-    //       style={styles.background}
-    //     >
-    //       <View style={styles.smallHeaderContainer}>
-    //         <TouchableOpacity
-    //           onPress={() => navigation.goBack()}
-    //           style={styles.backButton}
-    //         >
-    //           <Ionicons name="chevron-back" size={24} color="#000" />
-    //         </TouchableOpacity>
-    //         <Text style={styles.title}> {doctor.category} </Text>
-    //       </View>
-
-    //       <View style={styles.fixedDoctorCard}>
-    //         <View style={styles.transDoctorCard}>
-    //           <Image source={{ uri: imageUri }} style={styles.doctorImage} />
-    //           <View style={styles.doctorInfo}>
-    //             <Text style={styles.doctorName}>{doctor.username}</Text>
-    //             <Text style={styles.doctorCategory}>{doctor.category}</Text>
-    //             <Text style={styles.description}>Hospital: {doctor.location}</Text>
-    //             <Text style={styles.doctorRating}>⭐ {doctor.rating || "N/A"}</Text>
-    //           </View>
-    //           <TouchableOpacity
-    //             onPress={toggleFavorite}
-    //             style={styles.favoriteIcon}
-    //           >
-    //             <FontAwesome
-    //               name={isFavorite ? "heart" : "heart-o"}
-    //               size={24}
-    //               color={isFavorite ? "red" : "gray"}
-    //             />
-    //           </TouchableOpacity>
-    //         </View>
-    //       </View>
-
-    //       <FlatList
-    //         data={data}
-    //         renderItem={renderItem}
-    //         keyExtractor={(item) => item.type}
-    //         // contentContainerStyle={styles.scrollableContent}
-    //         style={styles.uAContainer}
-    //       />
-    //     </ImageBackground>
-    //   );
     <ImageBackground
       source={require("../../../assets/DoctorDetails.png")}
       style={[styles.background, { flex: 1 }]}
@@ -692,6 +590,7 @@ const AppointmentDoctorDetails = ({ route, navigation }) => {
         </TouchableOpacity>
         <Text style={styles.title}> {doctor.category} </Text>
       </View>
+
       <View style={styles.uAcontainer}>
         {/* Static Doctor Info */}
         <View style={styles.transDoctorCard}>
@@ -788,7 +687,8 @@ const AppointmentDoctorDetails = ({ route, navigation }) => {
                     📞 {doctor.phone_number || "N/A"}
                   </Text>
                   <Text style={styles.sectionContent}>
-                    📍 {doctor.hospital_address || "N/A"}
+                    📍 {doctor.location || "N/A"} {"\n"}{" "}
+                    {doctor.hospital_address || ""}
                   </Text>
                 </>
               );
@@ -803,7 +703,28 @@ const AppointmentDoctorDetails = ({ route, navigation }) => {
                     style={styles.datePickerButton}
                     onPress={() => setDatePickerVisibility(true)}
                   >
-                    <Text style={styles.datePickerText}>
+                    <View style={styles.dateInputContent}>
+                      <Ionicons
+                        name="calendar-outline"
+                        size={20}
+                        color="#000"
+                        style={styles.iconStyle}
+                      />
+                      <Text style={styles.dateText}>
+                        {date ? formatDate(date) : "Select a Date"}
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                  <DateTimePickerModal
+                    isVisible={isDatePickerVisible}
+                    mode="date"
+                    display="inline"
+                    onConfirm={handleConfirmDate}
+                    onCancel={() => setDatePickerVisibility(false)}
+                    date={date ? new Date(date) : today}
+                    minimumDate={today}
+                  />
+                  {/* <Text style={styles.datePickerText}>
                       {selectedDate || "Select a Date"}
                     </Text>
                   </TouchableOpacity>
@@ -813,7 +734,7 @@ const AppointmentDoctorDetails = ({ route, navigation }) => {
                     onConfirm={handleConfirmDate}
                     onCancel={() => setDatePickerVisibility(false)}
                     minimumDate={new Date()}
-                  />
+                  /> */}
                 </>
               );
             }
@@ -821,7 +742,7 @@ const AppointmentDoctorDetails = ({ route, navigation }) => {
             if (item.key === "TimeSlots") {
               return (
                 <>
-                  <Text style={styles.aSectionTitle}>Select Time</Text>
+                  <Text style={styles.aSectionTitle}>Select Time Slots</Text>
                   <View style={styles.displayUnderline} />
                   <FlatList
                     data={availableTimes}
@@ -842,9 +763,9 @@ const AppointmentDoctorDetails = ({ route, navigation }) => {
                       </TouchableOpacity>
                     )}
                     ListEmptyComponent={
-                      selectedDate && (
+                      date && (
                         <Text style={styles.noTimesText}>
-                          No available times for the selected date.
+                          No available times for the selected date. {"\n"}
                         </Text>
                       )
                     }

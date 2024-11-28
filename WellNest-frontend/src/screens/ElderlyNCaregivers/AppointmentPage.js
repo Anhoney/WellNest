@@ -200,6 +200,11 @@ const AppointmentPage = () => {
       params: { doctorId, date: date.toISOString().split("T")[0] }, // Sending date as 'YYYY-MM-DD'
     });
     setAvailableTimes(response.data);
+    // Navigate to AppointmentDoctorDetails with the selected date
+    navigation.navigate("AppointmentDoctorDetails", {
+      doctorId,
+      selectedDate: date.toISOString().split("T")[0], // Pass the selected date
+    });
   };
 
   const handleTimeSelect = (time) => {

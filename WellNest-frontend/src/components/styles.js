@@ -1220,7 +1220,7 @@ export default StyleSheet.create({
     alignItems: "center",
   },
   selectedTimeSlot: {
-    backgroundColor: "#4CAF50",
+    backgroundColor: "#a9d9f4",
   },
   bookButton: {
     backgroundColor: "#4CAF50",
@@ -1229,11 +1229,11 @@ export default StyleSheet.create({
     alignItems: "center",
     marginTop: 20,
   },
-  buttonText: {
-    color: "#fff",
-    fontWeight: "bold",
-    fontSize: 16,
-  },
+  // buttonText: {
+  //   color: "#fff",
+  //   fontWeight: "bold",
+  //   fontSize: 16,
+  // },
   fixedDoctorCard: {
     position: "absolute",
     top: 120,

@@ -28,7 +28,8 @@ const CategoryDoctorsScreen = () => {
   const [loading, setLoading] = useState(true); // Handle loading state
   // Manage favorites outside render function
   const [favorites, setFavorites] = useState([]);
-
+  const selectedDate = searchParams?.date; // Extract the date
+  console.log("selectedDate:", selectedDate);
   // Fetch doctors and favorites when the screen is focused
   useFocusEffect(
     React.useCallback(() => {
@@ -46,7 +47,7 @@ const CategoryDoctorsScreen = () => {
             // Fetch doctors by search parameters
             response = await axios.post(`${API_BASE_URL}/search`, searchParams);
           }
-          console.log("API category Response:", response.data);
+          //   console.log("API category Response:", response.data);
           setDoctors(response.data || []);
         } catch (error) {
           console.error("Error fetching doctors:", error);
@@ -204,6 +205,7 @@ const CategoryDoctorsScreen = () => {
         onPress={() =>
           navigation.navigate("DoctorDetails", {
             doctorId: item.id,
+            selectedDate: selectedDate, // Pass the selectedDate here
           })
         }
       >

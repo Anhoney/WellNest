@@ -70,7 +70,7 @@ const searchDoctors = async (req, res) => {
     });
 
     res.status(200).json(doctors.rows);
-    console.log("Doctors found:", doctors.rows);
+    // console.log("Doctors found:", doctors.rows);
   } catch (error) {
     console.error("Error searching doctors:", error);
     res.status(500).json({ error: "Failed to search doctors" });
@@ -79,49 +79,259 @@ const searchDoctors = async (req, res) => {
 
 // Get available times for a specific doctor
 const getAvailableTimes = async (req, res) => {
-  const { doctorId, date } = req.query;
-
-  // Parse the date to get the day of the week
-  const parsedDate = new Date(date);
-  if (isNaN(parsedDate)) {
-    return res.status(400).json({ error: "Invalid date format" });
-  }
-  const dayOfWeek = parsedDate.getDay(); // Numeric day of the week
-
   try {
-    const availability = await pool.query(
-      `SELECT available_times
-       FROM hp_availability
-       WHERE user_id = $1 AND 
-       (
-           available_days = 'Everyday' 
-           OR (available_days = 'Every Weekday' AND $2 BETWEEN 1 AND 5) 
-           OR (available_days = 'Every Weekend' AND $2 IN (0, 6)) 
-           OR $2::TEXT = ANY(string_to_array(available_days, ',')))
-       `,
-      [doctorId, dayOfWeek]
-    );
+    const { doctorId, date } = req.query;
+    console.log("Doctor ID:", doctorId);
+    console.log("Date:", date);
 
-    if (availability.rows.length === 0) {
-      return res.status(404).json({ message: "No available times found" });
+    // Validate input
+    if (!doctorId || !date) {
+      return res
+        .status(400)
+        .json({ error: "Doctor ID and Date are required." });
     }
 
-    res.status(200).json(availability.rows[0].available_times);
+    // Parse the date to find the day of the week
+    const parsedDate = new Date(date);
+    if (isNaN(parsedDate)) {
+      return res.status(400).json({ error: "Invalid date format." });
+    }
+
+    const dayOfWeek = parsedDate.getDay(); // 0 (Sunday) to 6 (Saturday)
+    const dayCategory =
+      dayOfWeek === 0 || dayOfWeek === 6 ? "Every Weekend" : "Every Weekday"; // Determine the day category
+
+    console.log("Day of the week:", dayOfWeek);
+    console.log("Day category:", dayCategory);
+    // Fetch user_id from hp_availability using doctorId
+    const userIdQuery = `
+SELECT user_id, available_times, available_days 
+FROM hp_availability 
+WHERE id = $1
+`;
+    const userIdResult = await pool.query(userIdQuery, [doctorId]);
+
+    if (userIdResult.rows.length === 0) {
+      return res.status(404).json({ error: "Doctor not found." });
+    }
+
+    const {
+      user_id: userId,
+      available_times: availableTimes,
+      available_days: availableDays,
+    } = userIdResult.rows[0];
+
+    // Check if the day matches the available_days
+    const isAvailable =
+      availableDays === "Everyday" ||
+      (availableDays === "Every Weekday" && dayCategory === "Every Weekday") ||
+      (availableDays === "Every Weekend" && dayCategory === "Every Weekend");
+
+    if (!isAvailable) {
+      return res.json([]); // No availability for the given day
+    }
+
+    console.log("Available times:", availableTimes);
+    console.log("UserId getAvailableTime:", userId);
+    // Fetch booked times from hp_appointments
+    //     const bookedAppointmentsQuery = `
+    // SELECT app_time AS time
+    // FROM hp_appointments
+    // WHERE hp_id = $1 AND app_date = $2
+    // `;
+    //     const bookedAppointments = await pool.query(bookedAppointmentsQuery, [
+    //       userId,
+    //       date,
+    //     ]);
+
+    //     // Fetch booked times from hp_virtual_appointment
+    //     const virtualAppointmentsQuery = `
+    // SELECT hpva_time AS time
+    // FROM hp_virtual_appointment
+    // WHERE hp_id = $1 AND hpva_date = $2
+    // `;
+    //     const virtualAppointments = await pool.query(virtualAppointmentsQuery, [
+    //       userId,
+    //       date,
+    //     ]);
+
+    // Fetch booked times from both tables
+    const bookedAppointmentsQuery = `
+SELECT app_time AS time FROM hp_appointments 
+WHERE hp_id = $1 AND app_date = $2
+UNION
+SELECT hpva_time AS time FROM hp_virtual_appointment 
+WHERE hp_id = $1 AND hpva_date = $2
+`;
+    const bookedAppointments = await pool.query(bookedAppointmentsQuery, [
+      userId,
+      date,
+    ]);
+
+    // Combine all booked times
+    // const bookedTimes = [
+    //   ...bookedAppointments.rows.map((appt) => appt.time),
+    //   ...virtualAppointments.rows.map((vAppt) => vAppt.time),
+    // ];
+
+    const bookedTimes = bookedAppointments.rows.map((appt) => appt.time);
+    console.log("Booked times:", bookedTimes);
+
+    // Convert booked times to 'hh:mm AM/PM' format
+    const convertTo12HourFormat = (time) => {
+      const [hours, minutes] = time.split(":");
+      const period = hours >= 12 ? "PM" : "AM";
+      const adjustedHours = hours % 12 || 12; // Convert 0 to 12 for midnight
+      return `${adjustedHours}:${minutes.padStart(2, "0")} ${period}`;
+    };
+
+    const bookedTimes12Hour = bookedTimes.map(convertTo12HourFormat);
+    console.log("Booked times in 12-hour format:", bookedTimes12Hour);
+
+    // Normalize availableTimes to replace non-breaking spaces with regular spaces
+    const normalizedAvailableTimes = availableTimes.map((time) =>
+      time.replace(/\u202F/g, " ")
+    );
+
+    // Filter available times
+    const filteredTimes = normalizedAvailableTimes.filter(
+      (time) => !bookedTimes12Hour.includes(time)
+    );
+    // // Filter available times
+    // const filteredTimes = availableTimes.filter(
+    //   (time) => !bookedTimes.includes(time)
+    // );
+
+    // Filter available times
+    // const filteredTimes = availableTimes.filter(
+    //   (time) => !bookedTimes12Hour.includes(time)
+    // );
+
+    console.log("Filtered Available Times:", filteredTimes);
+    res.status(200).json(filteredTimes); // Send the filtered times
   } catch (error) {
     console.error("Error fetching available times:", error);
-    res.status(500).json({ error: "Failed to fetch available times" });
+    res.status(500).json({ error: "An error occurred while fetching times." });
   }
+};
+
+const convertTo24HourFormat = (time) => {
+  // Check if the time is defined and is a string
+  if (!time || typeof time !== "string") {
+    throw new Error("Invalid time format: Time must be a string");
+  }
+
+  // Normalize the time string by trimming and replacing any non-standard whitespace characters
+  time = time.trim().replace(/\s+/g, " "); // Replace multiple whitespace characters with a single space
+
+  // Log the exact time received and its length for debugging purposes
+  console.log("Received time:", time);
+  console.log("Length of received time:", time.length);
+
+  // Regular expression to match a 12-hour time format (e.g., "11:00 AM", "12:30 PM")
+  const timeFormat = /^(\d{1,2}):(\d{2}) (AM|PM)$/i;
+
+  // Attempt to match the time string against the regular expression
+  const match = time.match(timeFormat);
+  if (!match) {
+    throw new Error("Invalid time format: Expected format is 'hh:mm AM/PM'");
+  }
+
+  let [_, hours, minutes, period] = match;
+
+  // Convert string values to numbers
+  hours = parseInt(hours, 10);
+  minutes = parseInt(minutes, 10);
+
+  // Convert the time to 24-hour format
+  if (period.toUpperCase() === "PM" && hours !== 12) {
+    hours += 12; // If it's PM and the hour is less than 12, add 12 hours
+  } else if (period.toUpperCase() === "AM" && hours === 12) {
+    hours = 0; // If it's 12 AM, set hour to 0 (midnight)
+  }
+
+  // Ensure hours, minutes, and seconds are in the correct format
+  const formattedTime = `${String(hours).padStart(2, "0")}:${String(
+    minutes
+  ).padStart(2, "0")}:00`;
+
+  // Return the time in 'HH:MM:SS' format for PostgreSQL TIME without timezone
+  return formattedTime;
 };
 
 // Book an appointment
 const bookAppointment = async (req, res) => {
-  const { userId, doctorId, date, time } = req.body;
+  const { doctorId, date, time } = req.body;
+  const userId = req.userId; // Get userId from the authenticated request
+  console.log("Booking Appointment", userId, doctorId, date, time);
+
+  if (!userId) {
+    return res.status(401).json({ error: "User  not authenticated" });
+  }
 
   try {
+    // Convert the provided time to 24-hour format
+    const convertedTime = convertTo24HourFormat(time);
+    console.log("Converted time:", convertedTime);
+
+    // Fetch the doctor (hp_id) from the hp_availability table using the doctorId (availability_id)
+    const availabilityQuery = await pool.query(
+      `SELECT user_id FROM hp_availability WHERE id = $1`,
+      [doctorId]
+    );
+
+    if (availabilityQuery.rows.length === 0) {
+      return res.status(404).json({ error: "Doctor not found" });
+    }
+
+    const hpId = availabilityQuery.rows[0].user_id; // Get the hp_id (doctor's id) from the availability table
+
+    // Check if the user already has a booking on the same date and time
+    const existingAppointmentQuery = `
+SELECT 1 FROM hp_appointments 
+WHERE u_id = $1 AND hp_id = $2 AND app_date = $3 AND app_time = $4
+UNION
+SELECT 1 FROM hp_virtual_appointment 
+WHERE u_id = $1 AND hp_id = $2 AND hpva_date = $3 AND hpva_time = $4
+`;
+    const existingAppointment = await pool.query(existingAppointmentQuery, [
+      userId,
+      hpId,
+      date,
+      convertedTime,
+    ]);
+
+    if (existingAppointment.rows.length > 0) {
+      return res.status(400).json({
+        error: "You already have an appointment at this time.",
+      });
+    }
+
+    // Check if the time slot is already booked by another user
+    const timeSlotQuery = `
+SELECT 1 FROM hp_appointments 
+WHERE hp_id = $1 AND app_date = $2 AND app_time = $3
+UNION
+SELECT 1 FROM hp_virtual_appointment 
+WHERE hp_id = $1 AND hpva_date = $2 AND hpva_time = $3
+`;
+    const timeSlotTaken = await pool.query(timeSlotQuery, [
+      hpId,
+      date,
+      convertedTime,
+    ]);
+
+    if (timeSlotTaken.rows.length > 0) {
+      return res.status(400).json({
+        error: "This time slot is already booked by another user.",
+      });
+    }
+
+    // Insert the appointment into the hp_appointments table
     await pool.query(
-      `INSERT INTO appointments (user_id, doctor_id, date, time)
-       VALUES ($1, $2, $3, $4)`,
-      [userId, doctorId, date, time]
+      `INSERT INTO hp_appointments (u_id, hp_id, app_date, app_time, app_status, app_sickness, app_description, app_address)
+         VALUES ($1, $2, $3, $4, 'pending', NULL, NULL, NULL)`, // Assuming 'pending' status by default, and other fields as NULL
+      [userId, hpId, date, convertedTime]
     );
 
     res.status(201).json({ message: "Appointment booked successfully" });

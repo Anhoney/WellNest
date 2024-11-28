@@ -34,7 +34,7 @@ router.post("/search", searchDoctors);
 router.get("/availableTimes", getAvailableTimes);
 
 // Route for booking an appointment (requires user authentication)
-router.post("/book", authenticateToken, bookAppointment);
+router.post("/bookAppointment", authenticateToken, bookAppointment);
 
 // Route for fetching unique categories
 router.get("/categories", getCategories); // New route for categories

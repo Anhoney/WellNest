@@ -599,8 +599,8 @@ const HpEditProfilePage = () => {
           >
             <View style={styles.genderRadioButtonContainer}>
               <RadioButton.Item
-                label="Weekday"
-                value="Weekday"
+                label="Every Weekday"
+                value="Every Weekday"
                 mode="android"
                 position="leading"
                 color={styles.radioButtonColor.color}
@@ -609,8 +609,8 @@ const HpEditProfilePage = () => {
             </View>
             <View style={styles.genderRadioButtonContainer}>
               <RadioButton.Item
-                label="Weekend"
-                value="Weekend"
+                label="Every Weekend"
+                value="Every Weekend"
                 mode="android"
                 position="leading"
                 color={styles.radioButtonColor.color}
