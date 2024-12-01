@@ -41,58 +41,119 @@ const AppointmentPage = () => {
   const [userId, setUserId] = useState(null);
 
   // const [isDatePickerOpen, setDatePickerOpen] = useState(false);
+  // Polling function to keep data updated
+  const pollData = useCallback(() => {
+    fetchCategories();
+    fetchFavoriteDoctors();
+  }, []);
 
   // Fetch categories from API
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     const fetchUserId = async () => {
+  //       const userId = await getUserIdFromToken();
+  //       // console.log("userId:", userId);
+  //       if (userId) {
+  //         setUserId(userId);
+  //       }
+  //     };
+
+  //     const fetchCategories = async () => {
+  //       try {
+  //         const response = await axios.get(`${API_BASE_URL}/categories`);
+  //         setCategories(response.data);
+  //       } catch (error) {
+  //         console.error("Error fetching categories:", error);
+  //       }
+  //     };
+
+  //     const fetchFavoriteDoctors = async () => {
+  //       try {
+  //         const token = await AsyncStorage.getItem("token");
+  //         // console.log("Token:", token); // Log the token
+
+  //         if (!token) {
+  //           console.error("No token found");
+  //           return;
+  //         }
+
+  //         const response = await axios.get(`${API_BASE_URL}/getFavorites`, {
+  //           headers: { Authorization: `Bearer ${token}` },
+  //         });
+
+  //         // console.log("Favorite Doctors Response:", response.data); // Log the response from the backend
+
+  //         // Extract the IDs for easier management
+  //         const favoriteIds = response.data.map(
+  //           (doctor) => doctor.availability_id
+  //         );
+  //         setFavoriteDoctors(response.data || []);
+  //         setFavorites(favoriteIds);
+  //       } catch (error) {
+  //         console.error("Error fetching favorite doctors:", error);
+  //       }
+  //     };
+  //     fetchUserId();
+  //     fetchCategories();
+  //     fetchFavoriteDoctors();
+
+  //   }, [])
+  // );
+
   useFocusEffect(
     useCallback(() => {
-      const fetchUserId = async () => {
-        const userId = await getUserIdFromToken();
-        // console.log("userId:", userId);
-        if (userId) {
-          setUserId(userId);
-        }
-      };
-
-      const fetchCategories = async () => {
-        try {
-          const response = await axios.get(`${API_BASE_URL}/categories`);
-          setCategories(response.data);
-        } catch (error) {
-          console.error("Error fetching categories:", error);
-        }
-      };
-
-      const fetchFavoriteDoctors = async () => {
-        try {
-          const token = await AsyncStorage.getItem("token");
-          // console.log("Token:", token); // Log the token
-
-          if (!token) {
-            console.error("No token found");
-            return;
-          }
-
-          const response = await axios.get(`${API_BASE_URL}/getFavorites`, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-
-          // console.log("Favorite Doctors Response:", response.data); // Log the response from the backend
-
-          // Extract the IDs for easier management
-          const favoriteIds = response.data.map(
-            (doctor) => doctor.availability_id
-          );
-          setFavoriteDoctors(response.data || []);
-          setFavorites(favoriteIds);
-        } catch (error) {
-          console.error("Error fetching favorite doctors:", error);
-        }
-      };
       fetchUserId();
-      fetchCategories();
-      fetchFavoriteDoctors();
-    }, [])
+      pollData(); // Initial fetch
+
+      // Set up polling to fetch data every 10 seconds
+      const intervalId = setInterval(pollData, 10000); // Poll every 10 seconds
+
+      // Cleanup function to clear the interval
+      return () => clearInterval(intervalId);
+    }, [pollData])
   );
+
+  const fetchUserId = async () => {
+    const userId = await getUserIdFromToken();
+    // console.log("userId:", userId);
+    if (userId) {
+      setUserId(userId);
+    }
+  };
+
+  const fetchCategories = async () => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/categories`);
+      setCategories(response.data);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  };
+
+  const fetchFavoriteDoctors = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      // console.log("Token:", token); // Log the token
+
+      if (!token) {
+        console.error("No token found");
+        return;
+      }
+
+      const response = await axios.get(`${API_BASE_URL}/getFavorites`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      // console.log("Favorite Doctors Response:", response.data); // Log the response from the backend
+
+      // Extract the IDs for easier management
+      const favoriteIds = response.data.map((doctor) => doctor.availability_id);
+      setFavoriteDoctors(response.data || []);
+      setFavorites(favoriteIds);
+    } catch (error) {
+      console.error("Error fetching favorite doctors:", error);
+    }
+  };
 
   // Function to toggle favorites
   const toggleFavorite = async (doctorId) => {
@@ -140,25 +201,35 @@ const AppointmentPage = () => {
       : "https://via.placeholder.com/150";
 
     return (
-      <View style={styles.doctorCard}>
-        <Image source={{ uri: imageUri }} style={styles.doctorImage} />
-        <View style={styles.doctorInfo}>
-          <Text style={styles.doctorName}>{item.username}</Text>
-          <Text style={styles.doctorCategory}>{item.category}</Text>
-          <Text style={styles.doctorCategory}>{item.location}</Text>
-          <Text style={styles.doctorRating}>⭐ {item.rating || "N/A"}</Text>
+      <TouchableOpacity
+        onPress={() => {
+          // Navigate to AppointmentDoctorDetails with the selected doctor and date
+          navigation.navigate("DoctorDetails", {
+            doctorId: item.availability_id, // Assuming item.id is the doctor's ID
+            // selectedDate: date.toISOString().split("T")[0], // Pass the selected date
+          });
+        }}
+      >
+        <View style={styles.doctorCard}>
+          <Image source={{ uri: imageUri }} style={styles.doctorImage} />
+          <View style={styles.doctorInfo}>
+            <Text style={styles.doctorName}>{item.username}</Text>
+            <Text style={styles.doctorCategory}>{item.category}</Text>
+            <Text style={styles.doctorCategory}>{item.location}</Text>
+            <Text style={styles.doctorRating}>⭐ {item.rating || "N/A"}</Text>
+          </View>
+          <TouchableOpacity
+            onPress={() => toggleFavorite(item.availability_id)}
+            style={styles.favoriteIcon}
+          >
+            <FontAwesome
+              name={isFavorite ? "heart" : "heart-o"}
+              size={24}
+              color={isFavorite ? "red" : "gray"}
+            />
+          </TouchableOpacity>
         </View>
-        <TouchableOpacity
-          onPress={() => toggleFavorite(item.availability_id)}
-          style={styles.favoriteIcon}
-        >
-          <FontAwesome
-            name={isFavorite ? "heart" : "heart-o"}
-            size={24}
-            color={isFavorite ? "red" : "gray"}
-          />
-        </TouchableOpacity>
-      </View>
+      </TouchableOpacity>
     );
   };
 
@@ -297,6 +368,15 @@ const AppointmentPage = () => {
       handleDoctorSelect(selectedDoctor);
     }
   };
+  const EmptyFavorites = () => (
+    <View style={styles.emptyFavoritesContainer}>
+      <Image
+        source={require("../../../assets/NoFavourite.png")}
+        style={styles.emptyFavoritesImage}
+      />
+      <Text style={styles.noDataText}>No favorites yet.</Text>
+    </View>
+  );
 
   // Get today's date
   const today = new Date();
@@ -439,7 +519,8 @@ const AppointmentPage = () => {
             keyExtractor={(item) => item.availability_id.toString()}
             renderItem={renderFavoriteCard}
             ListEmptyComponent={
-              <Text style={styles.noDataText}>No favorites yet</Text>
+              <EmptyFavorites />
+              // <Text style={styles.noDataText}>No favorites yet</Text>
             }
           />
         ) : (

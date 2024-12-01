@@ -324,7 +324,7 @@
 // export default AppointmentDoctorDetails;
 
 //AppointmentDoctorDetails.js
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
   Text,
@@ -402,6 +402,17 @@ const AppointmentDoctorDetails = ({ route, navigation }) => {
 
     fetchDoctorDetails();
     fetchFavorites();
+
+    // Set up polling to fetch data every 10 seconds
+    const intervalId = setInterval(() => {
+      fetchDoctorDetails();
+      if (selectedDate) {
+        fetchAvailableTimes(selectedDate);
+      }
+    }, 10000); // Poll every 10 seconds
+
+    // Cleanup function to clear the interval
+    return () => clearInterval(intervalId);
   }, [doctorId, selectedDate]);
 
   const fetchAvailableTimes = async (date) => {
@@ -417,12 +428,12 @@ const AppointmentDoctorDetails = ({ route, navigation }) => {
 
       setAvailableTimes(filteredTimes);
 
-      if (filteredTimes.length === 0) {
-        Alert.alert(
-          "No Available Times",
-          "No available time slots for this date."
-        );
-      }
+      // if (filteredTimes.length === 0) {
+      //   Alert.alert(
+      //     "No Available Times",
+      //     "No available time slots for this date."
+      //   );
+      // }
 
       // if (response.data.length === 0) {
       //   Alert.alert(
@@ -482,7 +493,7 @@ const AppointmentDoctorDetails = ({ route, navigation }) => {
     setDatePickerVisibility(false);
 
     // Log the selected date for debugging
-    console.log("Selected Date:", formattedDate);
+    // console.log("Selected Date:", formattedDate);
 
     // Fetch available times for the newly selected date
     await fetchAvailableTimes(formattedDate);
@@ -554,12 +565,12 @@ const AppointmentDoctorDetails = ({ route, navigation }) => {
 
   const getBusinessDays = (businessDays) => {
     switch (businessDays) {
-      case "Weekday":
-        return "(Mon-Fri)";
-      case "Weekend":
-        return "(Sat-Sun)";
+      case "Every Weekday":
+        return "Mon-Fri";
+      case "Every Weekend":
+        return "Sat-Sun";
       case "Everyday":
-        return "(Mon-Sun)";
+        return "Mon-Sun";
       default:
         return "";
     }
@@ -574,6 +585,19 @@ const AppointmentDoctorDetails = ({ route, navigation }) => {
     { type: "timeSelection" },
     { type: "bookButton" },
   ];
+
+  const handleNext = () => {
+    if (!date || !selectedTime) {
+      Alert.alert("Error", "Please select a date and time.");
+      return;
+    }
+
+    navigation.navigate("BookAppointmentDetailsScreen", {
+      doctorId: doctorId,
+      selectedDate: date,
+      selectedTime: selectedTime,
+    });
+  };
 
   return (
     <ImageBackground
@@ -632,8 +656,8 @@ const AppointmentDoctorDetails = ({ route, navigation }) => {
               style={{ marginRight: 5 }}
             />
             <Text style={styles.infoText}>
-              {doctor.business_hours || "N/A"} /{" "}
-              {getBusinessDays(doctor.business_days) || "N/A"}
+              {getBusinessDays(doctor.available_days) || "N/A"} /{"\n"}
+              {doctor.business_hours || "N/A"}
             </Text>
           </View>
         </View>
@@ -646,13 +670,22 @@ const AppointmentDoctorDetails = ({ route, navigation }) => {
             { key: "About" },
             { key: "DatePicker" },
             { key: "TimeSlots" },
-            { key: "BookButton" },
+            { key: "NextButton" },
+            // { key: "BookButton" },
           ]}
           keyExtractor={(item) => item.key}
           renderItem={({ item }) => {
             if (item.key === "Profile") {
               return (
-                <TouchableOpacity style={styles.profileButton}>
+                <TouchableOpacity
+                  style={styles.profileButton}
+                  onPress={() => {
+                    navigation.navigate("DoctorProfileScreen", {
+                      doctorId: doctorId, // Assuming item.id is the doctor's ID
+                      // selectedDate: date.toISOString().split("T")[0], // Pass the selected date
+                    });
+                  }}
+                >
                   <View style={{ flexDirection: "row", alignItems: "center" }}>
                     <FontAwesome
                       name="user"
@@ -724,17 +757,6 @@ const AppointmentDoctorDetails = ({ route, navigation }) => {
                     date={date ? new Date(date) : today}
                     minimumDate={today}
                   />
-                  {/* <Text style={styles.datePickerText}>
-                      {selectedDate || "Select a Date"}
-                    </Text>
-                  </TouchableOpacity>
-                  <DateTimePickerModal
-                    isVisible={isDatePickerVisible}
-                    mode="date"
-                    onConfirm={handleConfirmDate}
-                    onCancel={() => setDatePickerVisibility(false)}
-                    minimumDate={new Date()}
-                  /> */}
                 </>
               );
             }
@@ -774,13 +796,16 @@ const AppointmentDoctorDetails = ({ route, navigation }) => {
               );
             }
 
-            if (item.key === "BookButton") {
+            if (item.key === "NextButton") {
+              // if (item.key === "BookButton") {
               return (
                 <TouchableOpacity
                   style={styles.signOutButton}
-                  onPress={handleBookAppointment}
+                  onPress={handleNext}
+                  // onPress={handleBookAppointment}
                 >
-                  <Text style={styles.buttonText}>Book Appointment</Text>
+                  <Text style={styles.buttonText}>Next</Text>
+                  {/* <Text style={styles.buttonText}>Book Appointment</Text> */}
                 </TouchableOpacity>
               );
             }
@@ -788,7 +813,7 @@ const AppointmentDoctorDetails = ({ route, navigation }) => {
           }}
         />
       </View>
-      <NavigationBar navigation={navigation} activePage="MainPage" />
+      <NavigationBar navigation={navigation} activePage="" />
     </ImageBackground>
   );
 };

@@ -1191,13 +1191,13 @@ export default StyleSheet.create({
     fontSize: 17,
   },
   aSectionTitle: {
-    fontSize: 18,
+    fontSize: 22,
     fontWeight: "bold",
     marginVertical: 10,
-    color: "#333",
+    color: "#007abb",
   },
   sectionContent: {
-    fontSize: 16,
+    fontSize: 18,
     color: "#000000",
     marginBottom: 10,
   },
@@ -1267,4 +1267,183 @@ export default StyleSheet.create({
     padding: 16,
     // backgroundColor: "#ffffff",
   },
+  whiteUAcontainer: {
+    backgroundColor: "#fff",
+    // flexGrow: 1,
+    borderRadius: 10,
+    // marginVertical: 10,
+    padding: 16,
+    marginTop: -25,
+    // flex: 1,
+  },
+  emptyFavoritesContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 20,
+  },
+  emptyFavoritesImage: {
+    marginTop: 10,
+    marginLeft: 25,
+    // width: 100, // Adjust width as needed
+    // height: 100, // Adjust height as needed
+    marginBottom: 10, // Space between the image and the text
+  },
+  //BookAppointmentDetailsScreen.js
+  aLabel: {
+    fontSize: 20,
+    fontWeight: "bold",
+    // marginTop: 10,
+    color: "#007abb",
+    marginVertical: 10,
+  },
+  borderInput: {
+    flex: 1,
+    height: 50,
+    fontSize: 18,
+    padding: 10,
+    color: "#000",
+    borderColor: "#808080",
+    borderWidth: 1,
+    borderRadius: 15, // Increase border radius for a rounder effect
+    overflow: "hidden",
+    marginBottom: 10,
+  },
+  // radioButtonContainer: {
+  //   flexDirection: "row", // Align items in a row
+  //   alignItems: "center", // Center vertically
+  //   justifyContent: "flex-start", // Align items to the left
+  //   width: "100%", // Full width to align with the ScrollView
+  //   marginLeft: 30,
+  // },
+  //AppointmentConfirmationScreen.js
+  tableContainer: {
+    margin: 16,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    overflow: "hidden",
+  },
+  tableRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    padding: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "# ccc",
+  },
+  tableHeader: {
+    fontWeight: "bold",
+    fontSize: 18,
+  },
+  tableCell: {
+    fontSize: 18,
+    flex: 1,
+    marginLeft: 8,
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 35,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: "center",
+  },
+  closeButton: {
+    backgroundColor: "#2196F3",
+    borderRadius: 10,
+    padding: 10,
+    elevation: 2,
+  },
+  successImage: {
+    // width: 150, // Adjust width as needed
+    // height: 150, // Adjust height as needed
+    marginBottom: 15, // Space between the image and the text
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    // justifyContent: "flex-end", // Aligns the modal to the bottom of the screen
+    backgroundColor: "rgba(0, 0, 0, 0.5)", // Optional: Adds a semi-transparent background
+  },
+
+  //AppointmentHistoryScreen.js
+  // const styles = StyleSheet.create({
+  // container: { flex: 1, backgroundColor: "#f7f7f7", padding: 16 },
+  // header: {
+  //   fontSize: 20,
+  //   fontWeight: "bold",
+  //   marginBottom: 16,
+  //   textAlign: "center",
+  // },
+  loadingText: { textAlign: "center", marginTop: 20 },
+  emptyText: { textAlign: "center", marginTop: 20, color: "#888" },
+  card: {
+    backgroundColor: "#fff",
+    padding: 16,
+    // marginBottom: 16,
+    borderRadius: 8,
+    // flexDirection: "row",
+    flexDirection: "row",
+    // marginVertical: 10,
+    // shadowColor: "#000",
+    // shadowOffset: { width: 0, height: 2 },
+    // shadowOpacity: 0.1,
+    // shadowRadius: 4,
+    // elevation: 2,
+  },
+  upcoming: { borderColor: "#4CAF50", borderWidth: 2 },
+  past: { borderColor: "#888", borderWidth: 2 },
+  doctorName: { fontSize: 18, fontWeight: "bold" },
+  doctorDetails: { fontSize: 16, color: "#555" },
+  date: {
+    fontSize: 16,
+    color: "#008000",
+    marginTop: 8,
+    marginVertical: 8,
+    fontWeight: "bold",
+  },
+  status: { fontSize: 16, fontWeight: "bold" },
+  sCancelButton: {
+    backgroundColor: "#FF5722",
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 10,
+  },
+  sCancelButtonText: { color: "#fff", textAlign: "center", fontWeight: "bold" },
+  outterCard: {
+    backgroundColor: "#fff",
+    padding: 16,
+    marginBottom: 16,
+    borderRadius: 8,
+    // flexDirection: "row",
+    marginVertical: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  statusContainer: {
+    flexDirection: "row", // Align items in a row
+    alignItems: "center", // Center items vertically
+    marginTop: 8, // Optional: Add some margin for spacing
+  },
+  // backButton: {
+  //   backgroundColor: "#FFC107",
+  //   padding: 12,
+  //   borderRadius: 5,
+  //   marginTop: 20,
+  // },
+  // backButtonText: { textAlign: "center", fontWeight: "bold", color: "#000" },
+  // // });
 });

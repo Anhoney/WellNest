@@ -24,6 +24,9 @@ const {
   getDoctorsByCategory,
   addRating,
   getDoctorAppointmentDetails,
+  getScheduledAppointments,
+  cancelAppointment,
+  getAppointmentDetails,
 } = require("../controllers/userAppointmentsController");
 const authenticateToken = require("../middleware/authMiddleware"); // Import authentication middleware
 
@@ -46,5 +49,13 @@ router.get("/searchByCategory", getDoctorsByCategory);
 router.post("/addRating", addRating);
 
 router.get("/doctor/:doctorId", getDoctorAppointmentDetails);
+
+// Get appointments for a user
+router.get("/getScheduledAppointments/:userId", getScheduledAppointments);
+
+// Cancel appointment
+router.delete("/cancelAppointment/:appointmentId", cancelAppointment);
+
+router.get("/getAppointmentDetails/:appointmentId", getAppointmentDetails);
 
 module.exports = router;

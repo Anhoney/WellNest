@@ -22,6 +22,11 @@ import MedicationReminderPage from "../src/screens/ElderlyNCaregivers/Medication
 import ElderlyAssessmentPage from "../src/screens/ElderlyNCaregivers/ElderlyAssessmentPage";
 import AppointmentDoctorDetails from "../src/screens/ElderlyNCaregivers/AppointmentDoctorDetails";
 import CategoryDoctorsScreen from "../src/screens/ElderlyNCaregivers/CategoryDoctorsScreen";
+import DoctorProfileScreen from "../src/screens/ElderlyNCaregivers/DoctorProfileScreen";
+import BookAppointmentDetailsScreen from "../src/screens/ElderlyNCaregivers/BookAppointmentDetailsScreen";
+import AppointmentConfirmationScreen from "../src/screens/ElderlyNCaregivers/AppointmentConfirmationScreen";
+import AppointmentHistoryScreen from "../src/screens/ElderlyNCaregivers/AppointmentHistoryScreen";
+import HistoryAppDetails from "../src/screens/ElderlyNCaregivers/HistoryAppDetails";
 
 // Healthcare Provider screens
 import HealthcareProviderMainPage from "../src/screens/HealthcareProvider/HealthcareProviderMainPage";
@@ -155,6 +160,27 @@ const AppNavigator = () => (
         options={{ title: "DoctorDetails" }}
       />
       <Stack.Screen name="CategoryDoctors" component={CategoryDoctorsScreen} />
+      <Stack.Screen
+        name="DoctorProfileScreen"
+        component={DoctorProfileScreen}
+        options={{ title: "DoctorProfile" }}
+      />
+      <Stack.Screen
+        name="BookAppointmentDetailsScreen"
+        component={BookAppointmentDetailsScreen}
+        options={{ title: "BookAppointment" }}
+      />
+      <Stack.Screen
+        name="AppointmentConfirmation"
+        component={AppointmentConfirmationScreen}
+        options={{ title: "AppointmentConfirmation" }}
+      />
+      <Stack.Screen
+        name="AppointmentHistory"
+        component={AppointmentHistoryScreen}
+        options={{ title: "AppointmentHistory" }}
+      />
+      <Stack.Screen name="HistoryAppDetails" component={HistoryAppDetails} />
     </Stack.Navigator>
   </NavigationContainer>
 );
