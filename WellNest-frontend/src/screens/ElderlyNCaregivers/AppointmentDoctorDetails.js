@@ -488,7 +488,14 @@ const AppointmentDoctorDetails = ({ route, navigation }) => {
 
   // Handle the selected date
   const handleConfirmDate = async (selectedDate) => {
-    const formattedDate = selectedDate.toISOString().split("T")[0]; // Format to YYYY-MM-DD
+    // const formattedDate = selectedDate.toISOString().split("T")[0]; // Format to YYYY-MM-DD
+    // Format the date as YYYY-MM-DD using local time
+    const formattedDate = `${selectedDate.getFullYear()}-${(
+      selectedDate.getMonth() + 1
+    )
+      .toString()
+      .padStart(2, "0")}-${selectedDate.getDate().toString().padStart(2, "0")}`;
+
     setDate(formattedDate); // Update the date state
     setDatePickerVisibility(false);
 

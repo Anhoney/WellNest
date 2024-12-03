@@ -36,6 +36,10 @@ import HpMyCreatedAppointments from "../src/screens/HealthcareProvider/HpMyCreat
 import HpAppointmentEditPage from "../src/screens/HealthcareProvider/HpAppointmentEditPage";
 import HpProfilePage from "../src/screens/HealthcareProvider/HpProfilePage";
 import HpEditProfilePage from "../src/screens/HealthcareProvider/HpEditProfilePage";
+import HpUpcomingAppointments from "../src/screens/HealthcareProvider/HpUpcomingAppointments";
+import HpUpcomingAppointmentDetails from "../src/screens/HealthcareProvider/HpUpcomingAppointmentDetails";
+import HpPastAppointments from "../src/screens/HealthcareProvider/HpPastAppointments";
+import MedicalReportWriting from "../src/screens/HealthcareProvider/MedicalReportWriting";
 
 // Community Organizer
 import CommunityOrganizerMainPage from "../src/screens/CommunityOrganizers/CommunityOrganizerMainPage";
@@ -180,7 +184,20 @@ const AppNavigator = () => (
         component={AppointmentHistoryScreen}
         options={{ title: "AppointmentHistory" }}
       />
+      <Stack.Screen
+        name="HpUpcomingAppointments"
+        component={HpUpcomingAppointments}
+      />
       <Stack.Screen name="HistoryAppDetails" component={HistoryAppDetails} />
+      <Stack.Screen
+        name="HpUpcomingAppointmentDetails"
+        component={HpUpcomingAppointmentDetails}
+      />
+      <Stack.Screen name="HpPastAppointments" component={HpPastAppointments} />
+      <Stack.Screen
+        name="MedicalReportWriting"
+        component={MedicalReportWriting}
+      />
     </Stack.Navigator>
   </NavigationContainer>
 );

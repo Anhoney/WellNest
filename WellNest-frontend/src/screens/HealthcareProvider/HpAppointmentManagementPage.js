@@ -48,18 +48,18 @@ const HpAppointmentManagementPage = ({}) => {
             </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity
+          {/* <TouchableOpacity
             style={styles.hpButton}
-            onPress={() => navigation.navigate("HpMyCreatedAppointments")}
+            onPress={() => navigation.navigate("HpPreviewAppointment")}
           >
             <Text style={styles.hpButtonText}>
-              My Created Physical Appointments
+              Physical Appointments Preview
             </Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
 
           <TouchableOpacity
             style={styles.hpButton}
-            onPress={() => navigation.navigate("UpcomingPhysicalAppointments")}
+            onPress={() => navigation.navigate("HpUpcomingAppointments")}
           >
             <Text style={styles.hpButtonText}>
               Upcoming Physical Appointments Schedule
@@ -68,7 +68,7 @@ const HpAppointmentManagementPage = ({}) => {
 
           <TouchableOpacity
             style={styles.hpButton}
-            onPress={() => navigation.navigate("PastPhysicalAppointments")}
+            onPress={() => navigation.navigate("HpPastAppointments")}
           >
             <Text style={styles.hpButtonText}>
               Past Physical Appointments Schedule

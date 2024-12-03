@@ -63,6 +63,7 @@ const appointmentsRoute = require("./routes/appointmentsRoute");
 const profileRoutes = require("./routes/profileRoutes");
 const userAppointmentsRoutes = require("./routes/userAppointmentsRoutes");
 const favoriteRoutes = require("./routes/favoriteRoutes");
+const medicalReportRoutes = require("./routes/medicalReportRoutes");
 // const usersRoute = require("./routes/usersRoute");
 
 require("dotenv").config();
@@ -91,6 +92,7 @@ app.use("/api", userAppointmentsRoutes);
 
 app.use("/api", favoriteRoutes);
 
+app.use("/api", medicalReportRoutes);
 // app.use("/api", usersRoute);
 
 const PORT = process.env.PORT || 5001;

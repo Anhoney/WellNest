@@ -171,6 +171,15 @@ const AppointmentHistoryScreen = ({ navigation }) => {
     // let imageUri = item.profile_image
     //   ? item.profile_image // Base64 string returned from the backend
     //   : "https://via.placeholder.com/150";
+
+    // Determine the status to display
+    let displayStatus;
+    if (item.app_status === "pending") {
+      displayStatus = "Pending";
+    } else {
+      displayStatus = isUpcoming ? "Upcoming" : "Completed";
+    }
+
     // Check if the profile image is a Base64 string
     let imageUri = item.profile_image
       ? `data:image/png;base64,${item.profile_image}` // Add MIME type prefix
@@ -233,7 +242,8 @@ const AppointmentHistoryScreen = ({ navigation }) => {
               <View style={styles.statusContainer}>
                 <Text style={styles.doctorDetails}>Status: </Text>
                 <Text style={styles.status}>
-                  {isUpcoming ? "Upcoming" : "Completed"}
+                  {displayStatus}
+                  {/* {isUpcoming ? "Upcoming" : "Completed"} */}
                 </Text>
               </View>
             </View>
@@ -255,6 +265,16 @@ const AppointmentHistoryScreen = ({ navigation }) => {
       </View>
     );
   };
+
+  const renderEmptyComponent = () => (
+    <View style={styles.emptyContainer}>
+      <Image
+        source={require("../../../assets/NothingDog.png")}
+        style={styles.emptyImage}
+      />
+      <Text style={styles.emptyText}>No appointments found.</Text>
+    </View>
+  );
 
   return (
     <ImageBackground
@@ -286,9 +306,7 @@ const AppointmentHistoryScreen = ({ navigation }) => {
             }
             // keyExtractor={(item) => `${item.id}-${item.is_virtual}`}
             renderItem={renderAppointment}
-            ListEmptyComponent={
-              <Text style={styles.emptyText}>No appointments found.</Text>
-            }
+            ListEmptyComponent={renderEmptyComponent}
           />
         )}
         <TouchableOpacity

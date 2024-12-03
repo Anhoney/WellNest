@@ -234,17 +234,23 @@ const AppointmentPage = () => {
   };
 
   const handleSearch = async () => {
+    // Adjust the date to local time zone
+    const adjustedDate = new Date(
+      date.getTime() - date.getTimezoneOffset() * 60000
+    );
+    const formattedDate = adjustedDate.toISOString().split("T")[0]; // Format as 'YYYY-MM-DD'
+
     // Log the search parameters before making the API call
     console.log("Search Params:", {
       searchQuery,
       location,
-      date: date.toISOString().split("T")[0], // Format date as 'YYYY-MM-DD'
+      date: formattedDate, // Format date as 'YYYY-MM-DD'
     });
 
     const searchParams = {
       searchQuery,
       location,
-      date: date.toISOString().split("T")[0], // Format date as 'YYYY-MM-DD'
+      date: formattedDate, // Format date as 'YYYY-MM-DD'
     };
 
     // Log the parameters to ensure they are correct
@@ -260,21 +266,27 @@ const AppointmentPage = () => {
   };
 
   const handleDoctorSelect = async (doctorId) => {
+    // Adjust the date to local time zone
+    const adjustedDate = new Date(
+      date.getTime() - date.getTimezoneOffset() * 60000
+    );
+    const formattedDate = adjustedDate.toISOString().split("T")[0]; // Format as 'YYYY-MM-DD'
+
     // Log the doctor ID and date to verify the request
     console.log("Fetching available times for Doctor ID:", doctorId);
-    console.log("For Date:", date.toISOString().split("T")[0]);
+    console.log("For Date:", formattedDate);
 
     // Set the selected doctor
     setSelectedDoctor(doctorId);
     // Fetch available times for the selected doctor
     const response = await axios.get(`${API_BASE_URL}/availableTimes`, {
-      params: { doctorId, date: date.toISOString().split("T")[0] }, // Sending date as 'YYYY-MM-DD'
+      params: { doctorId, date: formattedDate }, // Sending date as 'YYYY-MM-DD'
     });
     setAvailableTimes(response.data);
     // Navigate to AppointmentDoctorDetails with the selected date
     navigation.navigate("AppointmentDoctorDetails", {
       doctorId,
-      selectedDate: date.toISOString().split("T")[0], // Pass the selected date
+      selectedDate: formattedDate, // Pass the selected date
     });
   };
 
@@ -311,18 +323,6 @@ const AppointmentPage = () => {
     // });
     // setDoctors(response.data); // Update the doctor list
   };
-
-  // Render each doctor card
-  const renderDoctorCard = ({ item }) => (
-    <View style={styles.doctorCard}>
-      <Image source={{ uri: item.profile_image }} style={styles.doctorImage} />
-      <View style={styles.doctorInfo}>
-        <Text style={styles.doctorName}>{item.username}</Text>
-        <Text style={styles.doctorCategory}>{item.specialist}</Text>
-        <Text style={styles.doctorRating}>⭐ {item.rating || "N/A"}</Text>
-      </View>
-    </View>
-  );
 
   const handleBookAppointment = async () => {
     if (!selectedDoctor || !selectedTime) {

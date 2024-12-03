@@ -975,12 +975,20 @@ export default StyleSheet.create({
     backgroundColor: "#FF0000", // Red color for delete button
     // padding: 10,
     // borderRadius: 5,
-    marginTop: 10,
+    // marginTop: 10,
     // alignItems: "center",
     paddingVertical: 15,
     borderRadius: 10,
     alignItems: "center",
     marginVertical: 20,
+
+    // borderRadius: 8,
+    margin: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.8,
+    shadowRadius: 2,
+    elevation: 5, // Add hover effect on Android
   },
   deleteButtonText: {
     color: "#FFFFFF", // White text color
@@ -1055,7 +1063,7 @@ export default StyleSheet.create({
   },
   hpAcontainer: {
     flex: 1,
-    backgroundColor: "#D3D3D3",
+    // backgroundColor: "#D3D3D3",
     padding: 16,
   },
   category: {
@@ -1390,7 +1398,7 @@ export default StyleSheet.create({
   card: {
     backgroundColor: "#fff",
     padding: 16,
-    // marginBottom: 16,
+    marginBottom: 16,
     borderRadius: 8,
     // flexDirection: "row",
     flexDirection: "row",
@@ -1438,12 +1446,165 @@ export default StyleSheet.create({
     alignItems: "center", // Center items vertically
     marginTop: 8, // Optional: Add some margin for spacing
   },
-  // backButton: {
-  //   backgroundColor: "#FFC107",
-  //   padding: 12,
-  //   borderRadius: 5,
-  //   marginTop: 20,
+  //HpUpcomingAppointmentDetails.js
+  whiteHpAcontainer: {
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    padding: 16,
+    marginTop: -150,
+  },
+  //HpPastAppointments.js
+  whiteMrAcontainer: {
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    padding: 16,
+    marginTop: -180,
+  },
+  medicalText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#FFFFFF",
+  },
+  buttonStatusContainer: {
+    flexDirection: "row", // Align items in a row
+    alignItems: "center", // Center items vertically
+    marginTop: 8, // Optional: Add some margin for spacing
+    backgroundColor: "#177ffd",
+    padding: 8,
+    borderRadius: 8,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.8,
+    shadowRadius: 2,
+    elevation: 5, // Add hover effect on Android
+  },
+  //MedicalReportWriting.js
+  // container: {
+  //   padding: 20,
+  //   backgroundColor: "#fff",
   // },
-  // backButtonText: { textAlign: "center", fontWeight: "bold", color: "#000" },
-  // // });
+  // title: {
+  //   fontSize: 24,
+  //   fontWeight: "bold",
+  //   marginBottom: 20,
+  // },
+  // input: {
+  //   borderWidth: 1,
+  //   borderColor: "#ccc",
+  //   borderRadius: 5,
+  //   padding: 10,
+  //   marginBottom: 15,
+  // },
+  // medicineContainer: {
+  //   // flexDirection: "row",
+  //   // justifyContent: "space-between",
+  //   marginBottom: 15,
+  // },
+  // medicineInput: {
+  //   flex: 1,
+  //   borderWidth: 1,
+  //   borderColor: "#ccc",
+  //   borderRadius: 5,
+  //   padding: 10,
+  //   // marginRight: 10,
+  //   width: "100%",
+  // },
+  medicineContainer: {
+    marginBottom: 15,
+    width: "100%", // Ensure the container takes full width
+  },
+  medicineInput: {
+    borderWidth: 1,
+    fontSize: 18,
+    borderColor: "#ccc",
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 10, // Add margin for spacing between inputs
+    width: "100%", // Ensure the input takes full width
+  },
+  addButton: {
+    backgroundColor: "#007BFF",
+    padding: 10,
+    borderRadius: 5,
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  addButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 18,
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  mrUnderline: {
+    height: 2, // Height of the underline
+    backgroundColor: "#D3D3D3", // Color of the underline
+    width: "100%", // Width of the underline
+    alignSelf: "center", // Center the underline horizontally
+    // marginBottom: -10,
+    marginVertical: 10, // Margin above and below
+  },
+  mrInputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#fff",
+    borderColor: "#ddd",
+    borderWidth: 1,
+    borderRadius: 5,
+    marginBottom: 25,
+    paddingHorizontal: 10,
+    width: "100%",
+  },
+  mrSubmitButton: {
+    backgroundColor: "#28A745",
+    padding: 10,
+    borderRadius: 5,
+    flex: 1,
+    marginRight: 10,
+  },
+  mrCancelButton: {
+    backgroundColor: "#FFFFFF", // Set the background color to white
+    padding: 10,
+    borderRadius: 5,
+    flex: 1,
+    borderColor: "#007BFF", // Change the border color to blue
+    borderWidth: 2, // Add border width to make the border visible
+  },
+  mrButtonText: {
+    color: "#fff",
+    textAlign: "center",
+    fontWeight: "bold",
+    fontSize: 19,
+  },
+  mrLabel: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginTop: 10,
+  },
+  medicineLabel: {
+    fontSize: 16,
+    fontWeight: "bold",
+    marginBottom: 5,
+    color: "#333",
+  },
+  mrDeleteButton: {
+    backgroundColor: "#DC3545",
+    padding: 10,
+    borderRadius: 5,
+    flex: 1,
+    marginRight: 10,
+    alignItems: "center",
+  },
+  blueMrButtonText: {
+    color: "#007BFF",
+    textAlign: "center",
+    fontWeight: "bold",
+    fontSize: 19,
+  },
+  buttonContent: {
+    flexDirection: "row", // Align items in a row
+    alignItems: "center", // Center items vertically
+  },
 });

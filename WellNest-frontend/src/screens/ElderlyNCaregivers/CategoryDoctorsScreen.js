@@ -30,7 +30,7 @@ const CategoryDoctorsScreen = () => {
   // Manage favorites outside render function
   const [favorites, setFavorites] = useState([]);
   const selectedDate = searchParams?.date; // Extract the date
-  // console.log("selectedDate:", selectedDate);
+  // console.log("Lastest cate selectedDate:", selectedDate);
 
   // Fetch doctors and favorites when the screen is focused
   const fetchDoctors = async () => {
