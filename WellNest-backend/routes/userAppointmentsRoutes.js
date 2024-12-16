@@ -1,21 +1,9 @@
-// const express = require("express");
-// const router = express.Router();
-// const userAppointmentsController = require("../controllers/userAppointmentsController");
-
-// // Route for searching doctors
-// router.post("/search", userAppointmentsController.searchDoctors);
-
-// // Route for getting available times for a doctor
-// router.get("/availableTimes", userAppointmentsController.getAvailableTimes);
-
-// // Route for booking an appointment
-// router.post("/book", userAppointmentsController.bookAppointment);
-
-// module.exports = router;
-
 //userAppointmentsRoutes.js
 const express = require("express");
 const router = express.Router();
+const multer = require("multer");
+const path = require("path");
+
 const {
   searchDoctors,
   getAvailableTimes,
@@ -27,8 +15,28 @@ const {
   getScheduledAppointments,
   cancelAppointment,
   getAppointmentDetails,
+  searchVirtualDoctors,
+  getVirtualCategories,
+  getVirtualDoctorsByCategory,
+  getVirtualDoctorAppointmentDetails,
+  getVirtualAvailableTimes,
+  bookVirtualAppointment,
+  uploadReceipt,
+  getVirtualAppointmentDetails,
 } = require("../controllers/userAppointmentsController");
 const authenticateToken = require("../middleware/authMiddleware"); // Import authentication middleware
+
+// Set up multer for file uploads
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/"); // Directory to save uploaded files
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname)); // Append timestamp to the filename
+  },
+});
+
+const upload = multer({ storage });
 
 // Route for searching doctors (public or authenticated, depending on requirements)
 router.post("/search", searchDoctors);
@@ -57,5 +65,27 @@ router.get("/getScheduledAppointments/:userId", getScheduledAppointments);
 router.delete("/cancelAppointment/:appointmentId", cancelAppointment);
 
 router.get("/getAppointmentDetails/:appointmentId", getAppointmentDetails);
+
+router.post("/searchVirtualDoctors", searchVirtualDoctors);
+router.get("/virtualCategories", getVirtualCategories); // New route for categories
+router.get("/searchByVirtualCategory", getVirtualDoctorsByCategory);
+router.get("/virtual/doctor/:doctorId", getVirtualDoctorAppointmentDetails);
+router.get("/virtual/availableTimes", getVirtualAvailableTimes);
+router.post(
+  "/virtual/bookAppointment",
+  authenticateToken,
+  bookVirtualAppointment
+);
+// Route for uploading receipts
+router.post(
+  "/uploadReceipt",
+  authenticateToken,
+  upload.single("file"),
+  uploadReceipt
+);
+router.get(
+  "/getVirtualAppointmentDetails/:appointmentId",
+  getVirtualAppointmentDetails
+);
 
 module.exports = router;

@@ -27,6 +27,15 @@ import BookAppointmentDetailsScreen from "../src/screens/ElderlyNCaregivers/Book
 import AppointmentConfirmationScreen from "../src/screens/ElderlyNCaregivers/AppointmentConfirmationScreen";
 import AppointmentHistoryScreen from "../src/screens/ElderlyNCaregivers/AppointmentHistoryScreen";
 import HistoryAppDetails from "../src/screens/ElderlyNCaregivers/HistoryAppDetails";
+import VirtualCategoryDoctorsScreen from "../src/screens/ElderlyNCaregivers/VirtualCategoryDoctorsScreen";
+import VirtualDoctorDetails from "../src/screens/ElderlyNCaregivers/VirtualDoctorDetails";
+import VirtualBookingDetails from "../src/screens/ElderlyNCaregivers/VirtualBookingDetails";
+// import VirtualConfirmationScreen from "../src/screens/ElderlyNCaregivers/VirtualConfirmationScreen";
+import VirtualDoctorProfileScreen from "../src/screens/ElderlyNCaregivers/VirtualDoctorProfileScreen";
+import {
+  VirtualConfirmationScreen,
+  PaymentScreen,
+} from "../src/screens/ElderlyNCaregivers/VirtualConfirmationScreen";
 
 // Healthcare Provider screens
 import HealthcareProviderMainPage from "../src/screens/HealthcareProvider/HealthcareProviderMainPage";
@@ -40,6 +49,8 @@ import HpUpcomingAppointments from "../src/screens/HealthcareProvider/HpUpcoming
 import HpUpcomingAppointmentDetails from "../src/screens/HealthcareProvider/HpUpcomingAppointmentDetails";
 import HpPastAppointments from "../src/screens/HealthcareProvider/HpPastAppointments";
 import MedicalReportWriting from "../src/screens/HealthcareProvider/MedicalReportWriting";
+import HpVAppManagementPage from "../src/screens/HealthcareProvider/HpVAppManagementPage";
+import HpCreateOrEditVApp from "../src/screens/HealthcareProvider/HpCreateOrEditVApp";
 
 // Community Organizer
 import CommunityOrganizerMainPage from "../src/screens/CommunityOrganizers/CommunityOrganizerMainPage";
@@ -198,6 +209,32 @@ const AppNavigator = () => (
         name="MedicalReportWriting"
         component={MedicalReportWriting}
       />
+      <Stack.Screen
+        name="HpVAppManagementPage"
+        component={HpVAppManagementPage}
+      />
+      <Stack.Screen name="HpCreateOrEditVApp" component={HpCreateOrEditVApp} />
+      <Stack.Screen
+        name="VirtualCategoryDoctors"
+        component={VirtualCategoryDoctorsScreen}
+      />
+      <Stack.Screen
+        name="VirtualBookingDetails"
+        component={VirtualBookingDetails}
+      />
+      <Stack.Screen
+        name="VirtualDoctorDetails"
+        component={VirtualDoctorDetails}
+      />
+      <Stack.Screen
+        name="VirtualConfirmation"
+        component={VirtualConfirmationScreen}
+      />
+      <Stack.Screen
+        name="VirtualDoctorProfileScreen"
+        component={VirtualDoctorProfileScreen}
+      />
+      <Stack.Screen name="PaymentScreen" component={PaymentScreen} />
     </Stack.Navigator>
   </NavigationContainer>
 );

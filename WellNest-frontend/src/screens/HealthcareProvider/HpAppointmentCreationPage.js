@@ -564,8 +564,8 @@ const HpAppointmentCreationPage = () => {
           </Text>
         </View>
 
-        <TouchableOpacity style={styles.doneButton} onPress={handleSubmit}>
-          <Text style={styles.doneButtonText}>Done</Text>
+        <TouchableOpacity style={styles.signOutButton} onPress={handleSubmit}>
+          <Text style={styles.signOutButtonText}>Done</Text>
         </TouchableOpacity>
 
         {existingAppointment && ( // Conditionally render the delete button

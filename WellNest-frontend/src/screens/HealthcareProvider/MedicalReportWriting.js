@@ -10,6 +10,7 @@ import {
   StyleSheet,
   ImageBackground,
   Image,
+  Modal,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import styles from "../../components/styles";
@@ -29,6 +30,7 @@ const MedicalReportWriting = ({ route }) => {
   const [userId, setUserId] = useState(null);
   const [appointments, setAppointments] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [modalVisible, setModalVisible] = useState(false); // Modal state
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false); // State for date picker visibility
   const imageUri = appointments.profile_image
     ? `data:image/png;base64 ${appointments.profile_image}`
@@ -117,45 +119,75 @@ const MedicalReportWriting = ({ route }) => {
     }
   };
 
-  const handleDeleteReport = async () => {
-    Alert.alert(
-      "Confirm Deletion",
-      "Are you sure you want to delete this medical report?",
-      [
-        {
-          text: "Cancel",
-          style: "cancel", // This will style the button as a cancel action
-        },
-        {
-          text: "Delete",
-          onPress: async () => {
-            try {
-              const token = await AsyncStorage.getItem("token");
-              const response = await fetch(
-                `${API_BASE_URL}/medicalReports/delete/${appointmentId}`,
-                {
-                  method: "DELETE",
-                  headers: {
-                    Authorization: `Bearer ${token}`,
-                  },
-                }
-              );
+  // const handleDeleteReport = async () => {
+  //   Alert.alert(
+  //     "Confirm Deletion",
+  //     "Are you sure you want to delete this medical report?",
+  //     [
+  //       {
+  //         text: "Cancel",
+  //         style: "cancel", // This will style the button as a cancel action
+  //       },
+  //       {
+  //         text: "Delete",
+  //         onPress: async () => {
+  //           try {
+  //             const token = await AsyncStorage.getItem("token");
+  //             const response = await fetch(
+  //               `${API_BASE_URL}/medicalReports/delete/${appointmentId}`,
+  //               {
+  //                 method: "DELETE",
+  //                 headers: {
+  //                   Authorization: `Bearer ${token}`,
+  //                 },
+  //               }
+  //             );
 
-              if (!response.ok) {
-                throw new Error("Failed to delete medical report.");
-              }
+  //             if (!response.ok) {
+  //               throw new Error("Failed to delete medical report.");
+  //             }
 
-              Alert.alert("Success", "Medical report deleted successfully.");
-              navigation.goBack(); // Navigate back after deletion
-            } catch (error) {
-              console.error("Error deleting medical report:", error);
-              Alert.alert("Error", "Failed to delete medical report.");
-            }
+  //             Alert.alert("Success", "Medical report deleted successfully.");
+  //             navigation.goBack(); // Navigate back after deletion
+  //           } catch (error) {
+  //             console.error("Error deleting medical report:", error);
+  //             Alert.alert("Error", "Failed to delete medical report.");
+  //           }
+  //         },
+  //       },
+  //     ],
+  //     { cancelable: false } // Prevents dismissing the alert by tapping outside
+  //   );
+  // };
+
+  const handleDeleteReport = () => {
+    setModalVisible(true); // Show modal
+  };
+
+  const confirmDeleteReport = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      const response = await fetch(
+        `${API_BASE_URL}/medicalReports/delete/${appointmentId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
           },
-        },
-      ],
-      { cancelable: false } // Prevents dismissing the alert by tapping outside
-    );
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to delete medical report.");
+      }
+
+      setModalVisible(false); // Close modal on success
+      Alert.alert("Success", "Medical report deleted successfully.");
+      navigation.goBack(); // Navigate back after deletion
+    } catch (error) {
+      console.error("Error deleting medical report:", error);
+      Alert.alert("Error", "Failed to delete medical report.");
+    }
   };
 
   if (isLoading) {
@@ -351,13 +383,51 @@ const MedicalReportWriting = ({ route }) => {
             <View style={styles.buttonContainer}>
               <TouchableOpacity
                 style={styles.mrDeleteButton}
-                onPress={handleDeleteReport}
+                // onPress={handleDeleteReport}
+                onPress={() => setModalVisible(true)} // Show modal
               >
                 <View style={styles.dateInputContent}>
                   <Ionicons name="trash-bin" size={20} color="#FFF" />
                   <Text style={styles.mrButtonText}> Delete Report </Text>
                 </View>
               </TouchableOpacity>
+
+              <Modal
+                animationType="slide"
+                transparent={true}
+                visible={modalVisible}
+                onRequestClose={() => setModalVisible(false)}
+              >
+                <View style={styles.modalContainer}>
+                  <View style={styles.modalView}>
+                    <Text style={styles.modalTitle}>Confirm Deletion</Text>
+                    <Image
+                      source={require("../../../assets/DeleteCat.png")}
+                      style={styles.successImage} // Add this style in styles.js
+                    />
+                    <Text style={styles.modalMessage}>
+                      Are you sure you want to delete this medical report?
+                    </Text>
+                    <View style={styles.modalButtons}>
+                      <TouchableOpacity
+                        style={styles.modalConfirmButton}
+                        onPress={confirmDeleteReport} // Confirm action
+                      >
+                        <Text style={styles.modalConfirmButtonText}>
+                          Confirm
+                        </Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={styles.modalCancelButton}
+                        onPress={() => setModalVisible(false)} // Cancel action
+                      >
+                        <Text style={styles.modalCancelButtonText}>Cancel</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </View>
+              </Modal>
+
               <TouchableOpacity
                 style={styles.mrCancelButton}
                 onPress={() => navigation.goBack()}

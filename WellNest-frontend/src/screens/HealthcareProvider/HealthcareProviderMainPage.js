@@ -154,7 +154,7 @@ const HealthcareProviderMainPage = ({}) => {
               </TouchableOpacity>
 
               <TouchableOpacity
-                onPress={() => navigation.navigate("VirtualConsultation")}
+                onPress={() => navigation.navigate("HpVAppManagementPage")}
               >
                 <Image
                   source={require("../../../assets/VirtualConsultation.png")}

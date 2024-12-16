@@ -11,7 +11,7 @@ import {
   ImageBackground,
   Image,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import API_BASE_URL from "../../../config/config";
 import axios from "axios";
@@ -26,9 +26,14 @@ const HpUpcomingAppointments = () => {
   const [loading, setLoading] = useState(true);
   const navigation = useNavigation();
 
-  useEffect(() => {
-    fetchUpcomingAppointments();
-  }, []);
+  // useEffect(() => {
+  //   fetchUpcomingAppointments();
+  // }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchUpcomingAppointments();
+    }, [])
+  );
 
   const fetchUpcomingAppointments = async () => {
     try {

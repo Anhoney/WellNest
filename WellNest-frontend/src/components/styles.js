@@ -229,6 +229,11 @@ export default StyleSheet.create({
     alignItems: "center",
     flexDirection: "row", // Align items in a row (horizontally)
     justifyContent: "center", // Center items horizontally
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.8,
+    shadowRadius: 2,
+    elevation: 5, // Add hover effect on Android
   },
   uploadPrecautions: {
     color: "#808080", // Same gray color
@@ -958,19 +963,19 @@ export default StyleSheet.create({
     fontWeight: "bold",
     marginTop: 10,
   },
-  doneButton: {
-    backgroundColor: "#FFA500",
-    paddingVertical: 15,
-    borderRadius: 10,
-    alignItems: "center",
-    marginVertical: 20,
-    marginTop: 70,
-  },
-  doneButtonText: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
+  // doneButton: {
+  //   backgroundColor: "#FFA500",
+  //   paddingVertical: 15,
+  //   borderRadius: 10,
+  //   alignItems: "center",
+  //   marginVertical: 20,
+  //   marginTop: 70,
+  // },
+  // doneButtonText: {
+  //   color: "white",
+  //   fontSize: 16,
+  //   fontWeight: "bold",
+  // },
   deleteButton: {
     backgroundColor: "#FF0000", // Red color for delete button
     // padding: 10,
@@ -1110,7 +1115,7 @@ export default StyleSheet.create({
     flex: 1,
   },
   doctorName: {
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: "bold",
     color: "#333",
     marginBottom: 2,
@@ -1606,5 +1611,81 @@ export default StyleSheet.create({
   buttonContent: {
     flexDirection: "row", // Align items in a row
     alignItems: "center", // Center items vertically
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  modalButtons: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+  },
+  modalConfirmButton: {
+    backgroundColor: "red",
+    padding: 10,
+    borderRadius: 5,
+    margin: 5,
+  },
+  modalConfirmButtonText: {
+    color: "white",
+    fontWeight: "bold",
+  },
+  modalCancelButton: {
+    backgroundColor: "gray",
+    padding: 10,
+    borderRadius: 5,
+    margin: 5,
+  },
+  modalCancelButtonText: {
+    color: "white",
+    fontWeight: "bold",
+  },
+  modalMessage: {
+    fontSize: 16,
+    textAlign: "center",
+    marginBottom: 20,
+  },
+  //VirtualCategoryDoctorsScreen.js
+  serviceText: {
+    marginTop: 5,
+    fontSize: 14,
+    color: "#000",
+    fontWeight: "bold",
+  },
+  sText: {
+    fontSize: 14,
+    color: "#000",
+  },
+  //VirtualBookingDetails.js
+  symptomButtonsContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    marginVertical: 10,
+  },
+  symptomButton: {
+    backgroundColor: "#EFEFEF",
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 20,
+    margin: 5,
+  },
+  symptomButtonText: {
+    color: "#000",
+    fontSize: 14,
+    fontWeight: "bold",
+  },
+  boldSectionContent: {
+    fontSize: 18,
+    color: "#000000",
+    marginBottom: 10,
+    fontWeight: "bold",
+  },
+  grayBackgroundContainer: {
+    backgroundColor: "#f0f0f0", // Light gray background
+    padding: 15, // Add some padding for better spacing
+    borderRadius: 10, // Optional: rounded corners
+    marginVertical: 10, // Optional: space between this and other components
   },
 });

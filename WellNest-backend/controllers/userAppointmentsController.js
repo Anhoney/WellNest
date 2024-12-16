@@ -1004,6 +1004,684 @@ const getAppointmentDetails = async (req, res) => {
           hv.u_id, 
           hv.hpva_date AS appointment_date, 
           hv.hpva_time AS appointment_time, 
+          hv.duration, 
+          hv.status, 
+          hv.meeting_link, 
+          hv.notes AS notes, 
+          hv.payment_status, 
+          hv.fee, 
+          hv.receipt_url,
+          hv.service,
+          hv.symptoms,
+          NULL AS medical_coverage, 
+          NULL AS who_will_see, 
+          NULL AS patient_seen_before, 
+          NULL AS app_sickness, 
+          p.username AS doctor_name,
+          p.specialist AS doctor_specialization,
+          a.category,
+          a.services_provide::text AS services_provide,
+          CASE 
+            WHEN p.profile_image IS NOT NULL  
+            THEN ENCODE(p.profile_image, 'base64') 
+            ELSE NULL 
+          END AS profile_image,
+          up.gender AS gender,
+          u.full_name AS full_name
+        FROM hp_virtual_appointment hv
+        JOIN hp_profile p ON hv.hp_id = p.user_id
+        JOIN hp_virtual_availability a ON hv.hp_id = a.hp_id
+        JOIN users u ON hv.u_id = u.id
+        JOIN profile up ON hv.u_id = up.user_id
+        WHERE hv.hpva_id = $1
+      `
+      : `
+        SELECT 
+          ha.hp_app_id AS appointment_id, 
+          ha.hp_id, 
+          ha.u_id, 
+          ha.app_date AS appointment_date, 
+          ha.app_time AS appointment_time, 
+          ha.app_status AS status, 
+          ha.medical_coverage, 
+          ha.who_will_see, 
+          ha.patient_seen_before, 
+          ha.app_sickness,
+          ha.note AS notes, 
+          p.username AS doctor_name,
+          p.specialist AS doctor_specialization,
+          a.category,
+          a.location,
+          a.hospital_address,
+          CASE 
+            WHEN p.profile_image IS NOT NULL 
+            THEN ENCODE(p.profile_image, 'base64') 
+            ELSE NULL 
+          END AS profile_image,
+          up.gender AS gender,
+          u.full_name AS full_name
+        FROM hp_appointments ha
+        JOIN hp_profile p ON ha.hp_id = p.user_id
+        JOIN hp_availability a ON ha.hp_id = a.user_id
+        JOIN users u ON ha.u_id = u.id
+        JOIN profile up ON ha.u_id = up.user_id
+        WHERE ha.hp_app_id = $1
+      `;
+
+    // Execute the query
+    const appointmentResult = await pool.query(query, [id]);
+
+    // Check if the appointment exists
+    if (appointmentResult.rows.length === 0) {
+      return res.status(404).json({ error: "Appointment not found." });
+    }
+
+    // Respond with the appointment details
+    res.status(200).json(appointmentResult.rows[0]);
+  } catch (error) {
+    console.error("Error fetching appointment details:", error);
+    res.status(500).json({ error: "Failed to fetch appointment details" });
+  }
+};
+
+//Virtual Consultation
+const searchVirtualDoctors = async (req, res) => {
+  const { searchQuery, date } = req.body;
+
+  // Validate and parse the date to determine the day of the week
+  if (!date) {
+    return res.status(400).json({ error: "Date is required" });
+  }
+
+  const parsedDate = new Date(date);
+  if (isNaN(parsedDate)) {
+    return res.status(400).json({ error: "Invalid date format" });
+  }
+
+  const dayOfWeek = parsedDate.getDay(); // Get the numeric day of the week (0-6)
+  const isWeekday = dayOfWeek >= 1 && dayOfWeek <= 5; // Monday-Friday
+  const isWeekend = dayOfWeek === 0 || dayOfWeek === 6; // Saturday-Sunday
+
+  // Split searchQuery into words for flexible matching
+  const searchQueryWords = searchQuery ? searchQuery.trim().split(/\s+/) : [];
+
+  try {
+    const doctors = await pool.query(
+      `SELECT 
+        p.id, 
+        p.username, 
+        p.specialist, 
+        CASE 
+          WHEN p.profile_image IS NOT NULL 
+          THEN CONCAT('data:image/png;base64,', ENCODE(p.profile_image, 'base64'))
+          ELSE NULL 
+        END AS profile_image, 
+        p.rating, 
+        a.description, 
+        a.services_provide::text AS services_provide, -- Convert JSONB to text
+        a.category, 
+        a.available_days, 
+        a.available_times, 
+        a.price, 
+        a.bank_receiver_name, 
+        a.bank_name, 
+        a.account_number, 
+        a.id AS virtual_availability_id
+       FROM hp_profile p
+       JOIN hp_virtual_availability a ON p.user_id = a.hp_id
+       WHERE ($1::TEXT[] IS NULL OR (
+              SELECT COUNT(*) FROM unnest($1::TEXT[]) AS word 
+              WHERE p.username ILIKE CONCAT('%', word, '%')
+           ) = cardinality($1::TEXT[])) -- Match all words in username
+         AND (
+             a.available_days = 'Everyday' -- Available everyday
+           OR (a.available_days = 'Every Weekday' AND $2 = 'weekday') -- Available weekdays
+           OR (a.available_days = 'Every Weekend' AND $2 = 'weekend') -- Available weekends
+           OR $3::TEXT = ANY (string_to_array(a.available_days, ',')) -- Specific day
+            )`,
+      [
+        searchQueryWords.length > 0 ? searchQueryWords : null, // Words from searchQuery
+        isWeekday ? "weekday" : isWeekend ? "weekend" : null, // Day category
+        dayOfWeek.toString(), // Numeric day of the week as a string
+      ]
+    );
+
+    res.status(200).json(doctors.rows);
+  } catch (error) {
+    console.error("Error searching virtual doctors:", error);
+    res.status(500).json({ error: "Failed to search virtual doctors" });
+  }
+};
+
+// Fetch unique categories
+const getVirtualCategories = async (req, res) => {
+  try {
+    const categories = await pool.query(
+      `SELECT DISTINCT category 
+         FROM hp_virtual_availability`
+    );
+
+    if (categories.rows.length === 0) {
+      return res.status(404).json({ message: "No categories found." });
+    }
+
+    res.status(200).json(categories.rows);
+  } catch (error) {
+    console.error("Error fetching categories:", error);
+    res.status(500).json({ error: "Failed to fetch categories" });
+  }
+};
+
+const getVirtualDoctorsByCategory = async (req, res) => {
+  const { category } = req.query;
+  console.log("Category received on backend:", category);
+  try {
+    const doctors = await pool.query(
+      `SELECT 
+           p.id, 
+           p.username, 
+           v.category,
+           v.description,
+           v.services_provide::text AS services_provide, -- Convert JSONB to text
+           v.available_days,
+           v.available_times,
+           v.price,
+           v.bank_receiver_name,
+           v.bank_name,
+           v.account_number,
+           v.id AS virtual_availability_id,
+           CASE 
+             WHEN p.profile_image IS NOT NULL 
+             THEN CONCAT('data:image/png;base64,', ENCODE(p.profile_image, 'base64'))
+             ELSE NULL 
+           END AS profile_image,
+           p.rating
+         FROM hp_profile p
+         JOIN hp_virtual_availability v ON p.user_id = v.hp_id
+         WHERE v.category = $1`,
+      [category]
+    );
+
+    if (doctors.rows.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "No virtual doctors found for this category" });
+    }
+
+    res.status(200).json(doctors.rows);
+  } catch (error) {
+    console.error("Error fetching virtual doctors by category:", error);
+    res
+      .status(500)
+      .json({ error: "Failed to fetch virtual doctors by category" });
+  }
+};
+
+// Fetch doctor details including profile and availability
+const getVirtualDoctorAppointmentDetails = async (req, res) => {
+  const { doctorId } = req.params; // Get doctorId from route params
+
+  try {
+    // Query to fetch doctor details from hp_profile and hp_availability tables
+    const doctorDetails = await pool.query(
+      `
+        SELECT 
+          p.username,
+          p.phone_number,
+          p.education,
+          p.experience,
+          p.credentials,
+          p.languages,
+          p.services,
+          p.business_hours,
+          p.business_days,
+          p.summary,
+         CASE 
+  WHEN p.profile_image IS NOT NULL 
+  THEN ENCODE(p.profile_image, 'base64') 
+  ELSE NULL 
+END AS profile_image,
+          p.rating,
+          p.user_id,
+          a.description,
+          a.services_provide::text AS services_provide, -- Convert JSONB to text
+          a.available_days,
+          a.available_times,
+          a.category,
+           a.bank_receiver_name,
+           a.bank_name,
+           a.account_number,
+       a.hp_id,
+          u.healthcare_license,
+          u.email, 
+          u.full_name
+        FROM hp_profile p
+        JOIN hp_virtual_availability a ON p.user_id = a.hp_id
+        JOIN users u ON p.user_id = u.id
+        WHERE a.id = $1
+        `,
+      [doctorId] // Use the doctorId to filter by hp_availability primary ID
+    );
+
+    // Check if the doctor details were found
+    if (doctorDetails.rows.length === 0) {
+      return res.status(404).json({ message: "Doctor not found" });
+    }
+
+    // Respond with the doctor details
+    res.status(200).json(doctorDetails.rows[0]);
+  } catch (error) {
+    console.error("Error fetching doctor details:", error);
+    res.status(500).json({ error: "Failed to fetch doctor details" });
+  }
+};
+
+// Get available times for a specific doctor
+const getVirtualAvailableTimes = async (req, res) => {
+  try {
+    const { doctorId, date } = req.query;
+    // console.log("Doctor ID:", doctorId);
+    // console.log("Date:", date);
+
+    // Validate input
+    if (!doctorId || !date) {
+      return res
+        .status(400)
+        .json({ error: "Doctor ID and Date are required." });
+    }
+
+    // Parse the date to find the day of the week
+    const parsedDate = new Date(date);
+    if (isNaN(parsedDate)) {
+      return res.status(400).json({ error: "Invalid date format." });
+    }
+
+    const dayOfWeek = parsedDate.getDay(); // 0 (Sunday) to 6 (Saturday)
+    const dayCategory =
+      dayOfWeek === 0 || dayOfWeek === 6 ? "Every Weekend" : "Every Weekday"; // Determine the day category
+
+    // console.log("Day of the week:", dayOfWeek);
+    // console.log("Day category:", dayCategory);
+    // Fetch user_id from hp_availability using doctorId
+    const userIdQuery = `
+SELECT hp_id, available_times, available_days 
+FROM hp_virtual_availability 
+WHERE id = $1
+`;
+    const userIdResult = await pool.query(userIdQuery, [doctorId]);
+
+    if (userIdResult.rows.length === 0) {
+      return res.status(404).json({ error: "Doctor not found." });
+    }
+
+    const {
+      hp_id: userId,
+      available_times: availableTimes,
+      available_days: availableDays,
+    } = userIdResult.rows[0];
+
+    // Check if the day matches the available_days
+    const isAvailable =
+      availableDays === "Everyday" ||
+      (availableDays === "Every Weekday" && dayCategory === "Every Weekday") ||
+      (availableDays === "Every Weekend" && dayCategory === "Every Weekend");
+
+    if (!isAvailable) {
+      return res.json([]); // No availability for the given day
+    }
+
+    // console.log("Available times:", availableTimes);
+    // console.log("UserId getAvailableTime:", userId);
+    // Fetch booked times from hp_appointments
+    //     const bookedAppointmentsQuery = `
+    // SELECT app_time AS time
+    // FROM hp_appointments
+    // WHERE hp_id = $1 AND app_date = $2
+    // `;
+    //     const bookedAppointments = await pool.query(bookedAppointmentsQuery, [
+    //       userId,
+    //       date,
+    //     ]);
+
+    //     // Fetch booked times from hp_virtual_appointment
+    //     const virtualAppointmentsQuery = `
+    // SELECT hpva_time AS time
+    // FROM hp_virtual_appointment
+    // WHERE hp_id = $1 AND hpva_date = $2
+    // `;
+    //     const virtualAppointments = await pool.query(virtualAppointmentsQuery, [
+    //       userId,
+    //       date,
+    //     ]);
+
+    // Fetch booked times from both tables
+    const bookedAppointmentsQuery = `
+SELECT app_time AS time FROM hp_appointments 
+WHERE hp_id = $1 AND app_date = $2
+UNION
+SELECT hpva_time AS time FROM hp_virtual_appointment 
+WHERE hp_id = $1 AND hpva_date = $2
+`;
+    const bookedAppointments = await pool.query(bookedAppointmentsQuery, [
+      userId,
+      date,
+    ]);
+
+    // Combine all booked times
+    // const bookedTimes = [
+    //   ...bookedAppointments.rows.map((appt) => appt.time),
+    //   ...virtualAppointments.rows.map((vAppt) => vAppt.time),
+    // ];
+
+    const bookedTimes = bookedAppointments.rows.map((appt) => appt.time);
+    // console.log("Booked times:", bookedTimes);
+
+    // Convert booked times to 'hh:mm AM/PM' format
+    const convertTo12HourFormat = (time) => {
+      const [hours, minutes] = time.split(":");
+      const period = hours >= 12 ? "PM" : "AM";
+      const adjustedHours = hours % 12 || 12; // Convert 0 to 12 for midnight
+      return `${adjustedHours}:${minutes.padStart(2, "0")} ${period}`;
+    };
+
+    const bookedTimes12Hour = bookedTimes.map(convertTo12HourFormat);
+    // console.log("Booked times in 12-hour format:", bookedTimes12Hour);
+
+    // Normalize availableTimes to replace non-breaking spaces with regular spaces
+    const normalizedAvailableTimes = availableTimes.map((time) =>
+      time.replace(/\u202F/g, " ")
+    );
+
+    // Filter available times
+    const filteredTimes = normalizedAvailableTimes.filter(
+      (time) => !bookedTimes12Hour.includes(time)
+    );
+    // // Filter available times
+    // const filteredTimes = availableTimes.filter(
+    //   (time) => !bookedTimes.includes(time)
+    // );
+
+    // Filter available times
+    // const filteredTimes = availableTimes.filter(
+    //   (time) => !bookedTimes12Hour.includes(time)
+    // );
+
+    // console.log("Filtered Available Times:", filteredTimes);
+    res.status(200).json(filteredTimes); // Send the filtered times
+  } catch (error) {
+    console.error("Error fetching available times:", error);
+    res.status(500).json({ error: "An error occurred while fetching times." });
+  }
+};
+
+// Book a virtual appointment
+const bookVirtualAppointment = async (req, res) => {
+  const {
+    doctorId,
+    date,
+    time,
+    whoWillSee,
+    patientSeenBefore,
+    note,
+    symptoms,
+    duration, // Assuming you want to include duration
+    meetingLink, // Assuming you want to include a meeting link
+    fee, // Assuming you want to include a fee
+    receiptUrl,
+    services,
+  } = req.body;
+
+  const userId = req.userId; // Get userId from the authenticated request
+  console.log("userId:", userId);
+
+  if (!userId) {
+    return res.status(401).json({ error: "User  not authenticated" });
+  }
+
+  try {
+    // Convert the provided time to 24-hour format
+    const convertedTime = convertTo24HourFormat(time);
+
+    // Fetch the doctor (hp_id) from the hp_virtual_availability table using the doctorId
+    const availabilityQuery = await pool.query(
+      `SELECT hp_id FROM hp_virtual_availability WHERE id = $1`,
+      [doctorId]
+    );
+
+    if (availabilityQuery.rows.length === 0) {
+      return res.status(404).json({ error: "Doctor not found" });
+    }
+
+    const hpId = availabilityQuery.rows[0].hp_id; // Correctly get the hp_id from the availability table
+    console.log("hpId:", hpId);
+
+    // Check if the user already has a booking on the same date and time
+    const existingAppointmentQuery = `
+      SELECT 1 FROM hp_appointments 
+      WHERE u_id = $1 AND hp_id = $2 AND app_date = $3 AND app_time = $4
+      UNION
+      SELECT 1 FROM hp_virtual_appointment 
+      WHERE u_id = $1 AND hp_id = $2 AND hpva_date = $3 AND hpva_time = $4
+    `;
+    const existingAppointment = await pool.query(existingAppointmentQuery, [
+      userId,
+      hpId,
+      date,
+      convertedTime,
+    ]);
+
+    if (existingAppointment.rows.length > 0) {
+      return res.status(400).json({
+        error: "You already have an appointment at this time.",
+      });
+    }
+
+    // Check if the time slot is already booked by another user
+    const timeSlotQuery = `
+      SELECT 1 FROM hp_virtual_appointment 
+      WHERE hp_id = $1 AND hpva_date = $2 AND hpva_time = $3
+    `;
+    const timeSlotTaken = await pool.query(timeSlotQuery, [
+      hpId,
+      date,
+      convertedTime,
+    ]);
+
+    if (timeSlotTaken.rows.length > 0) {
+      return res.status(400).json({
+        error: "This time slot is already booked by another user.",
+      });
+    }
+
+    // Insert the virtual appointment into the hp_virtual_appointment table
+    const insertAppointmentQuery = await pool.query(
+      `INSERT INTO hp_virtual_appointment (
+        u_id, 
+        hp_id, 
+        hpva_date, 
+        hpva_time, 
+        duration, 
+        status, 
+        meeting_link, 
+        notes, 
+        created_at, 
+        updated_at, 
+        payment_status, 
+        fee,
+        receipt_url, service, symptoms, who_will_see, patient_seen_before
+      )
+      VALUES ($1, $2, $3, $4, $5, 'pending', $6, $7, NOW(), NOW(), 'uncheck', $8, $9, $10, $11, $12, $13)
+      RETURNING hpva_id`, // Add the RETURNING clause to get the last inserted ID
+      [
+        userId,
+        hpId,
+        date,
+        convertedTime,
+        duration,
+        meetingLink,
+        note,
+        fee,
+        receiptUrl,
+        services,
+        symptoms,
+        whoWillSee,
+        patientSeenBefore,
+      ]
+    );
+
+    const appointmentId = `virtual_${insertAppointmentQuery.rows[0].hpva_id}`;
+    console.log("Book Virtual Appointment ID:", appointmentId);
+    res.status(201).json({
+      message: "Virtual appointment booked successfully",
+      appointmentId,
+    });
+  } catch (error) {
+    console.error("Error booking virtual appointment:", error);
+    res.status(500).json({ error: "Failed to book virtual appointment" });
+  }
+};
+
+// // Book a virtual appointment
+// const bookVirtualAppointment = async (req, res) => {
+//   const {
+//     doctorId,
+//     hp_id,
+//     date,
+//     time,
+//     medicalCoverage,
+//     whoWillSee,
+//     patientSeenBefore,
+//     note,
+//     app_sickness,
+//     duration, // Assuming you want to include duration
+//     meetingLink, // Assuming you want to include a meeting link
+//     fee, // Assuming you want to include a fee
+//   } = req.body;
+
+//   const userId = req.userId; // Get userId from the authenticated request
+//   console.log("userId:", userId);
+
+//   if (!userId) {
+//     return res.status(401).json({ error: "User  not authenticated" });
+//   }
+
+//   try {
+//     // Convert the provided time to 24-hour format
+//     const convertedTime = convertTo24HourFormat(time);
+
+//     // Fetch the doctor (hp_id) from the hp_availability table using the doctorId (availability_id)
+//     const availabilityQuery = await pool.query(
+//       `SELECT hp_id FROM hp_virtual_availability WHERE id = $1`,
+//       [doctorId]
+//     );
+
+//     if (availabilityQuery.rows.length === 0) {
+//       return res.status(404).json({ error: "Doctor not found" });
+//     }
+
+//     const hpId = availabilityQuery.rows[0].user_id; // Get the hp_id (doctor's id) from the availability table
+//     console.log("hpId", hpId);
+//     // Check if the user already has a booking on the same date and time
+//     const existingAppointmentQuery = `
+//       SELECT 1 FROM hp_appointments
+//       WHERE u_id = $1 AND hp_id = $2 AND app_date = $3 AND app_time = $4
+//       UNION
+//       SELECT 1 FROM hp_virtual_appointment
+//       WHERE u_id = $1 AND hp_id = $2 AND hpva_date = $3 AND hpva_time = $4
+//     `;
+//     const existingAppointment = await pool.query(existingAppointmentQuery, [
+//       userId,
+//       hpId,
+//       date,
+//       convertedTime,
+//     ]);
+
+//     if (existingAppointment.rows.length > 0) {
+//       return res.status(400).json({
+//         error: "You already have an appointment at this time.",
+//       });
+//     }
+
+//     // Check if the time slot is already booked by another user
+//     const timeSlotQuery = `
+//       SELECT 1 FROM hp_virtual_appointment
+//       WHERE hp_id = $1 AND hpva_date = $2 AND hpva_time = $3
+//     `;
+//     const timeSlotTaken = await pool.query(timeSlotQuery, [
+//       hpId,
+//       date,
+//       convertedTime,
+//     ]);
+
+//     if (timeSlotTaken.rows.length > 0) {
+//       return res.status(400).json({
+//         error: "This time slot is already booked by another user.",
+//       });
+//     }
+
+//     // Insert the virtual appointment into the hp_virtual_appointment table
+//     const insertAppointmentQuery = await pool.query(
+//       `INSERT INTO hp_virtual_appointment (
+//         u_id,
+//         hp_id,
+//         hpva_date,
+//         hpva_time,
+//         duration,
+//         status,
+//         meeting_link,
+//         notes,
+//         created_at,
+//         updated_at,
+//         payment_status,
+//         fee
+//       )
+//       VALUES ($1, $2, $3, $4, $5, 'pending', $6, $7, NOW(), NOW(), 'unpaid', $8)
+//       RETURNING hpva_id`, // Add the RETURNING clause to get the last inserted ID
+//       [userId, hpId, date, convertedTime, duration, meetingLink, note, fee]
+//     );
+
+//     const appointmentId = `virtual_${insertAppointmentQuery.rows[0].hpva_id}`; // Get the last inserted ID
+//     console.log("Book Virtual Appointment ID:", appointmentId);
+//     res.status(201).json({
+//       message: "Virtual appointment booked successfully",
+//       appointmentId,
+//     });
+//   } catch (error) {
+//     console.error("Error booking virtual appointment:", error);
+//     res.status(500).json({ error: "Failed to book virtual appointment" });
+//   }
+// };
+const uploadReceipt = async (req, res) => {
+  console.log(req.file); // Log the file object
+  if (!req.file) {
+    return res.status(400).json({ error: "No file uploaded" });
+  }
+
+  // Construct the file URL (adjust the base URL as needed)
+  const fileUrl = `http://localhost:5001/uploads/${req.file.filename}`;
+
+  // You can also save the file URL to the database if needed
+  // For example, you might want to associate it with a user or appointment
+
+  res.json({ fileUrl });
+};
+const getVirtualAppointmentDetails = async (req, res) => {
+  const appointmentId = req.params.appointmentId;
+
+  try {
+    // Determine the appointment type and ID
+    const isVirtual = appointmentId.startsWith("virtual_");
+    const id = appointmentId.split("_")[1];
+
+    // Query selection based on appointment type
+    const query = isVirtual
+      ? `
+        SELECT 
+          hv.hpva_id AS appointment_id, 
+          hv.hp_id, 
+          hv.u_id, 
+          hv.hpva_date AS appointment_date, 
+          hv.hpva_time AS appointment_time, 
           hv.status, 
           NULL AS medical_coverage, 
           NULL AS who_will_see, 
@@ -1089,4 +1767,12 @@ module.exports = {
   getScheduledAppointments,
   cancelAppointment,
   getAppointmentDetails,
+  searchVirtualDoctors,
+  getVirtualCategories,
+  getVirtualDoctorsByCategory,
+  getVirtualDoctorAppointmentDetails,
+  getVirtualAvailableTimes,
+  bookVirtualAppointment,
+  uploadReceipt,
+  getVirtualAppointmentDetails,
 };

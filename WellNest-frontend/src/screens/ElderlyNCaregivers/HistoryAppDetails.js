@@ -20,7 +20,9 @@ const HistoryAppDetails = ({ route, navigation }) => {
   const { appointmentId } = route.params; // Get appointmentId from route params
   const [appointmentDetails, setAppointmentDetails] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [services, setServices] = useState([]);
   console.log("HistoryAppDetailsappointmentId:", appointmentId);
+
   useEffect(() => {
     const fetchAppointmentDetails = async () => {
       const token = await AsyncStorage.getItem("token");
@@ -43,6 +45,28 @@ const HistoryAppDetails = ({ route, navigation }) => {
         const result = await response.json();
         if (response.ok) {
           setAppointmentDetails(result);
+          // Parse the services_provide JSON string
+          // let parsedServices = [];
+          // try {
+          //   parsedServices = JSON.parse(result.services_provide) || [];
+          // } catch (error) {
+          //   console.error("Error parsing services_provide:", error);
+          //   parsedServices = [];
+          // }
+
+          // setServices(parsedServices);
+          // Parse services_provide only for virtual appointments
+          if (appointmentId.startsWith("virtual_")) {
+            let parsedServices = [];
+            try {
+              parsedServices = JSON.parse(result.services_provide) || [];
+            } catch (error) {
+              console.error("Error parsing services_provide:", error);
+              parsedServices = [];
+            }
+
+            setServices(parsedServices);
+          }
         } else {
           alert(result.error || "Failed to fetch appointment details.");
         }
@@ -98,6 +122,16 @@ const HistoryAppDetails = ({ route, navigation }) => {
     appointmentDetails.appointment_date,
     appointmentDetails.appointment_time
   );
+
+  // Function to format service names
+  const formatServiceName = (serviceName) => {
+    return serviceName.replace(/([A-Z])/g, " $1").trim();
+  };
+
+  // Determine if the appointment is virtual or physical
+  const isVirtual = appointmentId.startsWith("virtual_");
+  const isPhysical = appointmentId.startsWith("physical_");
+
   return (
     <ImageBackground
       source={require("../../../assets/DoctorDetails.png")}
@@ -123,9 +157,36 @@ const HistoryAppDetails = ({ route, navigation }) => {
             <Text style={styles.doctorCategory}>
               {appointmentDetails.category}
             </Text>
-            <Text style={styles.description}>
+
+            {/* <Text style={styles.description}>
               Location: {appointmentDetails.location}
-            </Text>
+            </Text> */}
+            {/* <Text style={styles.doctorRating}>
+              ⭐ {appointmentDetails.rating || "N/A"}
+            </Text> */}
+            {isVirtual && (
+              <>
+                <Text style={styles.serviceText}>Services Provided :</Text>
+                {(services || []).length > 0 ? (
+                  services.map((service, index) => (
+                    <Text key={index} style={styles.sText}>
+                      {formatServiceName(service.service)}: RM {service.price}
+                    </Text>
+                  ))
+                ) : (
+                  <Text style={styles.doctorCategory}>
+                    No services available
+                  </Text>
+                )}
+              </>
+            )}
+            {!isVirtual && (
+              <>
+                <Text style={styles.description}>
+                  Location: {appointmentDetails.location}
+                </Text>
+              </>
+            )}
             <Text style={styles.doctorRating}>
               ⭐ {appointmentDetails.rating || "N/A"}
             </Text>
@@ -148,26 +209,56 @@ const HistoryAppDetails = ({ route, navigation }) => {
       <View style={styles.uAcontainer}>
         <View style={styles.whiteUAcontainer}>
           <ScrollView contentContainerStyle={styles.scrollViewContent}>
-            <Text style={styles.aLabel}>Location</Text>
-            <View style={styles.displayUnderline} />
-            <Text style={styles.sectionContent}>
-              {appointmentDetails.location} {"\n"}
-              {appointmentDetails.hospital_address}
-              {"\n"}
-            </Text>
+            {!isVirtual && (
+              <>
+                <Text style={styles.aLabel}>Location</Text>
+                <View style={styles.displayUnderline} />
+                <Text style={styles.sectionContent}>
+                  {appointmentDetails.location} {"\n"}
+                  {appointmentDetails.hospital_address}
+                  {"\n"}
+                </Text>
+              </>
+            )}
             <Text style={styles.aLabel}>Patient Details</Text>
             <View style={styles.displayUnderline} />
             <View style={styles.tableContainer}>
-              <View style={styles.tableRow}>
+              {/* <View style={styles.tableRow}>
                 <Text style={styles.tableCell}>Medical Coverage:</Text>
                 <Text style={styles.tableCell}>
                   {appointmentDetails.medical_coverage}
                 </Text>
-              </View>
+              </View> */}
+              {!isVirtual && (
+                <>
+                  <View style={styles.tableRow}>
+                    <Text style={styles.tableCell}>Medical Coverage</Text>
+                    <Text style={styles.tableCell}>
+                      {appointmentDetails.medical_coverage}
+                    </Text>
+                  </View>
+                </>
+              )}
+              {isVirtual && (
+                <>
+                  <View style={styles.tableRow}>
+                    <Text style={styles.tableCell}>
+                      Virtual Consultation Method
+                    </Text>
+                    <Text style={styles.tableCell}>
+                      {formatServiceName(appointmentDetails.service)}
+                    </Text>
+                  </View>
+                </>
+              )}
               <View style={styles.tableRow}>
-                <Text style={styles.tableCell}>Reason:</Text>
                 <Text style={styles.tableCell}>
-                  {appointmentDetails.app_sickness}
+                  {isVirtual ? "Symptoms" : "Reason"}:
+                </Text>
+                <Text style={styles.tableCell}>
+                  {isVirtual
+                    ? appointmentDetails.symptoms || "N/A"
+                    : appointmentDetails.app_sickness || "N/A"}
                 </Text>
               </View>
               <View style={styles.tableRow}>
@@ -194,6 +285,16 @@ const HistoryAppDetails = ({ route, navigation }) => {
                   {appointmentDetails.appointment_id}
                 </Text>
               </View>
+              {isVirtual && (
+                <>
+                  <View style={styles.tableRow}>
+                    <Text style={styles.tableCell}>Payment</Text>
+                    <Text style={styles.tableCell}>
+                      RM {appointmentDetails.fee}
+                    </Text>
+                  </View>
+                </>
+              )}
               <View style={styles.tableRow}>
                 <Text style={styles.tableCell}>Status:</Text>
                 <Text style={styles.tableCell}>

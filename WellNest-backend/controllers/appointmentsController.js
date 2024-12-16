@@ -269,7 +269,8 @@ const getAppointmentDetailsByHpAppId = async (req, res) => {
             ELSE NULL 
           END AS profile_image,
           p.gender,
-      u.full_name
+      u.full_name,
+      u.phone_no
       FROM hp_appointments ha
       JOIN profile p ON ha.u_id = p.user_id
     JOIN users u ON ha.u_id = u.id
@@ -290,15 +291,15 @@ const getAppointmentDetailsByHpAppId = async (req, res) => {
 };
 
 const deleteSingleAppointment = async (req, res) => {
-  const { appointmentId } = req.params;
-
+  const { hp_app_id } = req.params;
+  console.log("Deleting appointment with ID:", hp_app_id);
   try {
     const query = `
       DELETE FROM hp_appointments
       WHERE hp_app_id = $1
       RETURNING *;
     `;
-    const result = await pool.query(query, [appointmentId]);
+    const result = await pool.query(query, [hp_app_id]);
 
     if (result.rowCount === 0) {
       return res.status(404).json({ message: "Appointment not found." });
@@ -313,7 +314,7 @@ const deleteSingleAppointment = async (req, res) => {
 
 const getPastAppointments = async (req, res) => {
   const { hpId } = req.params;
-  console.log("Fetching past appointments for hpId:", hpId);
+  // console.log("Fetching past appointments for hpId:", hpId);
 
   try {
     const query = `
@@ -351,6 +352,132 @@ const getPastAppointments = async (req, res) => {
   }
 };
 
+const upsertVirtualConsultation = async (req, res) => {
+  const {
+    description,
+    servicesProvide,
+    category,
+    availableDays,
+    availableTimes,
+    bank_receiver_name,
+    bank_name,
+    account_number,
+    hpId, // Passed from frontend
+  } = req.body;
+
+  try {
+    // Check if a record with the given hpId already exists
+    const { rowCount, rows } = await pool.query(
+      `
+      SELECT id FROM hp_virtual_availability WHERE hp_id = $1
+      `,
+      [hpId]
+    );
+
+    if (rowCount > 0) {
+      // Record exists, perform an update
+      const appointmentId = rows[0].id; // Get the existing record ID
+      const { rows: updatedRows } = await pool.query(
+        `
+        UPDATE hp_virtual_availability
+        SET description = $1, services_provide = $2, category = $3, available_days = $4, available_times = $5, bank_receiver_name = $6, bank_name = $7, account_number = $8, updated_at = NOW()
+        WHERE id = $9 RETURNING *
+        `,
+        [
+          description,
+          JSON.stringify(servicesProvide), // Store as JSON
+          category,
+          availableDays,
+          availableTimes,
+          bank_receiver_name,
+          bank_name,
+          account_number,
+          appointmentId,
+        ]
+      );
+      res.status(200).json({
+        message: "Virtual consultation updated successfully",
+        data: updatedRows[0],
+      });
+    } else {
+      // Record does not exist, perform an insert
+      const { rows: insertedRows } = await pool.query(
+        `
+        INSERT INTO hp_virtual_availability (description, services_provide, category, available_days, available_times, bank_receiver_name, bank_name, account_number, hp_id, created_at, updated_at)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW(), NOW()) RETURNING *
+        `,
+        [
+          description,
+          JSON.stringify(servicesProvide), // Store as JSON
+          category,
+          availableDays,
+          availableTimes,
+          bank_receiver_name,
+          bank_name,
+          account_number,
+          hpId,
+        ]
+      );
+      res.status(200).json({
+        message: "Virtual consultation created successfully",
+        data: insertedRows[0],
+      });
+    }
+  } catch (error) {
+    console.error("Error upserting virtual consultation:", error);
+    res.status(500).json({ error: "Failed to upsert virtual consultation" });
+  }
+};
+
+const getVirtualAvailabilityDetails = async (req, res) => {
+  const { hpId } = req.params;
+  try {
+    const query = `
+    SELECT 
+        id, 
+        description, 
+        services_provide, 
+        category, 
+        available_days, 
+        available_times, 
+        price, 
+        bank_receiver_name, 
+        bank_name, 
+        account_number, 
+        created_at, 
+        updated_at, 
+        hp_id
+      FROM 
+        hp_virtual_availability
+      WHERE 
+        hp_id = $1;
+  `;
+    const { rows } = await pool.query(query, [hpId]); // Pass hpId as a parameter
+    res.status(200).json(rows); // Send results as JSON
+  } catch (error) {
+    console.error("Error fetching virtual availability details:", error);
+    res
+      .status(500)
+      .json({ error: "Failed to fetch virtual availability details." });
+  }
+};
+
+// Function to delete an appointment by ID
+const deleteVirtualConsultation = async (req, res) => {
+  const { id } = req.params;
+  try {
+    await pool.query("DELETE FROM hp_virtual_availability WHERE id = $1", [id]);
+    res.json({
+      message: "Virtual consultation appointment deleted successfully",
+    });
+  } catch (error) {
+    console.error("Error deleting virtual consultation appointment:", error);
+    res
+      .status(500)
+      .json({ error: "Failed to delete virtual consultation appointment" });
+  }
+};
+
 module.exports = {
   createAppointment,
   getAppointments,
@@ -362,4 +489,7 @@ module.exports = {
   getAppointmentDetailsByHpAppId,
   deleteSingleAppointment,
   getPastAppointments,
+  getVirtualAvailabilityDetails,
+  upsertVirtualConsultation,
+  deleteVirtualConsultation,
 };

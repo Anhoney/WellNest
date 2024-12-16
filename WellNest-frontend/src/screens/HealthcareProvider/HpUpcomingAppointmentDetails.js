@@ -9,6 +9,7 @@ import {
   ScrollView,
   ImageBackground,
   Image,
+  Modal,
 } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 import axios from "axios";
@@ -26,6 +27,7 @@ const HpUpcomingAppointmentDetails = ({ route }) => {
   const [appointments, setAppointments] = useState([]);
   const [userId, setUserId] = useState(null);
   const navigation = useNavigation();
+  const [modalVisible, setModalVisible] = useState(false); // Modal visibility state
 
   console.log("hp_app_id:", hp_app_id);
 
@@ -103,6 +105,7 @@ const HpUpcomingAppointmentDetails = ({ route }) => {
 
       if (response.status === 200) {
         Alert.alert("Success", "Appointment deleted successfully.");
+        setModalVisible(false); // Close the modal after deletion
         navigation.goBack(); // Navigate back after deletion
       }
     } catch (error) {
@@ -254,6 +257,10 @@ const HpUpcomingAppointmentDetails = ({ route }) => {
                 <Text style={styles.tableCell}>{appointments.gender}</Text>
               </View>
               <View style={styles.tableRow}>
+                <Text style={styles.tableCell}>Phone Number:</Text>
+                <Text style={styles.tableCell}>{appointments.phone_no}</Text>
+              </View>
+              <View style={styles.tableRow}>
                 <Text style={styles.tableCell}>Notes:</Text>
                 <Text style={styles.tableCell}>
                   {appointments.note || "N/A"}
@@ -275,11 +282,47 @@ const HpUpcomingAppointmentDetails = ({ route }) => {
       <View>
         <TouchableOpacity
           style={styles.deleteButton}
-          onPress={deleteAppointment}
+          // onPress={deleteAppointment}
+          onPress={() => setModalVisible(true)} // Show modal
         >
           <Text style={styles.deleteButtonText}>Delete Appointment</Text>
         </TouchableOpacity>
       </View>
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalView}>
+            <Text style={styles.modalTitle}>Confirm Deletion</Text>
+            <Image
+              source={require("../../../assets/DeleteCat.png")}
+              style={styles.successImage} // Style for the image
+            />
+            <Text style={styles.modalMessage}>
+              Are you sure you want to delete this appointment?
+            </Text>
+            <View style={styles.modalButtons}>
+              <TouchableOpacity
+                style={styles.modalConfirmButton}
+                onPress={deleteAppointment}
+              >
+                <Text style={styles.modalConfirmButtonText}>Confirm</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.modalCancelButton}
+                onPress={() => setModalVisible(false)}
+              >
+                <Text style={styles.modalCancelButtonText}>Cancel</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
       <HpNavigationBar navigation={navigation} />
     </ImageBackground>
   );
