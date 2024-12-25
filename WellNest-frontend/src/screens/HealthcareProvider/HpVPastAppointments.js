@@ -1,4 +1,4 @@
-//HpPastAppointments.js
+//HpVPastAppointments.js
 import React, { useEffect, useState } from "react";
 import {
   View,
@@ -21,7 +21,7 @@ import { format } from "date-fns";
 import HpNavigationBar from "../../components/HpNavigationBar"; // Import your custom navigation bar component
 import styles from "../../components/styles"; // Import shared styles
 
-const HpPastAppointments = () => {
+const HpVPastAppointments = () => {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigation = useNavigation();
@@ -42,7 +42,7 @@ const HpPastAppointments = () => {
       }
 
       const response = await fetch(
-        `${API_BASE_URL}/getPastAppointments/${hpId}`
+        `${API_BASE_URL}/virtual/getPastAppointments/${hpId}`
       );
       if (!response.ok) {
         throw new Error("Failed to fetch appointments.");
@@ -54,19 +54,18 @@ const HpPastAppointments = () => {
       const updatedAppointments = await Promise.all(
         data.map(async (appointment) => {
           const reportExists = await checkMedicalReportExists(
-            appointment.hp_app_id
+            appointment.hpva_id
           );
           // Debugging: Log the report existence for each appointment
           console.log(
-            `Appointment ID: ${appointment.hp_app_id}, Report Exists: ${reportExists}`
+            `Appointment ID: ${appointment.hpva_id}, Report Exists: ${reportExists}`
           );
 
           return { ...appointment, reportExists };
         })
       );
+
       setAppointments(updatedAppointments);
-      // setAppointments(data);
-      console.log("appointments", data);
     } catch (error) {
       console.error("Error fetching appointments:", error);
       Alert.alert("Error", "Failed to fetch appointments.");
@@ -78,7 +77,7 @@ const HpPastAppointments = () => {
   const approveAppointment = async (appointmentId) => {
     try {
       const response = await fetch(
-        `${API_BASE_URL}/appointments/approve/${appointmentId}`,
+        `${API_BASE_URL}/virtual/appointments/approve/${appointmentId}`,
         { method: "PUT" }
       );
       if (!response.ok) {
@@ -93,11 +92,12 @@ const HpPastAppointments = () => {
       Alert.alert("Error", "Failed to approve appointment.");
     }
   };
-  const checkMedicalReportExists = async (hp_app_id) => {
+
+  const checkMedicalReportExists = async (hpva_id) => {
     try {
-      console.log("checkMedicalReport:", hp_app_id);
+      console.log("checkMedicalReport:", hpva_id);
       const response = await axios.get(
-        `${API_BASE_URL}/medicalReports/check/${hp_app_id}/physical`
+        `${API_BASE_URL}/medicalReports/check/${hpva_id}/virtual`
       );
       // Debugging: Log the response from the backend
       console.log("Response from checkMedicalReportExists:", response.data);
@@ -111,30 +111,30 @@ const HpPastAppointments = () => {
 
   const renderAppointment = ({ item }) => {
     // Log the appointment date for debugging
-    console.log("appointments", item.app_date);
-    // Convert date and time into readable formats
-    //   const formattedDate = item.app_date; // Already formatted by backend
-    //   const formattedTime = item.app_time; // Already formatted by backend
+    console.log("appointments", item.hpva_date);
+
     let imageUri = item.profile_image
       ? item.profile_image // Base64 string returned from the backend
       : "https://via.placeholder.com/150";
 
+    const appointmentType = "virtual"; // Set the appointment type for the check
+    console.log("Item.reportExists:", item.reportExists);
     return (
       <TouchableOpacity
         style={styles.card}
         onPress={() =>
-          navigation.navigate("HpUpcomingAppointmentDetails", {
-            hp_app_id: item.hp_app_id,
+          navigation.navigate("HpVUpcomingAppointmentDetails", {
+            hpva_id: item.hpva_id,
           })
         }
       >
         <Image source={{ uri: imageUri }} style={styles.doctorImage} />
         <View style={styles.doctorInfo}>
           <Text style={styles.doctorName}>{item.full_name}</Text>
-          <Text style={styles.details}>Date: {item.app_date}</Text>
-          <Text style={styles.details}>Time: {item.app_time}</Text>
+          <Text style={styles.details}>Date: {item.hpva_date}</Text>
+          <Text style={styles.details}>Time: {item.hpva_time}</Text>
           <Text style={styles.details}>Patient: {item.who_will_see}</Text>
-          <Text style={styles.details}>Status: {item.app_status}</Text>
+          <Text style={styles.details}>Status: {item.status}</Text>
 
           {/* Conditional rendering for the "Write Medical Report" button */}
           {/* {item.app_status === "approved" && (
@@ -153,10 +153,10 @@ const HpPastAppointments = () => {
             </TouchableOpacity>
           )} */}
           {/* Conditional rendering for the "Approve" and "Write Medical Report" buttons */}
-          {item.app_status === "pending" && (
+          {item.status === "pending" && (
             <TouchableOpacity
               style={styles.approveButton}
-              onPress={() => approveAppointment(item.hp_app_id)}
+              onPress={() => approveAppointment(item.hpva_id)}
             >
               <View style={styles.statusContainer}>
                 <Ionicons name="checkmark-circle" size={24} color="green" />
@@ -164,13 +164,24 @@ const HpPastAppointments = () => {
               </View>
             </TouchableOpacity>
           )}
-          {item.app_status === "approved" && (
+
+          {item.status === "approved" && (
             <TouchableOpacity
-              style={styles.smallApproveButton}
+              // style={[
+              //   styles.smallApproveButton,
+              //   {
+              //     backgroundColor: item.reportExists ? "blue" : "orange",
+              //     // backgroundColor: reportExists === null
+              //     //   ? "#ccc" // Loading state
+              //     //   : reportExists
+              //     //   ? "blue" // Exists
+              //     //   : "orange", // Does not exist
+              //   },
+              // ]}
               onPress={() =>
                 navigation.navigate("MedicalReportWriting", {
-                  appointmentId: item.hp_app_id,
-                  appointment_type: "physical",
+                  appointmentId: item.hpva_id,
+                  appointment_type: "virtual",
                 })
               }
             >
@@ -188,8 +199,13 @@ const HpPastAppointments = () => {
                   {item.reportExists
                     ? " Edit Medical Report"
                     : " Write Medical Report"}
+                  {console.log("Inside renderAppointment:", item.reportExists)}
+                  {/* {reportExists === null
+                  ? "Loading..."
+                  : reportExists
+                  ? "Edit Medical Report"
+                  : "Write Medical Report"} */}
                 </Text>
-                {/* <Text style={styles.medicalText}> Write Medical Report</Text> */}
               </View>
             </TouchableOpacity>
           )}
@@ -231,46 +247,12 @@ const HpPastAppointments = () => {
   }
 
   return (
-    //     <ImageBackground
-    //       source={require("../../../assets/PlainGrey.png")}
-    //       style={styles.background}
-    //     >
-    //       {/* Title Section with Back chevron-back */}
-    //       <View style={styles.smallHeaderContainer}>
-    //         <TouchableOpacity
-    //           onPress={() => navigation.goBack()}
-    //           style={styles.backButton}
-    //         >
-    //           <Ionicons name="chevron-back" size={24} color="#000" />
-    //         </TouchableOpacity>
-    //         <Text style={styles.hpTitle}>Past Appointments </Text>
-    //       </View>
-    //       {/* <View style={styles.hpContainer}> */}
-    //       <ScrollView contentContainerStyle={styles.hpContainer}>
-    //         <Text style={styles.sectionTitle}>Past Appointments</Text>
-    //         <View style={styles.singleUnderline}></View>
-    //         {loading ? (
-    //           <Text>Loading...</Text>
-    //         ) : (
-    //           <FlatList
-    //             data={appointments}
-    //             keyExtractor={(item) => item.hp_app_id.toString()}
-    //             renderItem={renderAppointment}
-    //             ListEmptyComponent={<Text>No upcoming appointments found.</Text>}
-    //           />
-    //         )}
-    //       </ScrollView>
-    //       {/* </View> */}
-    //       {/* Navigation Bar */}
-    //       <HpNavigationBar navigation={navigation} />
-    //     </ImageBackground>
-    //   );
-    // };
     <View style={{ flex: 1 }}>
       <ImageBackground
         source={require("../../../assets/PlainGrey.png")}
         style={styles.background}
       >
+        {/* Title Section with Back chevron-back */}
         <View style={styles.smallHeaderContainer}>
           <TouchableOpacity
             onPress={() => navigation.goBack()}
@@ -278,23 +260,29 @@ const HpPastAppointments = () => {
           >
             <Ionicons name="chevron-back" size={24} color="#000" />
           </TouchableOpacity>
-          <Text style={styles.hpTitle}>Past Physical {"\n"} Appointments </Text>
+          <Text style={styles.hpTitle}>Past Virtual {"\n"} Appointments </Text>
         </View>
         <Text>{"/n"}</Text>
-        {/* <Text style={styles.sectionTitle}>Past Appointments</Text> */}
+        {/* <View style={styles.hpContainer}> */}
+        {/* <Text style={styles.sectionTitle}>Past Virtual Appointments</Text> */}
         <View style={styles.singleUnderline}></View>
-        <FlatList
-          data={appointments}
-          keyExtractor={(item) => item.hp_app_id.toString()}
-          renderItem={renderAppointment}
-          contentContainerStyle={styles.hpContainer}
-          ListEmptyComponent={<Text>No past appointments found.</Text>}
-        />
+        {loading ? (
+          <Text>Loading...</Text>
+        ) : (
+          <FlatList
+            data={appointments}
+            keyExtractor={(item) => item.hpva_id.toString()}
+            renderItem={renderAppointment}
+            contentContainerStyle={styles.hpContainer}
+            ListEmptyComponent={<Text>No upcoming appointments found.</Text>}
+          />
+        )}
+        {/* </View> */}
+        {/* Navigation Bar */}
+        <HpNavigationBar navigation={navigation} />
       </ImageBackground>
-      {/* Navigation Bar */}
-      <HpNavigationBar navigation={navigation} />
     </View>
   );
 };
 
-export default HpPastAppointments;
+export default HpVPastAppointments;

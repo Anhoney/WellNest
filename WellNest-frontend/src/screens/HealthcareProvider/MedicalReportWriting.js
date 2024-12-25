@@ -23,7 +23,7 @@ import { getUserIdFromToken } from "../../../services/authService";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 const MedicalReportWriting = ({ route }) => {
-  const { appointmentId } = route.params; // Get appointment ID from route params
+  const { appointmentId, appointment_type } = route.params; // Get appointment ID from route params
   const [encounterSummary, setEncounterSummary] = useState("");
   const [followUpDate, setFollowUpDate] = useState(null);
   const [adviceGiven, setAdviceGiven] = useState("");
@@ -59,7 +59,7 @@ const MedicalReportWriting = ({ route }) => {
         console.log("fetchMedicalReport appointmentId:", appointmentId);
         const token = await AsyncStorage.getItem("token");
         const response = await fetch(
-          `${API_BASE_URL}/medicalReports/${appointmentId}`,
+          `${API_BASE_URL}/medicalReports/${appointmentId}?appointment_type=${appointment_type}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -100,24 +100,52 @@ const MedicalReportWriting = ({ route }) => {
     try {
       console.log("MW appointmentId:", appointmentId);
       const token = await AsyncStorage.getItem("token");
+
       if (!token) {
         alert("No token found. Please log in.");
         return;
       }
 
-      const response = await axios.get(
-        `${API_BASE_URL}/appointment/details/${appointmentId}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      // console.log("Fetched appointment details:", response.data);
+      // Determine the endpoint based on appointment_type
+      const endpoint =
+        appointment_type === "virtual"
+          ? `${API_BASE_URL}/virtual/appointment/details/${appointmentId}` // Use virtual endpoint for virtual appointments
+          : `${API_BASE_URL}/appointment/details/${appointmentId}`; // Use physical endpoint for physical appointments
+
+      const response = await axios.get(endpoint, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      console.log("Fetched appointment details:", response.data);
       setAppointments(response.data);
     } catch (error) {
       console.error("Error fetching appointments:", error);
       Alert.alert("Error", "Error fetching appointments.");
     }
   };
+
+  // const fetchAppointments = async () => {
+  //   try {
+  //     console.log("MW appointmentId:", appointmentId);
+  //     const token = await AsyncStorage.getItem("token");
+  //     if (!token) {
+  //       alert("No token found. Please log in.");
+  //       return;
+  //     }
+
+  //     const response = await axios.get(
+  //       `${API_BASE_URL}/appointment/details/${appointmentId}`,
+  //       {
+  //         headers: { Authorization: `Bearer ${token}` },
+  //       }
+  //     );
+  //     // console.log("Fetched appointment details:", response.data);
+  //     setAppointments(response.data);
+  //   } catch (error) {
+  //     console.error("Error fetching appointments:", error);
+  //     Alert.alert("Error", "Error fetching appointments.");
+  //   }
+  // };
 
   // const handleDeleteReport = async () => {
   //   Alert.alert(
@@ -215,6 +243,7 @@ const MedicalReportWriting = ({ route }) => {
         },
         body: JSON.stringify({
           appointment_id: appointmentId,
+          appointment_type: appointment_type,
           encounter_summary: encounterSummary,
           follow_up_date: followUpDate
             ? followUpDate.toISOString().split("T")[0]
@@ -250,6 +279,11 @@ const MedicalReportWriting = ({ route }) => {
     hideDatePicker();
   };
 
+  const formatServiceName = (service) => {
+    if (!service) return "Not Specified";
+    return service.replace(/([A-Z])/g, " $1").trim();
+  };
+
   return (
     <ImageBackground
       source={require("../../../assets/PlainGrey.png")}
@@ -266,7 +300,7 @@ const MedicalReportWriting = ({ route }) => {
         <Text style={styles.title}> Medical Report </Text>
       </View>
 
-      <View style={styles.hpAcontainer}>
+      {/* <View style={styles.hpAcontainer}>
         <View style={styles.doctorCard}>
           <Image source={{ uri: imageUri }} style={styles.doctorImage} />
           <View style={styles.doctorInfo}>
@@ -281,13 +315,64 @@ const MedicalReportWriting = ({ route }) => {
             </Text>
           </View>
         </View>
-      </View>
+      </View> */}
+
+      {/* Different Views for Virtual and Physical Appointments */}
+      {appointment_type === "virtual" ? (
+        <View style={styles.hpAcontainer}>
+          <View style={styles.doctorCard}>
+            <Image source={{ uri: imageUri }} style={styles.doctorImage} />
+            <View style={styles.doctorInfo}>
+              <Text style={styles.doctorName}>{appointments.full_name}</Text>
+              <Text style={styles.details}>Date: {appointments.hpva_date}</Text>
+              <Text style={styles.details}>Time: {appointments.hpva_time}</Text>
+              <Text style={styles.details}>
+                Patient: {appointments.who_will_see}
+              </Text>
+              <Text style={styles.details}>Status: {appointments.status}</Text>
+            </View>
+          </View>
+        </View>
+      ) : (
+        <View style={styles.hpAcontainer}>
+          <View style={styles.doctorCard}>
+            <Image source={{ uri: imageUri }} style={styles.doctorImage} />
+            <View style={styles.doctorInfo}>
+              <Text style={styles.doctorName}>{appointments.full_name}</Text>
+              <Text style={styles.details}>Date: {appointments.app_date}</Text>
+              <Text style={styles.details}>Time: {appointments.app_time}</Text>
+              <Text style={styles.details}>
+                Patient: {appointments.who_will_see}
+              </Text>
+              <Text style={styles.details}>
+                Status: {appointments.app_status}
+              </Text>
+            </View>
+          </View>
+        </View>
+      )}
+
       <View style={styles.uAcontainer}>
         <View style={styles.whiteMrAcontainer}>
           <ScrollView contentContainerStyle={styles.scrollViewContent}>
             <Text style={styles.mrLabel}>Booking No.</Text>
             <View style={styles.mrUnderline} />
-            <Text style={styles.sectionContent}>{appointments.hp_app_id}</Text>
+            <Text style={styles.sectionContent}>
+              {appointment_type === "virtual"
+                ? appointments.hpva_id
+                : appointments.hp_app_id}
+            </Text>
+
+            {/* Service Type (Virtual Only) */}
+            {appointment_type === "virtual" && (
+              <>
+                <Text style={styles.mrLabel}>Service Type</Text>
+                <View style={styles.mrUnderline} />
+                <Text style={styles.sectionContent}>
+                  {formatServiceName(appointments.service) || "Not Specified"}
+                </Text>
+              </>
+            )}
 
             <Text style={styles.mrLabel}>Encounter Summary</Text>
             <View style={styles.mrUnderline} />

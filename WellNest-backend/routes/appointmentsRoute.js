@@ -17,6 +17,12 @@ const {
   getVirtualAvailabilityDetails,
   upsertVirtualConsultation,
   deleteVirtualConsultation,
+  getUpcomingVirtualAppointments,
+  approveVirtualAppointment,
+  updateVirtualAppointmentStatus,
+  getVirtualAppointmentDetailsByHpAppId,
+  deleteVirtualSingleAppointment,
+  getPastVirtualAppointments,
 } = require("../controllers/appointmentsController");
 const authenticateToken = require("../middleware/authMiddleware");
 
@@ -71,4 +77,31 @@ router.delete(
   authenticateToken,
   deleteVirtualConsultation
 );
+// Fetch upcoming appointments for a healthcare provider
+router.get(
+  "/virtual/getUpcomingAppointment/:hpId",
+  getUpcomingVirtualAppointments
+);
+
+// Approve an appointment
+router.put(
+  "/virtual/appointments/approve/:appointmentId",
+  approveVirtualAppointment
+);
+// Update appointment status
+router.put(
+  "/virtual/appointments/updateStatus/:appointmentId",
+  updateVirtualAppointmentStatus
+);
+router.get(
+  "/virtual/appointment/details/:hpva_id",
+  getVirtualAppointmentDetailsByHpAppId
+);
+router.delete(
+  "/virtual/appointment/delete/:hpva_id",
+  authenticateToken,
+  deleteVirtualSingleAppointment
+);
+router.get("/virtual/getPastAppointments/:hpId", getPastVirtualAppointments);
+
 module.exports = router;

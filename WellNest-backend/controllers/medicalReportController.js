@@ -1,43 +1,8 @@
+//medicalReportController.js
 const pool = require("../config/db");
+const { notifyUser, createNotification } = require("./notificationController"); // Import createNotification
 
-// const createMedicalReport = async (req, res) => {
-//   //   const { hp_app_id } = req.params; // Get hp_app_id from request parameters
-//   const {
-//     appointment_id,
-//     encounter_summary,
-//     follow_up_date,
-//     advice_given,
-//     medicines,
-//   } = req.body; // Extract from request body
-//   try {
-//     // Insert the medical report
-//     const reportResult = await pool.query(
-//       `INSERT INTO medical_reports (appointment_id, encounter_summary, follow_up_date, advice_given)
-//              VALUES ($1, $2, $3, $4) RETURNING report_id`,
-//       [appointment_id, encounter_summary, follow_up_date, advice_given]
-//     );
-
-//     const reportId = reportResult.rows[0].report_id;
-
-//     // Insert medicines
-//     if (medicines && medicines.length > 0) {
-//       const medicineQueries = medicines.map((medicine) => {
-//         return pool.query(
-//           `INSERT INTO report_medicines (report_id, name, dosage, duration)
-//                      VALUES ($1, $2, $3, $4)`,
-//           [reportId, medicine.name, medicine.dosage, medicine.duration]
-//         );
-//       });
-//       await Promise.all(medicineQueries);
-//     }
-
-//     res.status(201).json({ message: "Medical report created successfully." });
-//   } catch (error) {
-//     console.error("Error creating medical report:", error);
-//     res.status(500).json({ error: "Failed to create medical report" });
-//   }
-// };
-
+//Healthcare Provider
 // Fetch medical report and associated medicines
 const getMedicalReport = async (req, res) => {
   const { appointment_id } = req.params;
@@ -71,21 +36,25 @@ const getMedicalReport = async (req, res) => {
   }
 };
 
-// Create or update medical report
 const createOrUpdateMedicalReport = async (req, res) => {
   const {
     appointment_id,
+    appointment_type, // New field to differentiate between physical and virtual
     encounter_summary,
     follow_up_date,
     advice_given,
     medicines,
   } = req.body;
 
+  if (!["physical", "virtual"].includes(appointment_type)) {
+    return res.status(400).json({ error: "Invalid appointment type." });
+  }
+
   try {
     // Check if the report already exists
     const existingReport = await pool.query(
-      `SELECT report_id FROM medical_reports WHERE appointment_id = $1`,
-      [appointment_id]
+      `SELECT report_id FROM medical_reports WHERE appointment_id = $1 AND appointment_type = $2`,
+      [appointment_id, appointment_type]
     );
 
     let reportId;
@@ -140,9 +109,15 @@ const createOrUpdateMedicalReport = async (req, res) => {
     } else {
       // Insert new report
       const reportResult = await pool.query(
-        `INSERT INTO medical_reports (appointment_id, encounter_summary, follow_up_date, advice_given)
-             VALUES ($1, $2, $3, $4) RETURNING report_id`,
-        [appointment_id, encounter_summary, follow_up_date, advice_given]
+        `INSERT INTO medical_reports (appointment_id, appointment_type, encounter_summary, follow_up_date, advice_given)
+             VALUES ($1, $2, $3, $4, $5) RETURNING report_id`,
+        [
+          appointment_id,
+          appointment_type,
+          encounter_summary,
+          follow_up_date,
+          advice_given,
+        ]
       );
       reportId = reportResult.rows[0].report_id;
 
@@ -157,6 +132,39 @@ const createOrUpdateMedicalReport = async (req, res) => {
         }
       }
     }
+
+    // Fetch user ID based on appointment type
+    let userId;
+    if (appointment_type === "virtual") {
+      const userResult = await pool.query(
+        `SELECT u_id FROM hp_virtual_appointment WHERE hpva_id = $1`,
+        [appointment_id]
+      );
+      userId = userResult.rows[0]?.u_id;
+    } else if (appointment_type === "physical") {
+      const userResult = await pool.query(
+        `SELECT u_id FROM hp_appointments WHERE app_id = $1`,
+        [appointment_id]
+      );
+      userId = userResult.rows[0]?.u_id;
+    }
+
+    if (!userId) {
+      return res
+        .status(404)
+        .json({ message: "User  not found for this appointment." });
+    }
+
+    // Notify the user about the report creation or update
+    const action = existingReport.rows.length > 0 ? "updated" : "created";
+    const message = `Your medical report has been ${action} for appointment ID ${appointment_id}.`;
+    await notifyUser(userId, message, "medical_report_notification");
+    // await createNotification(userId, message);
+
+    // Notify the user about the report creation or update
+    // const action = existingReport.rows.length > 0 ? "updated" : "created";
+    // const message = `Your medical report has been ${action} for appointment ID ${appointment_id}.`;
+    // await createNotification(appointment_id, message); // Assuming appointment_id corresponds to user ID for notification
 
     res.status(200).json({ message: "Medical report saved successfully." });
   } catch (error) {
@@ -187,6 +195,42 @@ const deleteMedicalReport = async (req, res) => {
     if (result.rowCount === 0) {
       return res.status(404).json({ message: "No medical report found." });
     }
+    // Fetch user ID based on appointment type
+    let userId;
+    const appointmentTypeResult = await pool.query(
+      `SELECT appointment_type FROM medical_reports WHERE appointment_id = $1`,
+      [appointment_id]
+    );
+
+    const appointmentType = appointmentTypeResult.rows[0]?.appointment_type;
+
+    if (appointmentType === "virtual") {
+      const userResult = await pool.query(
+        `SELECT u_id FROM hp_virtual_appointment WHERE hpva_id = $1`,
+        [appointment_id]
+      );
+      userId = userResult.rows[0]?.u_id;
+    } else if (appointmentType === "physical") {
+      const userResult = await pool.query(
+        `SELECT u_id FROM hp_appointments WHERE app_id = $1`,
+        [appointment_id]
+      );
+      userId = userResult.rows[0]?.u_id;
+    }
+    if (!userId) {
+      return res
+        .status(404)
+        .json({ message: "User  not found for this appointment." });
+    }
+
+    // Notify the user about the report deletion
+    const message = `Your medical report for appointment ID ${appointment_id} has been deleted.`;
+    await notifyUser(userId, message, "medical_report_notification");
+    // await createNotification(userId, message);
+
+    // Notify the user about the report deletion
+    // const message = `Your medical report for appointment ID ${appointment_id} has been deleted.`;
+    // await createNotification(appointment_id, message); // Assuming appointment_id corresponds to user ID for notification
 
     res.status(200).json({ message: "Medical report deleted successfully." });
   } catch (error) {
@@ -195,8 +239,63 @@ const deleteMedicalReport = async (req, res) => {
   }
 };
 
+const checkMedicalReportExists = async (req, res) => {
+  const { hpva_id, appointment_type } = req.params;
+
+  try {
+    const result = await pool.query(
+      `SELECT 1 FROM medical_reports WHERE appointment_id = $1 AND appointment_type = $2`,
+      [hpva_id, appointment_type]
+    );
+
+    // Respond with whether the report exists
+    res.status(200).json({ exists: result.rows.length > 0 });
+  } catch (error) {
+    console.error("Error checking medical report existence:", error);
+    res
+      .status(500)
+      .json({ error: "Failed to check medical report existence." });
+  }
+};
+
+//Elderly
+const getUserMedicalReports = async (req, res) => {
+  const { userId } = req.params;
+  try {
+    const query = `
+      SELECT 
+        mr.report_id,
+        mr.appointment_id,
+        mr.encounter_summary,
+        mr.follow_up_date,
+        mr.advice_given,
+        mr.created_at,
+        mr.appointment_type,
+        rm.medicine_id,
+        rm.name AS medicine_name,
+        rm.dosage,
+        rm.duration
+      FROM public.medical_reports mr
+      LEFT JOIN public.report_medicines rm ON mr.report_id = rm.report_id
+      LEFT JOIN public.hp_appointments ha ON ha.hp_app_id = mr.appointment_id
+      LEFT JOIN public.hp_virtual_appointment hva ON hva.hpva_id = mr.appointment_id
+      WHERE ha.u_id = $1 OR hva.u_id = $1
+      ORDER BY mr.created_at DESC;
+    `;
+
+    const results = await pool.query(query, [userId]);
+
+    res.json(results.rows);
+  } catch (error) {
+    console.error("Error fetching medical reports:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
 module.exports = {
   getMedicalReport,
   createOrUpdateMedicalReport,
   deleteMedicalReport,
+  checkMedicalReportExists,
+  getUserMedicalReports,
 };

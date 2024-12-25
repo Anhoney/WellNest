@@ -2,6 +2,7 @@ const express = require("express");
 const path = require("path");
 const bodyParser = require("body-parser");
 const cors = require("cors");
+const WebSocket = require("ws"); // Import WebSocket library
 const authRoutes = require("./routes/authRoutes");
 const registerRoute = require("./routes/registerRoute");
 const appointmentsRoute = require("./routes/appointmentsRoute");
@@ -9,9 +10,12 @@ const profileRoutes = require("./routes/profileRoutes");
 const userAppointmentsRoutes = require("./routes/userAppointmentsRoutes");
 const favoriteRoutes = require("./routes/favoriteRoutes");
 const medicalReportRoutes = require("./routes/medicalReportRoutes");
+const notificationRoutes = require("./routes/notificationRoutes");
 // const chatRoutes = require("./routes/chatRoutes"); // Added chat routes
+const scheduler = require("./scheduler"); // Import the scheduler
 
 require("dotenv").config();
+require("./reminderJobs"); // Import the scheduled tasks
 
 const app = express();
 app.use(cors());
@@ -32,6 +36,8 @@ app.use("/api", profileRoutes);
 app.use("/api", userAppointmentsRoutes);
 app.use("/api", favoriteRoutes);
 app.use("/api", medicalReportRoutes);
+// Use Notification Routes
+app.use("/api", notificationRoutes);
 
 // Serve static files from the "uploads" directory
 app.use("/uploads", express.static(path.join(__dirname, "uploads"))); // Adjust the path as necessary
@@ -40,3 +46,37 @@ const PORT = process.env.PORT || 5001;
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server is running on port ${PORT}`);
 });
+// module.exports = app;
+
+// // Create a WebSocket server
+// const wss = new WebSocket.Server({ noServer: true });
+
+// // Handle WebSocket connections
+// wss.on("connection", (ws) => {
+//   console.log("New client connected");
+
+//   ws.on("close", () => {
+//     console.log("Client disconnected");
+//   });
+// });
+
+// // Function to send notifications to a specific user
+// const sendNotification = (userId, message) => {
+//   wss.clients.forEach((client) => {
+//     if (client.readyState === WebSocket.OPEN) {
+//       client.send(JSON.stringify({ userId, message }));
+//     }
+//   });
+// };
+
+// // Integrate WebSocket with the HTTP server
+// const server = app.listen(process.env.PORT || 5001, "0.0.0.0", () => {
+//   console.log(`Server is running on port ${process.env.PORT || 5001}`);
+// });
+
+// // Upgrade HTTP server to handle WebSocket connections
+// server.on("upgrade", (request, socket, head) => {
+//   wss.handleUpgrade(request, socket, head, (ws) => {
+//     wss.emit("connection", ws, request);
+//   });
+// });

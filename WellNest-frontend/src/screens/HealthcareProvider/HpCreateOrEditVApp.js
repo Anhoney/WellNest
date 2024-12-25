@@ -14,7 +14,7 @@ import {
 // import CheckBox from "@react-native-community/checkbox";
 // import { CheckBox } from "expo-checkbox";
 // import CustomCheckBox from "../../components/CustomCheckBox";
-// import { CheckBox } from "react-native-elrements";
+// import { CheckBox } from "react-native-elements";
 import { CheckBox } from "@rneui/themed";
 import { Ionicons } from "@expo/vector-icons"; // Import icons from Expo
 import styles from "../../components/styles"; // Import shared styles

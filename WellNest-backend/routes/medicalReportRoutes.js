@@ -5,6 +5,8 @@ const {
   createOrUpdateMedicalReport,
   getMedicalReport,
   deleteMedicalReport,
+  checkMedicalReportExists,
+  getUserMedicalReports,
 } = require("../controllers/medicalReportController");
 const authenticateToken = require("../middleware/authMiddleware");
 
@@ -17,5 +19,15 @@ router.get(
   getMedicalReport
 );
 router.delete("/medicalReports/delete/:appointment_id", deleteMedicalReport);
+router.get(
+  "/medicalReports/check/:hpva_id/:appointment_type",
+  checkMedicalReportExists
+);
+
+router.get(
+  "/user/medicalReports/:userId",
+  authenticateToken,
+  getUserMedicalReports
+);
 
 module.exports = router;

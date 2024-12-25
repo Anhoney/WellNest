@@ -1688,4 +1688,206 @@ export default StyleSheet.create({
     borderRadius: 10, // Optional: rounded corners
     marginVertical: 10, // Optional: space between this and other components
   },
+  noDataImage: {
+    width: 200,
+    height: 200,
+    alignSelf: "center",
+    marginBottom: 20,
+  },
+  noDataText: {
+    fontSize: 18,
+    textAlign: "center",
+    color: "#888",
+  },
+  centerContent: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  //HpVUpcomingAppointment
+  HpVmodalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  HpVmodalContent: {
+    width: "90%",
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    padding: 20,
+    alignItems: "center",
+  },
+  receiptImage: {
+    width: "100%",
+    height: 300,
+    marginBottom: 20,
+  },
+  modalActions: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  // approveButton: {
+  //   backgroundColor: "green",
+  //   padding: 10,
+  //   borderRadius: 5,
+  //   marginHorizontal: 5,
+  // },
+  problemButton: {
+    backgroundColor: "orange",
+    padding: 10,
+    borderRadius: 5,
+    marginHorizontal: 5,
+  },
+  cancelButton: {
+    marginHorizontal: 5,
+  },
+  // approveText: {
+  //   color: "#fff",
+  // },
+  problemText: {
+    color: "#fff",
+  },
+  // checkReceiptButton: {
+  //   marginTop: 10,
+  // },
+  // checkText: {
+  //   color: "blue",
+  // },
+  checkReceiptButton: {
+    backgroundColor: "#007BFF", // Blue background color
+    borderRadius: 8, // Rounded corners
+    paddingVertical: 10, // Vertical padding
+    paddingHorizontal: 15, // Horizontal padding
+    marginTop: 10, // Space above the button
+    alignItems: "center", // Center the content
+    flexDirection: "row", // Align icon and text in a row
+    shadowColor: "#000", // Shadow color
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.2, // Shadow opacity
+    shadowRadius: 4, // Shadow radius
+    elevation: 2, // For Android shadow
+  },
+
+  checkText: {
+    color: "white", // White text color
+    fontSize: 16, // Font size
+    fontWeight: "bold", // Bold text
+    marginLeft: 8, // Space between icon and text
+  },
+  checkStatusContainer: {
+    flexDirection: "row", // Align items in a row
+    alignItems: "center", // Center items vertically
+    // marginTop: 8, // Optional: Add some margin for spacing
+  },
+  closeIcon: {
+    position: "absolute",
+    top: 40,
+    right: 20,
+    zIndex: 10,
+  },
+  modalButtonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    padding: 16,
+    backgroundColor: "#fff",
+  },
+
+  HpVapproveButton: {
+    backgroundColor: "#4CAF50",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    alignItems: "center",
+  },
+
+  HpVapproveText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 16,
+  },
+
+  HpVproblemButton: {
+    backgroundColor: "#FF6347",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    alignItems: "center",
+  },
+
+  HpVproblemText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 16,
+  },
+
+  HpVcloseIcon: {
+    position: "absolute",
+    top: 40,
+    right: 20,
+    zIndex: 2,
+  },
+  //Notification.js
+  // container: {
+  //   flex: 1,
+  //   padding: 20,
+  //   backgroundColor: "#fff",
+  // },
+  iconContainer: {
+    position: "relative",
+    alignSelf: "flex-end",
+  },
+  notificationIcon: {
+    fontSize: 24,
+  },
+  // redDot: {
+  //   position: "absolute",
+  //   top: 0,
+  //   right: 0,
+  //   width: 10,
+  //   height: 10,
+  //   backgroundColor: "red",
+  //   borderRadius: 5,
+  // },
+  redDot: {
+    position: "absolute",
+    top: -5,
+    right: -10,
+    backgroundColor: "red",
+    borderRadius: 12,
+    paddingHorizontal: 5,
+    height: 20,
+    minWidth: 20,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  redDotText: {
+    color: "#fff",
+    fontSize: 12,
+    fontWeight: "bold",
+  },
+  notificationItem: {
+    padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ccc",
+  },
+  unreadItem: {
+    backgroundColor: "#f9f9f9",
+  },
+  message: {
+    fontSize: 16,
+  },
+  timestamp: {
+    fontSize: 12,
+    color: "#666",
+  },
+  noNotifications: {
+    textAlign: "center",
+    marginTop: 20,
+    fontSize: 16,
+    color: "#999",
+  },
 });

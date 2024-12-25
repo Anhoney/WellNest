@@ -177,7 +177,12 @@ const ProfilePage = () => {
             />
             <Text style={styles.statusText}>Favourite</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.optionCard}>
+          <TouchableOpacity
+            style={styles.optionCard}
+            onPress={() => {
+              navigation.navigate("MedicalReport");
+            }}
+          >
             <Image
               source={require("../../../assets/MedicalHistory.png")}
               style={styles.optionIcon}

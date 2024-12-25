@@ -9,6 +9,7 @@ import LoginPage from "../src/screens/LoginPage";
 import ForgotPasswordPage from "../src/screens/ForgotPasswordPage";
 import RegisterPage from "../src/screens/RegisterPage";
 import ChangePassword from "../src/screens/ChangePassword";
+import Notifications from "../src/screens/Notification";
 
 // Elderly and caregivers
 import MainPage from "../src/screens/ElderlyNCaregivers/MainPage";
@@ -36,6 +37,7 @@ import {
   VirtualConfirmationScreen,
   PaymentScreen,
 } from "../src/screens/ElderlyNCaregivers/VirtualConfirmationScreen";
+import MedicalReport from "../src/screens/ElderlyNCaregivers/MedicalReport";
 
 // Healthcare Provider screens
 import HealthcareProviderMainPage from "../src/screens/HealthcareProvider/HealthcareProviderMainPage";
@@ -51,6 +53,9 @@ import HpPastAppointments from "../src/screens/HealthcareProvider/HpPastAppointm
 import MedicalReportWriting from "../src/screens/HealthcareProvider/MedicalReportWriting";
 import HpVAppManagementPage from "../src/screens/HealthcareProvider/HpVAppManagementPage";
 import HpCreateOrEditVApp from "../src/screens/HealthcareProvider/HpCreateOrEditVApp";
+import HpVUpcomingAppointments from "../src/screens/HealthcareProvider/HpVUpcomingAppointments";
+import HpVUpcomingAppointmentDetails from "../src/screens/HealthcareProvider/HpVUpcomingAppointmentDetails";
+import HpVPastAppointments from "../src/screens/HealthcareProvider/HpVPastAppointments";
 
 // Community Organizer
 import CommunityOrganizerMainPage from "../src/screens/CommunityOrganizers/CommunityOrganizerMainPage";
@@ -235,6 +240,20 @@ const AppNavigator = () => (
         component={VirtualDoctorProfileScreen}
       />
       <Stack.Screen name="PaymentScreen" component={PaymentScreen} />
+      <Stack.Screen
+        name="HpVUpcomingAppointments"
+        component={HpVUpcomingAppointments}
+      />
+      <Stack.Screen
+        name="HpVUpcomingAppointmentDetails"
+        component={HpVUpcomingAppointmentDetails}
+      />
+      <Stack.Screen
+        name="HpVPastAppointments"
+        component={HpVPastAppointments}
+      />
+      <Stack.Screen name="Notification" component={Notifications} />
+      <Stack.Screen name="MedicalReport" component={MedicalReport} />
     </Stack.Navigator>
   </NavigationContainer>
 );

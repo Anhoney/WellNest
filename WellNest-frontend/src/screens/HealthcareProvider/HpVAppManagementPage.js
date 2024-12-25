@@ -59,7 +59,7 @@ const HpVAppManagementPage = ({}) => {
 
           <TouchableOpacity
             style={styles.hpButton}
-            onPress={() => navigation.navigate("HpUpcomingAppointments")}
+            onPress={() => navigation.navigate("HpVUpcomingAppointments")}
           >
             <Text style={styles.hpButtonText}>
               Upcoming Virtual Consultations Schedule
@@ -68,7 +68,7 @@ const HpVAppManagementPage = ({}) => {
 
           <TouchableOpacity
             style={styles.hpButton}
-            onPress={() => navigation.navigate("HpPastAppointments")}
+            onPress={() => navigation.navigate("HpVPastAppointments")}
           >
             <Text style={styles.hpButtonText}>
               Past Virtual Consultations Schedule

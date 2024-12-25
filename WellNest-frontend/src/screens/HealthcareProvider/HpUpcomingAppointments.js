@@ -124,23 +124,59 @@ const HpUpcomingAppointments = () => {
     );
   };
 
+  if (loading) {
+    return <Text>Loading...</Text>;
+  }
+
+  if (appointments.length === 0) {
+    return (
+      <ImageBackground
+        source={require("../../../assets/PlainGrey.png")}
+        style={styles.background}
+      >
+        {/* Title Section with Back chevron-back */}
+        <View style={styles.smallHeaderContainer}>
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            style={styles.backButton}
+          >
+            <Ionicons name="chevron-back" size={24} color="#000" />
+          </TouchableOpacity>
+          <Text style={styles.hpTitle}>Upcoming Appointments </Text>
+        </View>
+
+        <View style={styles.centerContent}>
+          <Image
+            source={require("../../../assets/NothingDog.png")}
+            style={styles.noDataImage}
+          />
+          <Text style={styles.noDataText}>No Upcoming Appointments</Text>
+        </View>
+      </ImageBackground>
+    );
+  }
+
   return (
-    <ImageBackground
-      source={require("../../../assets/PlainGrey.png")}
-      style={styles.background}
-    >
-      {/* Title Section with Back chevron-back */}
-      <View style={styles.smallHeaderContainer}>
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={styles.backButton}
-        >
-          <Ionicons name="chevron-back" size={24} color="#000" />
-        </TouchableOpacity>
-        <Text style={styles.hpTitle}>Upcoming Appointments </Text>
-      </View>
-      <View style={styles.hpContainer}>
-        <Text style={styles.sectionTitle}>Upcoming Appointments</Text>
+    <View style={{ flex: 1 }}>
+      <ImageBackground
+        source={require("../../../assets/PlainGrey.png")}
+        style={styles.background}
+      >
+        {/* Title Section with Back chevron-back */}
+        <View style={styles.smallHeaderContainer}>
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            style={styles.backButton}
+          >
+            <Ionicons name="chevron-back" size={24} color="#000" />
+          </TouchableOpacity>
+          <Text style={styles.hpTitle}>
+            Upcoming Physical {"\n"}Appointments{" "}
+          </Text>
+        </View>
+        {/* <View style={styles.hpContainer}> */}
+        <Text>{"/n"}</Text>
+        {/* <Text style={styles.sectionTitle}>Upcoming Appointments</Text> */}
         <View style={styles.singleUnderline}></View>
         {loading ? (
           <Text>Loading...</Text>
@@ -149,13 +185,15 @@ const HpUpcomingAppointments = () => {
             data={appointments}
             keyExtractor={(item) => item.hp_app_id.toString()}
             renderItem={renderAppointment}
+            contentContainerStyle={styles.hpContainer}
             ListEmptyComponent={<Text>No upcoming appointments found.</Text>}
           />
         )}
-      </View>
-      {/* Navigation Bar */}
-      <HpNavigationBar navigation={navigation} />
-    </ImageBackground>
+        {/* </View> */}
+        {/* Navigation Bar */}
+        <HpNavigationBar navigation={navigation} />
+      </ImageBackground>
+    </View>
   );
 };
 
