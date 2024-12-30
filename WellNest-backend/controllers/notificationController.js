@@ -113,6 +113,7 @@ const markNotificationsAsRead = async (req, res) => {
 const countNotification = async (req, res) => {
   const { userId } = req.params;
 
+  // console.log("countNotification Received userId:", userId);
   try {
     const { rows } = await db.query(
       `

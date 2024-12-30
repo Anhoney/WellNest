@@ -205,8 +205,16 @@ const MedicalReportWriting = ({ route }) => {
         }
       );
 
+      // Log the response for debugging
+      console.log("Delete response status:", response.status);
+      const responseData = await response.json(); // Get the response body
+      console.log("Delete response data:", responseData); // Log the response data
+
       if (!response.ok) {
-        throw new Error("Failed to delete medical report.");
+        throw new Error(
+          responseData.message || "Failed to delete medical report."
+        );
+        // throw new Error("Failed to delete medical report.");
       }
 
       setModalVisible(false); // Close modal on success
@@ -214,7 +222,8 @@ const MedicalReportWriting = ({ route }) => {
       navigation.goBack(); // Navigate back after deletion
     } catch (error) {
       console.error("Error deleting medical report:", error);
-      Alert.alert("Error", "Failed to delete medical report.");
+      Alert.alert("Error", error.message || "Failed to delete medical report.");
+      // Alert.alert("Error", "Failed to delete medical report.");
     }
   };
 
@@ -441,7 +450,7 @@ const MedicalReportWriting = ({ route }) => {
                 />
                 <TextInput
                   style={styles.medicineInput}
-                  placeholder="Dosage"
+                  placeholder="Dosage (Eg. 1 Morning, 1 Night (Before food))"
                   value={medicine.dosage}
                   onChangeText={(value) =>
                     handleMedicineChange(index, "dosage", value)
@@ -449,7 +458,7 @@ const MedicalReportWriting = ({ route }) => {
                 />
                 <TextInput
                   style={styles.medicineInput}
-                  placeholder="Duration"
+                  placeholder="Duration (Eg. 10 Days, Tot: 20 Tab)"
                   value={medicine.duration}
                   onChangeText={(value) =>
                     handleMedicineChange(index, "duration", value)

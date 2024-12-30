@@ -19,6 +19,7 @@ import { AuthContext } from "../../../context/AuthProvider";
 import axios from "axios";
 import { getUserIdFromToken } from "../../../services/authService";
 import { Buffer } from "buffer";
+import { useNotification } from "../../../context/NotificationProvider";
 
 const SettingPage = () => {
   const { logout } = useContext(AuthContext); // Get logout from AuthContext
@@ -26,6 +27,7 @@ const SettingPage = () => {
   const navigation = useNavigation();
   const [userId, setUserId] = useState(null);
   const [username, setUsername] = useState("");
+  const { handleClearInterval } = useNotification();
 
   const fetchUserId = async () => {
     const userId = await getUserIdFromToken();
@@ -105,6 +107,7 @@ const SettingPage = () => {
           onPress: async () => {
             try {
               await logout(); // Log out function from AuthContext
+              handleClearInterval();
               navigation.navigate("LoginPage");
               // await logout(navigation); // Log out function from AuthContext
             } catch (error) {

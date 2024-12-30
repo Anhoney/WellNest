@@ -82,6 +82,7 @@ export const getUserIdFromToken = async () => {
     const token = await getToken();
     if (token) {
       const decodedToken = jwt_decode(token);
+      console.log("Decoded token:", decodedToken);
       return decodedToken.id; // Adjust the key based on the actual token payload
     }
     return null;

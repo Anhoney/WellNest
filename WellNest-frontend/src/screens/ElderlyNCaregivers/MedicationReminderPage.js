@@ -1,107 +1,202 @@
-// RegisterPage.js
+//MedicationReminderPage.js
 import React, { useState } from "react";
 import {
+  ImageBackground,
   View,
   Text,
-  TextInput,
   TouchableOpacity,
-  ImageBackground,
-  ScrollView,
-  Platform,
+  FlatList,
   Alert,
-  Image,
 } from "react-native";
-import { KeyboardAvoidingView } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
+import NavigationBar from "../../components/NavigationBar";
+import styles from "../../components/styles";
 import { useNavigation } from "@react-navigation/native";
-import { SafeAreaView } from "react-native-safe-area-context"; // Import SafeAreaView for iOS
-import axios from "axios";
-import * as DocumentPicker from "expo-document-picker"; // Import DocumentPicker
-import * as ImagePicker from "react-native-image-picker";
-import API_BASE_URL from "../../../config/config";
+
+const medications = [
+  {
+    id: 1,
+    name: "Oxycodone",
+    time: "10:00 AM",
+    status: "Completed",
+    foodRelation: "After Eating",
+  },
+  {
+    id: 2,
+    name: "Naloxone",
+    time: "04:00 PM",
+    status: "Skipped",
+  },
+  {
+    id: 3,
+    name: "Oxycodone",
+    time: "10:00 AM",
+    status: "Pending",
+    foodRelation: "After Eating",
+  },
+];
 
 const MedicationReminderPage = () => {
+  const [medicationList, setMedicationList] = useState(medications);
   const navigation = useNavigation();
-  //   const [selectedFile, setSelectedFile] = useState(null);
-  const [imageUri, setImageUri] = useState(null);
 
-  // Function to handle document picking
-  const handleFileSelection = async () => {
-    try {
-      const result = await DocumentPicker.getDocumentAsync({
-        type: "*/*",
-        copyToCacheDirectory: false,
-      });
-      if (result.type === "success") {
-        setFileState(result);
-        setFileName(result.name); // Set the file name for feedback
-      } else {
-        Alert.alert("File selection was canceled");
-      }
-    } catch (error) {
-      console.error("Document selection error:", error);
-      Alert.alert("Error selecting document" + error.message);
-    }
+  const handleMarkAsDone = (id) => {
+    const updatedList = medicationList.map((med) =>
+      med.id === id ? { ...med, status: "Completed" } : med
+    );
+    setMedicationList(updatedList);
   };
 
-  // Function to handle the upload
-  const handleUpload = async () => {
-    if (!selectedFile) {
-      Alert.alert("Error", "Please select a file to upload.");
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append("identityCardImage", {
-      uri: selectedFile.uri,
-      name: selectedFile.name,
-      type: selectedFile.mimeType || "application/octet-stream",
-    });
-
-    try {
-      const response = await axios.put(
-        `${API_BASE_URL}/update-identity-card/2`,
-        formData,
-        {
-          headers: { "Content-Type": "multipart/form-data" },
-        }
-      );
-      Alert.alert("Success", response.data.message);
-    } catch (error) {
-      console.error("Upload error:", error);
-      Alert.alert("Error", "Failed to upload the file. Please try again.");
-    }
-  };
+  const renderMedicationItem = ({ item }) => (
+    <TouchableOpacity
+      style={{
+        backgroundColor: "#FFF",
+        padding: 15,
+        borderRadius: 10,
+        marginVertical: 10,
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 4,
+        elevation: 5,
+      }}
+      onPress={() => {
+        Alert.alert("Edit/Delete", `Options for ${item.name}`);
+        // Navigate to a detailed view or edit/delete functionality
+      }}
+    >
+      <View style={{ flexDirection: "row", alignItems: "center" }}>
+        <Ionicons name="medkit-outline" size={24} color="#FF9800" />
+        <View style={{ marginLeft: 10 }}>
+          <Text style={{ fontSize: 16, fontWeight: "bold" }}>{item.name}</Text>
+          <Text style={{ fontSize: 14, color: "#888" }}>{item.time}</Text>
+          {item.foodRelation && (
+            <Text style={{ fontSize: 14, color: "#888" }}>
+              {item.foodRelation}
+            </Text>
+          )}
+          <Text style={{ fontSize: 14, color: "#4CAF50" }}>{item.status}</Text>
+        </View>
+      </View>
+      {item.status === "Pending" && (
+        <TouchableOpacity
+          style={{
+            backgroundColor: "#FF9800",
+            padding: 10,
+            borderRadius: 5,
+          }}
+          onPress={() => handleMarkAsDone(item.id)}
+        >
+          <Text style={{ color: "#FFF", fontSize: 14 }}>Done</Text>
+        </TouchableOpacity>
+      )}
+    </TouchableOpacity>
+  );
 
   return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+    <ImageBackground
+      source={require("../../../assets/PlainGrey.png")}
+      style={[styles.background, { flex: 1 }]}
+    >
+      {/* Title Section */}
+      <View style={styles.smallHeaderContainer}>
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={styles.backButton}
+        >
+          <Ionicons name="chevron-back" size={24} color="#000" />
+        </TouchableOpacity>
+        <Text style={styles.title}>Medication Reminder</Text>
+      </View>
+
+      {/* Plan Summary */}
+      <View
+        style={{
+          marginTop: 50,
+          backgroundColor: "#FFEB3B",
+          padding: 15,
+          margin: 10,
+          borderRadius: 10,
+          marginBottom: 50,
+        }}
+      >
+        <Text style={{ fontSize: 20, fontWeight: "bold" }}>
+          Your plan for today
+        </Text>
+        <Text style={{ fontSize: 18, color: "#555" }}>
+          {medicationList.filter((med) => med.status === "Completed").length} of{" "}
+          {medicationList.length} completed
+        </Text>
+      </View>
+
+      {/* Daily Review */}
+      <View style={{ flex: 1, paddingHorizontal: 15 }}>
+        <Text style={{ fontSize: 22, fontWeight: "bold", marginBottom: 10 }}>
+          Daily Review
+        </Text>
+        <FlatList
+          data={medicationList}
+          renderItem={renderMedicationItem}
+          keyExtractor={(item) => item.id.toString()}
+          showsVerticalScrollIndicator={false}
+        />
+      </View>
+
+      {/* Add Reminder Button
       <TouchableOpacity
         style={{
-          backgroundColor: "#4CAF50",
-          padding: 15,
-          borderRadius: 5,
-          marginBottom: 20,
+          position: "absolute",
+          bottom: 100,
+          right: 20,
+          backgroundColor: "#FF9800",
+          width: 60,
+          height: 60,
+          borderRadius: 30,
+          justifyContent: "center",
+          alignItems: "center",
+          elevation: 5,
         }}
-        onPress={handleFileSelection}
+        onPress={() => navigation.navigate("AddReminder")}
       >
-        <Text style={{ color: "#fff" }}>Select Identity Card Image</Text>
-      </TouchableOpacity>
+        <Text>Add Reminder</Text>
+        <Ionicons name="add" size={30} color="#FFF" />
+      </TouchableOpacity> */}
 
-      {selectedFile && (
-        <Text style={{ marginBottom: 20 }}>{selectedFile.name}</Text>
-      )}
-
+      {/* Add Reminder Button */}
       <TouchableOpacity
         style={{
-          backgroundColor: "#2196F3",
-          padding: 15,
-          borderRadius: 5,
+          position: "absolute",
+          bottom: 100,
+          right: 20,
+          backgroundColor: "#FF9800",
+          paddingHorizontal: 20,
+          paddingVertical: 15,
+          borderRadius: 30,
+          flexDirection: "row",
+          alignItems: "center",
+          elevation: 5,
         }}
-        onPress={handleUpload}
+        onPress={() => navigation.navigate("AddReminder")}
       >
-        <Text style={{ color: "#fff" }}>Submit</Text>
+        <Text
+          style={{
+            color: "#FFF",
+            fontSize: 16,
+            fontWeight: "bold",
+            marginRight: 10,
+          }}
+        >
+          Add Reminder
+        </Text>
+        <Ionicons name="add" size={24} color="#FFF" />
       </TouchableOpacity>
-    </View>
+
+      {/* Bottom Navigation Bar */}
+      <NavigationBar navigation={navigation} activePage="" />
+    </ImageBackground>
   );
 };
 

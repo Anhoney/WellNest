@@ -18,6 +18,7 @@ import { getUserIdFromToken } from "../../services/authService";
 import NavigationBar from "../components/NavigationBar";
 
 const Notifications = () => {
+  // Accept route prop to determine user type
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const navigation = useNavigation();
@@ -40,6 +41,8 @@ const Notifications = () => {
   };
 
   const fetchNotifications = async (userId) => {
+    // Accept userType
+
     setLoading(true);
     try {
       const response = await axios.get(
@@ -175,7 +178,7 @@ const Notifications = () => {
         </TouchableOpacity>
         <Text style={styles.title}>Notification</Text>
       </View>
-      <View style={styles.hpAcontainer}>
+      <View style={styles.notiContainer}>
         {/* <TouchableOpacity style={styles.iconContainer}>
           <Text style={styles.notificationIcon}>🔔</Text>
           {unreadCount > 0 && <View style={styles.redDot} />}
@@ -203,7 +206,7 @@ const Notifications = () => {
           }
         />
       </View>
-      <NavigationBar navigation={navigation} activePage="Notification" />
+      <NavigationBar navigation={navigation} activePage="Notifications" />
     </ImageBackground>
   );
 };

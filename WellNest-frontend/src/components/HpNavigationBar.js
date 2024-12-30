@@ -1,16 +1,19 @@
-//NavigationBar.js
+//HpNavigationBar.js
 import React from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import styles from "./styles"; // Assuming you have your styles.js setup
+import { useNotification } from "../../context/NotificationProvider";
 
-const NavigationBar = ({ navigation, activePage }) => {
+const HpNavigationBar = ({ navigation, activePage }) => {
+  const { unreadCount } = useNotification();
+
   const tabs = [
     { name: "HealthcareProviderMainPage", label: "Home", icon: "home-outline" },
     { name: "Schedule", label: "Schedule", icon: "calendar-outline" },
     { name: "Chat", label: "Chat", icon: "chatbubble-ellipses-outline" },
     {
-      name: "Notification",
+      name: "HpNotification",
       label: "Notification",
       icon: "notifications-outline",
     },
@@ -25,11 +28,23 @@ const NavigationBar = ({ navigation, activePage }) => {
           onPress={() => navigation.navigate(tab.name)}
           style={styles.tabButton}
         >
-          <Ionicons
+          <View style={{ position: "relative" }}>
+            <Ionicons
+              name={tab.icon}
+              size={28}
+              color={activePage === tab.name ? "#e67e22" : "#273746"}
+            />
+            {tab.name === "HpNotification" && unreadCount > 0 && (
+              <View style={styles.redDot}>
+                <Text style={styles.redDotText}>{unreadCount}</Text>
+              </View>
+            )}
+          </View>
+          {/* <Ionicons
             name={tab.icon}
             size={28}
             color={activePage === tab.name ? "#e67e22" : "#273746"}
-          />
+          /> */}
           <Text
             style={[
               styles.navText,
@@ -47,4 +62,4 @@ const NavigationBar = ({ navigation, activePage }) => {
   );
 };
 
-export default NavigationBar;
+export default HpNavigationBar;

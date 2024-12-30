@@ -5,13 +5,14 @@ const { findUserByPhoneNo } = require("../models/userModel");
 const pool = require("../config/db");
 
 const loginUser = async (req, res) => {
+  console.log("Login attempt with phone number:", req.body.phoneNo); // Debug log
   const { phoneNo, password } = req.body;
   // console.log(phoneNo)
   // console.log(password)
 
   try {
     const user = await findUserByPhoneNo(phoneNo);
-    console.log(user);
+    console.log("Fetched user:", user); // Debug log
     if (!user) return res.status(401).json({ error: "User not found" });
 
     const isMatch = await bcrypt.compare(password, user.password);
@@ -24,7 +25,7 @@ const loginUser = async (req, res) => {
       { expiresIn: "14d" }
     );
 
-    // Return token and role
+    console.log("Generated token:", token); // Debug log
     res.json({
       message: "Login successful",
       token,

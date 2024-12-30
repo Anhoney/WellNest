@@ -21,6 +21,7 @@ import axios from "axios";
 import jwt_decode from "jwt-decode";
 import { Buffer } from "buffer";
 import { getUserIdFromToken } from "../../../services/authService";
+import { useNotification } from "../../../context/NotificationProvider";
 
 const CoProfilePage = () => {
   const { logout } = useContext(AuthContext); // Get logout from AuthContext
@@ -28,6 +29,7 @@ const CoProfilePage = () => {
   const navigation = useNavigation();
   const [userId, setUserId] = useState(null);
   const [username, setUsername] = useState("");
+  const { handleClearInterval } = useNotification();
 
   const fetchUserId = async () => {
     const userId = await getUserIdFromToken();
@@ -126,6 +128,7 @@ const CoProfilePage = () => {
                   "Your account has been deleted successfully."
                 );
                 await logout(); // Log out and clear token
+                handleClearInterval();
                 navigation.reset({
                   index: 0,
                   routes: [{ name: "LoginPage" }],
@@ -174,6 +177,7 @@ const CoProfilePage = () => {
           onPress: async () => {
             try {
               await logout(); // Log out function from AuthContext
+              handleClearInterval();
               navigation.navigate("LoginPage");
             } catch (error) {
               console.error("Error signing out:", error);

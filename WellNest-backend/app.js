@@ -2,6 +2,7 @@ const express = require("express");
 const path = require("path");
 const bodyParser = require("body-parser");
 const cors = require("cors");
+const multer = require("multer"); // Import multer for file uploads
 const WebSocket = require("ws"); // Import WebSocket library
 const authRoutes = require("./routes/authRoutes");
 const registerRoute = require("./routes/registerRoute");
@@ -11,6 +12,7 @@ const userAppointmentsRoutes = require("./routes/userAppointmentsRoutes");
 const favoriteRoutes = require("./routes/favoriteRoutes");
 const medicalReportRoutes = require("./routes/medicalReportRoutes");
 const notificationRoutes = require("./routes/notificationRoutes");
+const medicationRoutes = require("./routes/medicationRoutes");
 // const chatRoutes = require("./routes/chatRoutes"); // Added chat routes
 const scheduler = require("./scheduler"); // Import the scheduler
 
@@ -38,6 +40,7 @@ app.use("/api", favoriteRoutes);
 app.use("/api", medicalReportRoutes);
 // Use Notification Routes
 app.use("/api", notificationRoutes);
+app.use("/api", medicationRoutes);
 
 // Serve static files from the "uploads" directory
 app.use("/uploads", express.static(path.join(__dirname, "uploads"))); // Adjust the path as necessary

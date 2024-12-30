@@ -228,8 +228,10 @@ import { Ionicons } from "@expo/vector-icons"; // Import icons from Expo
 import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
 import { AuthContext } from "../../context/AuthProvider";
+import { NotificationContext } from "../../context/NotificationProvider";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import API_BASE_URL from "../../config/config";
+import { useNotification } from "../../context/NotificationProvider";
 
 const LoginPage = () => {
   const [phoneNo, setphoneNo] = useState("");
@@ -237,7 +239,7 @@ const LoginPage = () => {
   const [isPasswordVisible, setPasswordVisible] = useState(false); // For toggling password visibility
   const navigation = useNavigation();
   const { login } = useContext(AuthContext);
-
+  const { initializeInterval } = useNotification();
   const handleLogin = async () => {
     console.log("Handle Login");
     setphoneNo("");
@@ -279,6 +281,7 @@ const LoginPage = () => {
           await AsyncStorage.setItem("full_name", full_name);
         }
         console.log("Login successful. Stored userId:", userId);
+        initializeInterval();
 
         // Navigate based on role
         if (role === "1" || role === "4") {

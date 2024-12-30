@@ -84,7 +84,7 @@
 // };
 
 // frontend/context/AuthProvider.js
-import React, { createContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import { storeToken, getToken, clearToken } from "../services/authService";
 // import { useNavigation } from "@react-navigation/native"; // Import useNavigation
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -94,6 +94,7 @@ export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [authToken, setAuthToken] = useState(null);
+  // const { initializeInterval } = useContext(NotificationProvider);
   // const navigation = useNavigation(); // Get the navigation object
 
   // Load token on app startup
@@ -109,6 +110,7 @@ export const AuthProvider = ({ children }) => {
   const login = async (token) => {
     await storeToken(token);
     setAuthToken(token);
+    // await initializeInterval();
   };
 
   // Logout function with navigation

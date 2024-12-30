@@ -6,35 +6,45 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
+  ImageBackground,
 } from "react-native";
+import styles from "../../components/styles"; // Import shared styles
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import API_BASE_URL from "../../../config/config";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { getUserIdFromToken } from "../../../services/authService";
+import NavigationBar from "../../components/NavigationBar";
+import {
+  useNavigation,
+  useRoute,
+  useFocusEffect,
+} from "@react-navigation/native";
 
 const MedicalReport = () => {
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState(null);
-  console.log(reports);
+  const navigation = useNavigation();
+  // console.log(reports);
 
   useEffect(() => {
     const fetchUserId = async () => {
       const userId = await getUserIdFromToken();
       // console.log("userId:", userId);
       if (userId) {
-        setUserId(userId);
+        // setUserId(userId);
         // fetchProfile(userId);
+        fetchMedicalReports(userId);
       }
     };
     fetchUserId();
   }, []);
 
-  useEffect(() => {
-    fetchMedicalReports();
-  }, []);
+  // useEffect(() => {
+  //   fetchMedicalReports();
+  // }, []);
 
-  const fetchMedicalReports = async () => {
+  const fetchMedicalReports = async (userId) => {
     try {
       const token = await AsyncStorage.getItem("token");
       if (!token) {
@@ -42,10 +52,10 @@ const MedicalReport = () => {
         return;
       }
 
-      const userId = await AsyncStorage.getItem("userId"); // Retrieve userId from storage
-      if (!userId) {
-        throw new Error("User ID not found");
-      }
+      // const userId = await AsyncStorage.getItem("userId"); // Retrieve userId from storage
+      // if (!userId) {
+      //   throw new Error("User ID not found");
+      // }
 
       const response = await fetch(
         `${API_BASE_URL}/user/medicalReports/${userId}`,
@@ -53,7 +63,7 @@ const MedicalReport = () => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-
+      console.log(userId);
       if (!response.ok) {
         throw new Error("Failed to fetch medical reports");
       }
@@ -66,15 +76,26 @@ const MedicalReport = () => {
     }
   };
 
+  // const renderMedicineList = (medicines) => {
+  //   return medicines.map((medicine, index) => (
+  //     <View
+  //       key={`${medicine.medicine_id}-${index}`}
+  //       style={styles.medicineContainer}
+  //     >
+  //       {/* <View key={index} style={styles.medicineContainer}> */}
+  //       <Text style={styles.medicineText}>
+  //         {medicine.medicine_name} - {medicine.dosage} ({medicine.duration})
+  //       </Text>
+  //     </View>
+  //   ));
+  // };
+
   const renderMedicineList = (medicines) => {
-    return medicines.map((medicine, index) => (
-      <View
-        key={`${medicine.medicine_id}-${index}`}
-        style={styles.medicineContainer}
-      >
-        {/* <View key={index} style={styles.medicineContainer}> */}
+    return medicines.map((medicine) => (
+      <View key={medicine.medicine_id} style={styles.medicineContainer}>
         <Text style={styles.medicineText}>
-          {medicine.medicine_name} - {medicine.dosage} ({medicine.duration})
+          {medicine.name} - {medicine.dosage} medicines (pills) / (
+          {medicine.duration}) Hours
         </Text>
       </View>
     ));
@@ -90,9 +111,11 @@ const MedicalReport = () => {
         Follow-up Date: {item.follow_up_date || "None"}
       </Text>
       <Text style={styles.details}>Advice: {item.advice_given}</Text>
-      <Text style={styles.details}>Created At: {item.created_at}</Text>
       <Text style={styles.details}>
-        Appointment Type: {item.appointment_type}
+        Created At: {item.formatted_created_at}
+      </Text>
+      <Text style={styles.details}>
+        Appointment Type: {item.appointment_type} Appointment
       </Text>
 
       <Text style={styles.medicineHeader}>Medicines:</Text>
@@ -113,58 +136,32 @@ const MedicalReport = () => {
   }
 
   return (
-    <ScrollView>
-      <FlatList
-        data={reports}
-        keyExtractor={(item, index) => `${item.report_id}-${index}`} // Combine `report_id` and index for uniqueness
-        // keyExtractor={(item) => item.report_id.toString()}
-        renderItem={renderReport}
-        contentContainerStyle={styles.container}
-      />
-    </ScrollView>
+    <ImageBackground
+      source={require("../../../assets/DoctorDetails.png")}
+      style={[styles.background, { flex: 1 }]}
+    >
+      {/* Title Section with Back chevron-back */}
+      <View style={styles.smallHeaderContainer}>
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={styles.backButton}
+        >
+          <Ionicons name="chevron-back" size={24} color="#000" />
+        </TouchableOpacity>
+        <Text style={styles.title}> Medical History </Text>
+      </View>
+      <View style={{ flex: 1, paddingBottom: 10 }}>
+        <FlatList
+          data={reports}
+          // keyExtractor={(item, index) => `${item.report_id}-${index}`} // Combine `report_id` and index for uniqueness
+          keyExtractor={(item) => item.report_id.toString()}
+          renderItem={renderReport}
+          contentContainerStyle={styles.hpContainer}
+        />
+      </View>
+      <NavigationBar navigation={navigation} activePage="" />
+    </ImageBackground>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    padding: 10,
-  },
-  card: {
-    backgroundColor: "#f9f9f9",
-    padding: 15,
-    marginVertical: 10,
-    borderRadius: 8,
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    shadowOffset: { width: 0, height: 2 },
-  },
-  reportTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 5,
-  },
-  details: {
-    fontSize: 14,
-    marginBottom: 5,
-  },
-  medicineHeader: {
-    fontSize: 16,
-    fontWeight: "bold",
-    marginTop: 10,
-  },
-  medicineContainer: {
-    marginVertical: 5,
-  },
-  medicineText: {
-    fontSize: 14,
-    fontStyle: "italic",
-  },
-  noMedicines: {
-    fontSize: 14,
-    fontStyle: "italic",
-    color: "gray",
-  },
-});
 
 export default MedicalReport;

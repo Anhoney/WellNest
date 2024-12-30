@@ -38,6 +38,7 @@ import {
   PaymentScreen,
 } from "../src/screens/ElderlyNCaregivers/VirtualConfirmationScreen";
 import MedicalReport from "../src/screens/ElderlyNCaregivers/MedicalReport";
+import AddReminder from "../src/screens/ElderlyNCaregivers/AddReminder";
 
 // Healthcare Provider screens
 import HealthcareProviderMainPage from "../src/screens/HealthcareProvider/HealthcareProviderMainPage";
@@ -56,6 +57,7 @@ import HpCreateOrEditVApp from "../src/screens/HealthcareProvider/HpCreateOrEdit
 import HpVUpcomingAppointments from "../src/screens/HealthcareProvider/HpVUpcomingAppointments";
 import HpVUpcomingAppointmentDetails from "../src/screens/HealthcareProvider/HpVUpcomingAppointmentDetails";
 import HpVPastAppointments from "../src/screens/HealthcareProvider/HpVPastAppointments";
+import HpNotification from "../src/screens/HealthcareProvider/HpNotification";
 
 // Community Organizer
 import CommunityOrganizerMainPage from "../src/screens/CommunityOrganizers/CommunityOrganizerMainPage";
@@ -252,8 +254,10 @@ const AppNavigator = () => (
         name="HpVPastAppointments"
         component={HpVPastAppointments}
       />
-      <Stack.Screen name="Notification" component={Notifications} />
+      <Stack.Screen name="Notifications" component={Notifications} />
       <Stack.Screen name="MedicalReport" component={MedicalReport} />
+      <Stack.Screen name="HpNotification" component={HpNotification} />
+      <Stack.Screen name="AddReminder" component={AddReminder} />
     </Stack.Navigator>
   </NavigationContainer>
 );

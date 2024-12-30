@@ -1,5 +1,6 @@
 //userAppointmentsController.js
 const pool = require("../config/db");
+const { notifyUser, createNotification } = require("./notificationController"); // Import createNotification
 
 // Search for doctors
 const searchDoctors = async (req, res) => {
@@ -392,6 +393,14 @@ WHERE hp_id = $1 AND hpva_date = $2 AND hpva_time = $3
     const appointmentId = `physical_${insertAppointmentQuery.rows[0].hp_app_id}`;
     // insertAppointmentQuery.rows[0].hp_app_id; // Get the last inserted ID
     console.log("Book Appointment Appointment ID:", appointmentId);
+
+    // Notify user
+    await notifyUser(
+      hpId,
+      `A new physical appointment has been scheduled for ${date} at ${time}. Please approve it.`,
+      "appointment_notification"
+    );
+
     res
       .status(201)
       .json({ message: "Appointment booked successfully", appointmentId });
@@ -435,7 +444,6 @@ const getDoctorsByCategory = async (req, res) => {
             THEN CONCAT('data:image/png;base64,', ENCODE(p.profile_image, 'base64'))
             ELSE NULL 
           END AS profile_image,
-    
            p.rating ,
            p.hospital,
            a.location, 
@@ -515,7 +523,6 @@ const getDoctorAppointmentDetails = async (req, res) => {
   THEN ENCODE(p.profile_image, 'base64') 
   ELSE NULL 
 END AS profile_image,
-
           p.rating,
           p.user_id,
           a.description,
@@ -823,11 +830,111 @@ const getScheduledAppointments = async (req, res) => {
 //     console.error("Error cancelling appointment:", error);
 //     res.status(500).json({ error: "Failed to cancel appointment" });
 //   }
+// // };
+
+// const cancelAppointment = async (req, res) => {
+//   const appointmentId = req.params.appointmentId;
+//   const isVirtual = req.query.isVirtual; // Extracting the query parameter
+//   console.log("cancelAppointmentId:", appointmentId);
+//   // Check if appointmentId exists and is a valid string
+//   if (!appointmentId || typeof appointmentId !== "string") {
+//     return res.status(400).json({
+//       error: "Appointment ID is required and should be a valid string.",
+//     });
+//   }
+
+//   try {
+//     // Extract the appointment type and numeric ID
+//     const parts = appointmentId.split("_");
+
+//     // Ensure the appointmentId is in the expected format (e.g., "physical_35" or "virtual_4")
+//     if (parts.length !== 2) {
+//       return res.status(400).json({
+//         error:
+//           "Invalid appointment ID format. Expected format: <type>_<numeric_id>",
+//       });
+//     }
+
+//     const appointmentType = parts[0]; // "physical" or "virtual"
+//     const appointmentNumericId = parts[1]; // "35" or "4"
+
+//     // Validate that the numeric ID is a valid number
+//     if (!appointmentNumericId || isNaN(appointmentNumericId)) {
+//       return res
+//         .status(400)
+//         .json({ error: "Invalid numeric part of the appointment ID." });
+//     }
+
+//     // Choose the table and query based on the appointment type
+//     let appointmentCheckQuery = "";
+//     let appointmentCheckParams = [appointmentNumericId];
+//     let userId = null; // To store user ID from the appointment record
+//     let tableName = ""; // To store the table name
+
+//     if (appointmentType === "physical") {
+//       appointmentCheckQuery = `SELECT * FROM hp_appointments WHERE hp_app_id = $1`;
+//       tableName = "hp_appointments";
+//     } else if (appointmentType === "virtual") {
+//       appointmentCheckQuery = `SELECT * FROM hp_virtual_appointment WHERE hpva_id = $1`;
+//       tableName = "hp_virtual_appointment";
+//     } else {
+//       return res.status(400).json({
+//         error: "Invalid appointment type. Expected 'physical' or 'virtual'.",
+//       });
+//     }
+
+//     // Check if the appointment exists in the corresponding table
+//     const appointmentCheck = await pool.query(
+//       appointmentCheckQuery,
+//       appointmentCheckParams
+//     );
+
+//     // If the appointment is not found
+//     if (appointmentCheck.rows.length === 0) {
+//       return res.status(404).json({ error: "Appointment not found." });
+//     }
+
+//     // Proceed to delete from the corresponding table
+//     // if (appointmentType === "physical") {
+//     //   await pool.query(`DELETE FROM hp_appointments WHERE hp_app_id = $1`, [
+//     //     appointmentNumericId,
+//     //   ]);
+//     // } else if (appointmentType === "virtual") {
+//     //   await pool.query(
+//     //     `DELETE FROM hp_virtual_appointment WHERE hpva_id = $1`,
+//     //     [appointmentNumericId]
+//     //   );
+//     // }
+
+//     // res.json({ success: true, message: "Appointment cancelled successfully." });
+//     // Proceed to delete from the corresponding table
+//     let deleteQuery = "";
+//     if (appointmentType === "physical") {
+//       deleteQuery = `DELETE FROM hp_appointments WHERE hp_app_id = $1`;
+//     } else if (appointmentType === "virtual") {
+//       deleteQuery = `DELETE FROM hp_virtual_appointment WHERE hpva_id = $1`;
+//     }
+
+//     await pool.query(deleteQuery, [appointmentNumericId]);
+
+//     // Notify the user about the cancellation
+//     const notificationMessage = `Your ${
+//       appointmentType === "physical" ? "physical" : "virtual"
+//     } appointment with ID ${appointmentId} has been canceled.`;
+//     await notifyUser(userId, notificationMessage, "appointment_cancellation");
+
+//     res.json({ success: true, message: "Appointment cancelled successfully." });
+//   } catch (error) {
+//     console.error("Error cancelling appointment:", error);
+//     res.status(500).json({ error: "Failed to cancel appointment." });
+//   }
 // };
+
 const cancelAppointment = async (req, res) => {
   const appointmentId = req.params.appointmentId;
-  const isVirtual = req.query.isVirtual; // Extracting the query parameter
+  const userIdFromQuery = req.query.userId; // Extract userId from query params
   console.log("cancelAppointmentId:", appointmentId);
+
   // Check if appointmentId exists and is a valid string
   if (!appointmentId || typeof appointmentId !== "string") {
     return res.status(400).json({
@@ -860,11 +967,12 @@ const cancelAppointment = async (req, res) => {
     // Choose the table and query based on the appointment type
     let appointmentCheckQuery = "";
     let appointmentCheckParams = [appointmentNumericId];
+    let userId = null; // To store user ID from the appointment record
 
     if (appointmentType === "physical") {
-      appointmentCheckQuery = `SELECT * FROM hp_appointments WHERE hp_app_id = $1`;
+      appointmentCheckQuery = `SELECT hp_id FROM hp_appointments WHERE hp_app_id = $1`;
     } else if (appointmentType === "virtual") {
-      appointmentCheckQuery = `SELECT * FROM hp_virtual_appointment WHERE hpva_id = $1`;
+      appointmentCheckQuery = `SELECT hp_id FROM hp_virtual_appointment WHERE hpva_id = $1`;
     } else {
       return res.status(400).json({
         error: "Invalid appointment type. Expected 'physical' or 'virtual'.",
@@ -882,16 +990,35 @@ const cancelAppointment = async (req, res) => {
       return res.status(404).json({ error: "Appointment not found." });
     }
 
+    // Extract the user ID from the query result
+    userId = appointmentCheck.rows[0].hp_id;
+
+    if (!userId) {
+      return res.status(500).json({
+        error: "Failed to retrieve user information for notification.",
+      });
+    }
+
     // Proceed to delete from the corresponding table
+    let deleteQuery = "";
     if (appointmentType === "physical") {
-      await pool.query(`DELETE FROM hp_appointments WHERE hp_app_id = $1`, [
-        appointmentNumericId,
-      ]);
+      deleteQuery = `DELETE FROM hp_appointments WHERE hp_app_id = $1`;
     } else if (appointmentType === "virtual") {
-      await pool.query(
-        `DELETE FROM hp_virtual_appointment WHERE hpva_id = $1`,
-        [appointmentNumericId]
-      );
+      deleteQuery = `DELETE FROM hp_virtual_appointment WHERE hpva_id = $1`;
+    }
+
+    await pool.query(deleteQuery, [appointmentNumericId]);
+
+    // Notify the user about the cancellation
+    const notificationMessage = `Your ${
+      appointmentType === "physical" ? "physical" : "virtual"
+    } appointment with ID ${appointmentNumericId} has been canceled.`;
+
+    try {
+      await notifyUser(userId, notificationMessage, "appointment_cancellation");
+    } catch (notifyError) {
+      console.error("Error notifying user:", notifyError);
+      // Optionally, you can return a warning about the notification failure without breaking the main cancellation flow.
     }
 
     res.json({ success: true, message: "Appointment cancelled successfully." });
@@ -1531,6 +1658,14 @@ const bookVirtualAppointment = async (req, res) => {
 
     const appointmentId = `virtual_${insertAppointmentQuery.rows[0].hpva_id}`;
     console.log("Book Virtual Appointment ID:", appointmentId);
+
+    // Notify user
+    await notifyUser(
+      hpId,
+      `A new virtual appointment has been scheduled for ${date} at ${time}. Please approve it.`,
+      "appointment_notification"
+    );
+
     res.status(201).json({
       message: "Virtual appointment booked successfully",
       appointmentId,

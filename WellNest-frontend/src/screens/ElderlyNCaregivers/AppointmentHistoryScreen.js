@@ -102,6 +102,12 @@ const AppointmentHistoryScreen = ({ navigation }) => {
 
   const cancelAppointment = async (appointmentId, isVirtual) => {
     console.log("Cancel Appointment Params:", { appointmentId, isVirtual }); // Log params
+
+    if (!userId) {
+      Alert.alert("Error", "No user found. Please log in.");
+      return;
+    }
+
     try {
       const response = await fetch(
         `${API_BASE_URL}/cancelAppointment/${appointmentId}`,
@@ -117,19 +123,26 @@ const AppointmentHistoryScreen = ({ navigation }) => {
         const errorText = await response.text(); // Read the response as text if not okay
         throw new Error(`Error: ${errorText}`);
       }
-      // Log the response for debugging
-      const responseText = await response.text(); // Read as text to check the actual response
-      console.log("Cancel Appointment Response:", responseText); // Log raw response
-
-      // Now try to parse the response as JSON
-      const result = JSON.parse(responseText);
-      //   const result = await response.json();
-      if (response.ok) {
+      const result = await response.json();
+      if (result.success) {
         Alert.alert("Success", "Appointment canceled successfully.");
-        fetchAppointments(); // Refresh the list
+        fetchAppointments(userId); // Refresh appointments using the userId
       } else {
         Alert.alert("Error", result.error || "Failed to cancel appointment.");
       }
+      // Log the response for debugging
+      // const responseText = await response.text(); // Read as text to check the actual response
+      // console.log("Cancel Appointment Response:", responseText); // Log raw response
+
+      // // Now try to parse the response as JSON
+      // const result = JSON.parse(responseText);
+      // //   const result = await response.json();
+      // if (response.ok) {
+      //   Alert.alert("Success", "Appointment canceled successfully.");
+      //   fetchAppointments(); // Refresh the list
+      // } else {
+      //   Alert.alert("Error", result.error || "Failed to cancel appointment.");
+      // }
     } catch (error) {
       console.error("Error canceling appointment:", error);
       Alert.alert(

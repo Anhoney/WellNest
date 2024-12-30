@@ -15,13 +15,27 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import styles from "../../components/styles"; // Import your custom styles
 import { Ionicons } from "@expo/vector-icons";
 import NavigationBar from "../../components/NavigationBar";
+import { getUserIdFromToken } from "../../../services/authService";
 
 const HistoryAppDetails = ({ route, navigation }) => {
   const { appointmentId } = route.params; // Get appointmentId from route params
   const [appointmentDetails, setAppointmentDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [services, setServices] = useState([]);
+  const [userId, setUserId] = useState(null);
   console.log("HistoryAppDetailsappointmentId:", appointmentId);
+
+  useEffect(() => {
+    const fetchUserId = async () => {
+      const userId = await getUserIdFromToken();
+      // console.log("userId:", userId);
+      if (userId) {
+        setUserId(userId);
+        // fetchProfile(userId);
+      }
+    };
+    fetchUserId();
+  }, []);
 
   useEffect(() => {
     const fetchAppointmentDetails = async () => {

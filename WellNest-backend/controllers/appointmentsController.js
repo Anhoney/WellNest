@@ -132,37 +132,6 @@ const updateAppointment = async (req, res) => {
   }
 };
 
-// const getSingleAppointment = async (req, res) => {
-//   const { appointmentId } = req.params;
-//   try {
-//     const appointment = await Appointment.findById(appointmentId);
-//     if (!appointment) {
-//       return res.status(404).json({ message: "Appointment not found" });
-//     }
-//     res.json(appointment);
-//   } catch (error) {
-//     console.error("Error fetching appointment:", error);
-//     res.status(500).json({ message: "Error fetching appointment", error });
-//   }
-// };
-// const getSingleAppointment = async (req, res) => {
-//   const { appointmentId } = req.params;
-//   try {
-//     const result = await pool.query(
-//       "SELECT id, description, location, available_days, available_times FROM hp_availability WHERE id = $1",
-//       [appointmentId]
-//     );
-
-//     if (result.rows.length === 0) {
-//       return res.status(404).json({ message: "Appointment not found" });
-//     }
-
-//     res.json(result.rows[0]);
-//   } catch (error) {
-//     console.error("Error fetching appointment:", error);
-//     res.status(500).json({ message: "Error fetching appointment", error });
-//   }
-// };
 const getSingleAppointment = async (req, res) => {
   const { appointmentId } = req.params;
   // console.log("Fetching appointment with ID:", appointmentId); // Log the appointment ID
