@@ -7,8 +7,6 @@ const pool = require("../config/db");
 const loginUser = async (req, res) => {
   console.log("Login attempt with phone number:", req.body.phoneNo); // Debug log
   const { phoneNo, password } = req.body;
-  // console.log(phoneNo)
-  // console.log(password)
 
   try {
     const user = await findUserByPhoneNo(phoneNo);

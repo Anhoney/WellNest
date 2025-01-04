@@ -1969,4 +1969,123 @@ export default StyleSheet.create({
     alignItems: "center",
     marginBottom: 5,
   },
+  //MedicationReminderPage.js
+  // background: {
+  //   flex: 1,
+  // },
+  // smallHeaderContainer: {
+  //   flexDirection: "row",
+  //   alignItems: "center",
+  //   padding: 15,
+  // },
+  // backButton: {
+  //   marginRight: 10,
+  // },
+  // title: {
+  //   fontSize: 20,
+  //   fontWeight: "bold",
+  // },
+  planSummaryContainer: {
+    marginTop: 50,
+    backgroundColor: "#FFEB3B",
+    padding: 15,
+    margin: 10,
+    borderRadius: 10,
+    marginBottom: 50,
+  },
+  planTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+  },
+  planSubText: {
+    fontSize: 18,
+    color: "#555",
+  },
+  dailyReviewContainer: {
+    flex: 1,
+    paddingHorizontal: 15,
+  },
+  dailyReviewTitle: {
+    fontSize: 22,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  mrCardContainer: {
+    backgroundColor: "#FFF",
+    padding: 15,
+    borderRadius: 10,
+    marginVertical: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  mrCardContent: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  mrMedicineImage: {
+    width: 70,
+    height: 70,
+    borderRadius: 5,
+  },
+  mrCardTextContainer: {
+    marginLeft: 10,
+  },
+  mrCardTitle: {
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  mrCardSubText: {
+    fontSize: 14,
+    color: "#888",
+  },
+  mrCardStatus: {
+    fontSize: 14,
+  },
+  doneButton: {
+    backgroundColor: "#FF9800",
+    padding: 10,
+    borderRadius: 5,
+  },
+  doneButtonText: {
+    color: "#FFF",
+    fontSize: 14,
+  },
+  addReminderButton: {
+    position: "absolute",
+    bottom: 100,
+    right: 20,
+    backgroundColor: "#FF9800",
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    borderRadius: 30,
+    flexDirection: "row",
+    alignItems: "center",
+    elevation: 5,
+  },
+  addReminderText: {
+    color: "#FFF",
+    fontSize: 16,
+    fontWeight: "bold",
+    marginRight: 10,
+  },
+  buttonGroup: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    marginTop: 10,
+  },
+  remindButton: {
+    backgroundColor: "#FFC107",
+    padding: 10,
+    borderRadius: 5,
+  },
+  remindButtonText: {
+    color: "#FFF",
+    fontSize: 14,
+  },
 });

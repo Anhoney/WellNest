@@ -1,5 +1,6 @@
 //userAppointmentsController.js
 const pool = require("../config/db");
+const { API_BASE_URL } = require("../config/config");
 const { notifyUser, createNotification } = require("./notificationController"); // Import createNotification
 
 // Search for doctors
@@ -1793,7 +1794,7 @@ const uploadReceipt = async (req, res) => {
   }
 
   // Construct the file URL (adjust the base URL as needed)
-  const fileUrl = `http://localhost:5001/uploads/${req.file.filename}`;
+  const fileUrl = `${API_BASE_URL}/uploads/${req.file.filename}`;
 
   // You can also save the file URL to the database if needed
   // For example, you might want to associate it with a user or appointment

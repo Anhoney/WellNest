@@ -1,27 +1,3 @@
-// db.js
-// const { Pool } = require('pg');
-
-// // Create a pool to manage connections
-// const pool = new Pool({
-//   user: 'postgres',         // Your PostgreSQL user
-//   host: 'localhost',        // Database server
-//   database: 'WellNest',     // Your database name
-//   password: '011009', // Your PostgreSQL password
-//   port: 5432,               // Default PostgreSQL port
-// });
-
-// // Test the connection
-// pool.connect((err) => {
-//   if (err) {
-//     console.error('Database connection error:', err.stack);
-//   } else {
-//     console.log('Connected to the database');
-//   }
-// });
-
-// // Export the pool for use in other files
-// module.exports = pool;
-
 // config/db.js
 const { Pool } = require("pg");
 require("dotenv").config();

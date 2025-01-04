@@ -5,6 +5,14 @@ const router = express.Router();
 const {
   createReminder,
   getMedications,
+  updateReminder,
+  getMedicationById,
+  deleteReminder,
+  updateMedicationStatus,
+  getMedicationsByStatus,
+  updateMedicationStatusCompleted,
+  stopAlarm,
+  snoozeAlarm,
   //   createOrUpdateMedicalReport,
   //   getMedicalReport,
   //   deleteMedicalReport,
@@ -21,7 +29,38 @@ router.post(
   upload.single("medicineImage"),
   createReminder
 );
+
+router.put(
+  "/user/medication/:medicationId",
+  authenticateToken,
+  upload.single("medicineImage"),
+  updateReminder
+);
 router.get("/get/medication/:userId", authenticateToken, getMedications);
+// routes/medicationRoutes.js
+router.get(
+  "/getSingle/medication/:medicationId",
+  authenticateToken,
+  getMedicationById
+);
+router.delete(
+  "/delete/medication/:medicationId",
+  authenticateToken,
+  deleteReminder
+);
+
+router.patch("/update-status/:medicationId", updateMedicationStatus);
+
+//Alarm
+// Fetch all medications
+router.get("/get/medications", getMedicationsByStatus);
+
+// Update medication status
+router.put("/medications/:id/status", updateMedicationStatusCompleted);
+
+router.post("/stop-alarm", stopAlarm);
+router.post("/snooze-alarm", snoozeAlarm);
+
 // router.get(
 //   "/medicalReports/:appointment_id",
 //   authenticateToken,

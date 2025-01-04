@@ -70,49 +70,6 @@ const virtualToggleFavorite = async (req, res) => {
   }
 };
 
-// const toggleFavorite = async (req, res) => {
-//   const { availabilityId, virtualAvailabilityId } = req.body; // Accept both IDs
-//   const userId = req.userId;
-
-//   if (!availabilityId && !virtualAvailabilityId) {
-//     return res.status(400).json({
-//       error: "Either availabilityId or virtualAvailabilityId is required.",
-//     });
-//   }
-
-//   try {
-//     // Query for existing favorite based on the provided ID
-//     const existingFavorite = await pool.query(
-//       `SELECT id FROM favorites
-//        WHERE user_id = $1
-//        AND (availability_id = $2 OR virtual_availability_id = $3)`,
-//       [userId, availabilityId || null, virtualAvailabilityId || null]
-//     );
-
-//     if (existingFavorite.rows.length > 0) {
-//       // If already a favorite, remove it
-//       await pool.query(
-//         `DELETE FROM favorites
-//          WHERE user_id = $1
-//          AND (availability_id = $2 OR virtual_availability_id = $3)`,
-//         [userId, availabilityId || null, virtualAvailabilityId || null]
-//       );
-//       return res.json({ success: true, message: "Removed from favorites" });
-//     } else {
-//       // Otherwise, add to favorites
-//       await pool.query(
-//         `INSERT INTO favorites (user_id, availability_id, virtual_availability_id)
-//          VALUES ($1, $2, $3)`,
-//         [userId, availabilityId || null, virtualAvailabilityId || null]
-//       );
-//       return res.json({ success: true, message: "Added to favorites" });
-//     }
-//   } catch (error) {
-//     console.error("Error toggling favorite:", error);
-//     res.status(500).json({ error: "Failed to toggle favorite" });
-//   }
-// };
-
 const getFavorites = async (req, res) => {
   const userId = req.userId;
 

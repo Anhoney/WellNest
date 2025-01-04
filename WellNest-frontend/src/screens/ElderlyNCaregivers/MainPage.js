@@ -197,7 +197,7 @@ const MainPage = ({ medicineReminder }) => {
               </TouchableOpacity>
 
               <TouchableOpacity
-                onPress={() => navigation.navigate("FamilyCollaboration")}
+                onPress={() => navigation.navigate("MedicationsScreen")}
               >
                 <Image
                   source={require("../../../assets/FamilyAndCaregiversCollaboration.png")}

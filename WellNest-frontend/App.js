@@ -204,6 +204,7 @@ export default function App() {
     <AuthProvider>
       <NotificationProvider>
         <AppNavigator />
+        {/* <MedicationsScreen /> */}
       </NotificationProvider>
     </AuthProvider>
   );
