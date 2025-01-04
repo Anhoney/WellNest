@@ -305,7 +305,7 @@ const AppointmentHistoryScreen = ({ navigation }) => {
       </View>
 
       <View style={styles.uAcontainer}>
-        <Text style={styles.sectionTitle}>My Physical Appointments</Text>
+        <Text style={styles.sectionTitle}>My Appointments</Text>
         <View style={styles.singleUnderline}></View>
         {loading ? (
           <Text style={styles.loadingText}>Loading...</Text>

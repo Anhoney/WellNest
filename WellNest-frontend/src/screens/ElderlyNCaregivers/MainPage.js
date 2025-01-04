@@ -137,7 +137,7 @@ const MainPage = ({ medicineReminder }) => {
               </TouchableOpacity>
 
               <TouchableOpacity
-                onPress={() => navigation.navigate("Prescription")}
+                onPress={() => navigation.navigate("MedicalReport")}
               >
                 <Image
                   source={require("../../../assets/Prescription.png")}
@@ -173,7 +173,7 @@ const MainPage = ({ medicineReminder }) => {
               </TouchableOpacity>
 
               <TouchableOpacity
-                onPress={() => navigation.navigate("SocialEvents")}
+                onPress={() => navigation.navigate("SocialEventsScreen")}
               >
                 <Image
                   source={require("../../../assets/SocialEventsAndSupportGroups.png")}
@@ -185,7 +185,9 @@ const MainPage = ({ medicineReminder }) => {
               </TouchableOpacity>
 
               <TouchableOpacity
-                onPress={() => navigation.navigate("VolunteerOpportunities")}
+                onPress={() =>
+                  navigation.navigate("VolunteerOpportunitiesScreen")
+                }
               >
                 <Image
                   source={require("../../../assets/VolunteerOpportunities.png")}

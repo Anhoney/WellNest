@@ -10,10 +10,12 @@ const createReminder = async (req, res) => {
     pillName,
     amount,
     duration,
-    time,
+    // time,
     foodRelation,
     repeatOption,
     userId,
+    notificationTimes,
+    frequency,
   } = req.body; // Include repeatOption and userId
   console.log("Request Body:", req.body);
   let medicineImage = null;
@@ -30,18 +32,19 @@ const createReminder = async (req, res) => {
 
   try {
     const result = await pool.query(
-      `INSERT INTO medications (pill_name, amount, duration, time, food_relation, repeat_option, medicine_image, u_id)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
+      `INSERT INTO medications (pill_name, amount, duration, food_relation, repeat_option, medicine_image, u_id, notification_times, frequency)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *`,
       [
         pillName,
         amount,
         duration,
-        time,
         foodRelation,
         repeatOption,
         medicineImage,
         userId,
-      ] // Include all fields
+        notificationTimes,
+        frequency,
+      ]
     );
     res.status(201).json(result.rows[0]);
   } catch (error) {
@@ -73,10 +76,11 @@ const updateReminder = async (req, res) => {
     pillName,
     amount,
     duration,
-    time,
     foodRelation,
     repeatOption,
     userId,
+    notificationTimes,
+    frequency,
     // medicationId,
   } = req.body;
   const { medicationId } = req.params;
@@ -90,16 +94,18 @@ const updateReminder = async (req, res) => {
   console.log("Files:", req.files); // If using file uploads
   try {
     const result = await pool.query(
-      `UPDATE medications SET pill_name = $1, amount = $2, duration = $3, time = $4, food_relation = $5, repeat_option = $6, medicine_image = $7 
-       WHERE id = $8 AND u_id = $9 RETURNING *`,
+      `UPDATE medications SET pill_name = $1, amount = $2, duration = $3,  food_relation = $4, repeat_option = $5, medicine_image = $6, notification_times = $7, frequency = $8
+       WHERE id = $9 AND u_id = $10 RETURNING *`,
       [
         pillName,
         amount,
         duration,
-        time,
+        // time,
         foodRelation,
         repeatOption,
         medicineImage,
+        notificationTimes,
+        frequency,
         medicationId,
         userId,
       ]

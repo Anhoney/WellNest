@@ -634,13 +634,14 @@ export default StyleSheet.create({
     alignSelf: "center", // Center the rectangle
     width: "100%", // Adjust the width to fit the screen better
     justifyContent: "center",
-    height: 70, // Define the height of the rectangle
+    // height: 70, // Define the height of the rectangle
     //position: 'absolute', // Use absolute positioning
     top: 60, // Position the rectangle from the top
     left: 0, // Position the rectangle from the left
     right: 0, // Position the rectangle from the right
     zIndex: 1, // Ensure the rectangle is on top of other components
-    marginBottom: 45,
+    marginBottom: 60,
+    marginTop: 15,
   },
   prescriptionContainer: {
     flex: 1,
@@ -1901,7 +1902,7 @@ export default StyleSheet.create({
   // container: {
   //   padding: 10,
   // },
-  card: {
+  mrCard: {
     backgroundColor: "#f9f9f9",
     padding: 15,
     marginVertical: 10,
@@ -2087,5 +2088,32 @@ export default StyleSheet.create({
   remindButtonText: {
     color: "#FFF",
     fontSize: 14,
+  },
+  //MedicalReport.js
+  emptyContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  emptyImage: {
+    width: 200,
+    height: 200,
+    marginBottom: 20,
+  },
+  emptyText: {
+    fontSize: 18,
+    textAlign: "center",
+    color: "#555",
+  },
+  //SocialEventsScreen.js
+  scrollView: {
+    flexGrow: 1,
+    // paddingBottom: 20, // Space at the bottom
+    // marginTop: 50,
+    // justifyContent: 'center',
+    // alignItems: 'center',
+    // flexDirection: 'column', // Use column direction
+    // justifyContent: 'flex-start', // Start from the top
+    // alignItems: 'stretch', // Allow children to stretch to full width
   },
 });

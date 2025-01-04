@@ -39,7 +39,8 @@ import {
 } from "../src/screens/ElderlyNCaregivers/VirtualConfirmationScreen";
 import MedicalReport from "../src/screens/ElderlyNCaregivers/MedicalReport";
 import AddReminder from "../src/screens/ElderlyNCaregivers/AddReminder";
-// import MedicationsScreen from "../src/screens/ElderlyNCaregivers/MedicationsScreen";
+import SocialEventsScreen from "../src/screens/ElderlyNCaregivers/SocialEventsScreen";
+import VolunteerOpportunitiesScreen from "../src/screens/ElderlyNCaregivers/VolunteerOpportunitiesScreen";
 
 // Healthcare Provider screens
 import HealthcareProviderMainPage from "../src/screens/HealthcareProvider/HealthcareProviderMainPage";
@@ -259,6 +260,11 @@ const AppNavigator = () => (
       <Stack.Screen name="MedicalReport" component={MedicalReport} />
       <Stack.Screen name="HpNotification" component={HpNotification} />
       <Stack.Screen name="AddReminder" component={AddReminder} />
+      <Stack.Screen name="SocialEventsScreen" component={SocialEventsScreen} />
+      <Stack.Screen
+        name="VolunteerOpportunitiesScreen"
+        component={VolunteerOpportunitiesScreen}
+      />
       {/* <Stack.Screen name="MedicationsScreen" component={MedicationsScreen} /> */}
     </Stack.Navigator>
   </NavigationContainer>

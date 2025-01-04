@@ -2,6 +2,8 @@
 const schedule = require("node-schedule");
 const db = require("./config/db");
 const { notifyUser } = require("./controllers/notificationController");
+const { checkAlarms } = require("./controllers/medicationController");
+const cron = require("node-cron");
 
 // Function to fetch upcoming medication reminders
 const fetchUpcomingReminders = async () => {
@@ -35,3 +37,6 @@ schedule.scheduleJob("* * * * *", () => {
   console.log("Checking for upcoming medication reminders...");
   scheduleNotifications();
 });
+
+// Schedule the alarm check every minute
+cron.schedule("* * * * *", checkAlarms); // Runs every minute

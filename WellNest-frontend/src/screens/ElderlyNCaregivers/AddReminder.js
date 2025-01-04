@@ -48,8 +48,29 @@ const AddReminder = ({ route, navigation }) => {
   const [isTimePickerVisible, setTimePickerVisibility] = useState(false);
   const [isDeleteModalVisible, setDeleteModalVisible] = useState(false); // State for delete modal
   const [medications, setMedications] = useState([]);
+  const [notificationFrequency, setNotificationFrequency] =
+    useState("One time per day");
+  const [notificationTimes, setNotificationTimes] = useState([""]); // Array to hold notification times
+
+  const [isTimePickerVisibleArray, setTimePickerVisibleArray] = useState([
+    false,
+    false,
+    false,
+  ]);
+  // const formatTimeTo12Hour = (time) => {
+  //   const [hours, minutes] = time.split(":").map(Number);
+  //   const ampm = hours >= 12 ? "PM" : "AM";
+  //   const formattedHours = hours % 12 || 12; // Convert 0 to 12 for 12-hour format
+  //   return `${String(formattedHours).padStart(2, "0")}:${String(
+  //     minutes
+  //   ).padStart(2, "0")} ${ampm}`;
+  // };
 
   const formatTimeTo12Hour = (time) => {
+    if (!time || typeof time !== "string") {
+      console.warn("Invalid time format:", time);
+      return getCurrentTime(); // Fallback to current time if invalid
+    }
     const [hours, minutes] = time.split(":").map(Number);
     const ampm = hours >= 12 ? "PM" : "AM";
     const formattedHours = hours % 12 || 12; // Convert 0 to 12 for 12-hour format
@@ -79,13 +100,20 @@ const AddReminder = ({ route, navigation }) => {
           setAmount(String(data.amount));
           setDuration(String(data.duration));
           // setTime(data.time);
-          setTime(formatTimeTo12Hour(data.time)); // Format the time
+          // setTime(data.time ? formatTimeTo12Hour(data.time) : getCurrentTime()); // Safely format or set current time
+          // //setFrequency(data.frequency || "One time per day"); // Set frequency if available
+          //setNotificationTimes(data.notificationTimes || [""]);
+          //setTime(formatTimeTo12Hour(data.time)); // Format the time
           setRepeatOption(data.repeat_option);
           setFoodRelation(data.food_relation);
           setCurrentImage(data.medicine_image); // Store the current image URI
           setSelectedFile(
             data.medicine_image ? { uri: data.medicine_image } : null
           );
+          setNotificationFrequency(data.frequency || "One time per day");
+          setNotificationTimes(
+            data.notification_times ? data.notification_times : [""]
+          ); // Set notification times
         } catch (error) {
           console.error("Error fetching medication data:", error.message);
           Alert.alert("Error", "Failed to fetch medication data.");
@@ -95,36 +123,7 @@ const AddReminder = ({ route, navigation }) => {
     fetchMedicationData();
   }, [medicationId]);
 
-  // const handleTimeConfirm = (selectedTime) => {
-  //   const formattedTime = selectedTime.toTimeString().substring(0, 5);
-  //   setTime(formattedTime);
-  //   setTimePickerVisibility(false);
-  // };
-
-  // const handleSetReminder = async () => {
-  //   try {
-  //     const message = `Time to take ${pillName} (${amount}).`;
-  //     const notificationTime = new Date();
-  //     const [hours, minutes] = time.split(/[: ]/).map(Number);
-  //     const isPM = time.includes("PM");
-
-  //     notificationTime.setHours(isPM ? hours + 12 : hours);
-  //     notificationTime.setMinutes(minutes);
-  //     notificationTime.setSeconds(0);
-
-  //     await scheduleAlarmNotification(
-  //       medicationId || new Date().getTime(),
-  //       notificationTime,
-  //       message
-  //     );
-
-  //     Alert.alert("Reminder Set", `Alarm set for ${pillName}`);
-  //   } catch (error) {
-  //     console.error("Failed to set reminder:", error.message);
-  //     Alert.alert("Error", "Failed to set reminder. Please try again.");
-  //   }
-  // };
-  const handleTimeConfirm = (selectedTime) => {
+  const handleTimeConfirm = (selectedTime, index) => {
     const hours = selectedTime.getHours();
     const minutes = selectedTime.getMinutes();
     const ampm = hours >= 12 ? "PM" : "AM";
@@ -132,10 +131,18 @@ const AddReminder = ({ route, navigation }) => {
     const formattedHours = hours % 12 || 12; // Convert 0 to 12 for 12-hour format
     const formattedMinutes = String(minutes).padStart(2, "0");
 
-    setTime(
-      `${String(formattedHours).padStart(2, "0")}:${formattedMinutes} ${ampm}`
-    );
-    setTimePickerVisibility(false);
+    const formattedTime = `${String(formattedHours).padStart(
+      2,
+      "0"
+    )}:${formattedMinutes} ${ampm}`;
+    const newTimes = [...notificationTimes];
+    newTimes[index] = formattedTime; // Update the specific index with the new time
+    setNotificationTimes(newTimes);
+    setTimePickerVisibleArray((prev) => {
+      const updated = [...prev];
+      updated[index] = false; // Hide the time picker for this index
+      return updated;
+    });
   };
 
   useEffect(() => {
@@ -173,6 +180,44 @@ const AddReminder = ({ route, navigation }) => {
     setSelectedFile(result);
   };
 
+  // Function to handle frequency change
+  const handleFrequencyChange = (frequency) => {
+    setNotificationFrequency(frequency);
+    // Reset notification times based on frequency
+    if (frequency === "One time per day") {
+      setNotificationTimes([""]); // One time
+      setTimePickerVisibleArray([false]); // Reset visibility
+    } else if (frequency === "Twice per day") {
+      setNotificationTimes(["", ""]); // Two times
+      setTimePickerVisibleArray([false, false]); // Reset visibility
+    } else if (frequency === "Three times per day") {
+      setNotificationTimes(["", "", ""]); // Three times
+      setTimePickerVisibleArray([false, false, false]); // Reset visibility
+    }
+  };
+
+  // handleTimeChange: Safely parse selectedTime and apply formatting
+  const handleTimeChange = (index, selectedTime) => {
+    if (!(selectedTime instanceof Date)) {
+      selectedTime = new Date(selectedTime); // Convert if necessary
+    }
+    const hours = selectedTime.getHours();
+    const minutes = selectedTime.getMinutes();
+    const ampm = hours >= 12 ? "PM" : "AM";
+
+    const formattedHours = hours % 12 || 12; // Convert 0 to 12 for 12-hour format
+    const formattedMinutes = String(minutes).padStart(2, "0");
+
+    const formattedTime = `${String(formattedHours).padStart(
+      2,
+      "0"
+    )}:${formattedMinutes} ${ampm}`;
+
+    const newTimes = [...notificationTimes];
+    newTimes[index] = formattedTime;
+    setNotificationTimes(newTimes);
+  };
+
   const handleSubmit = async () => {
     if (!pillName || !amount || !duration || !time) {
       Alert.alert("Error", "Please fill in all fields!");
@@ -194,16 +239,11 @@ const AddReminder = ({ route, navigation }) => {
       formData.append("repeatOption", repeatOption);
       formData.append("foodRelation", foodRelation);
       formData.append("userId", userId);
+      formData.append("notificationTimes", JSON.stringify(notificationTimes)); // Send notification times as JSON
+      formData.append("frequency", notificationFrequency);
       console.log("Selected File:", selectedFile);
       console.log("Current Image:", currentImage);
-      // if (selectedFile) {
-      //   formData.append("medicineImage", {
-      //     uri: selectedFile.assets[0].uri,
-      //     name: selectedFile.assets[0].fileName,
-      //     // name: selectedFile.assets[0].uri.split("/").pop(),
-      //     type: selectedFile.mimeType || "image/jpeg",
-      //   });
-      // }
+
       if (
         selectedFile &&
         selectedFile.assets &&
@@ -225,18 +265,6 @@ const AddReminder = ({ route, navigation }) => {
           type: "image/jpeg", // Default type
         });
       }
-      //   else {
-      //     console.error("Selected file is missing required properties.");
-      //   }
-      // }
-      // if (selectedFile?.assets?.length > 0) {
-      //   const { uri, fileName } = selectedFile.assets[0];
-      //   formData.append("medicineImage", {
-      //     uri,
-      //     name: fileName || uri.split("/").pop(),
-      //     type: selectedFile.type || "image/jpeg",
-      //   });
-      // }
 
       const url = edit
         ? `${API_BASE_URL}/user/medication/${medicationId}` // Update API endpoint
@@ -272,50 +300,6 @@ const AddReminder = ({ route, navigation }) => {
     }
   };
 
-  // const handleDelete = async () => {
-  //   try {
-  //     const token = await AsyncStorage.getItem("token");
-  //     if (!token) {
-  //       alert("No token found. Please log in.");
-  //       return;
-  //     }
-
-  //     Alert.alert(
-  //       "Confirm Delete",
-  //       "Are you sure you want to delete this medication reminder?",
-  //       [
-  //         { text: "Cancel", style: "cancel" },
-  //         {
-  //           text: "Delete",
-  //           style: "destructive",
-  //           onPress: async () => {
-  //             try {
-  //               await axios.delete(
-  //                 `${API_BASE_URL}/delete/medication/${medicationId}`,
-  //                 {
-  //                   headers: {
-  //                     Authorization: `Bearer ${token}`,
-  //                   },
-  //                 }
-  //               );
-  //               Alert.alert(
-  //                 "Success",
-  //                 "Medication reminder deleted successfully!"
-  //               );
-  //               navigation.goBack();
-  //             } catch (error) {
-  //               console.error("Error deleting medication:", error.message);
-  //               Alert.alert("Error", "Failed to delete medication reminder.");
-  //             }
-  //           },
-  //         },
-  //       ]
-  //     );
-  //   } catch (error) {
-  //     console.error("Error during delete confirmation:", error.message);
-  //     Alert.alert("Error", "Failed to process delete action.");
-  //   }
-  // };
   const handleDelete = async () => {
     try {
       const token = await AsyncStorage.getItem("token");
@@ -404,6 +388,119 @@ const AddReminder = ({ route, navigation }) => {
           />
 
           <View style={styles.mrrow}>
+            <Ionicons name="repeat" size={18} color="#000" />
+            <Text style={styles.mrlabel}>Notification Frequency</Text>
+          </View>
+          <View style={styles.mrfoodButtons}>
+            {["One time per day", "Twice per day", "Three times per day"].map(
+              (option) => (
+                <TouchableOpacity
+                  key={option}
+                  style={[
+                    styles.mrfoodButton,
+                    notificationFrequency === option &&
+                      styles.mrfoodButtonActive,
+                  ]}
+                  onPress={() => handleFrequencyChange(option)}
+                >
+                  <Text>{option}</Text>
+                </TouchableOpacity>
+              )
+            )}
+          </View>
+          <View style={{ marginVertical: 8 }} />
+
+          {/* Render input fields for notification times */}
+          {notificationTimes.map((time, index) => (
+            <View key={index}>
+              <View style={styles.mrrow}>
+                <Ionicons name="time" size={18} color="#000" />
+                <Text style={styles.mrlabel}>
+                  Notification Time {index + 1}
+                </Text>
+              </View>
+              <TouchableOpacity
+                style={styles.mrinput}
+                onPress={() => {
+                  setTimePickerVisibleArray((prev) => {
+                    const updated = [...prev];
+                    updated[index] = true; // Show the time picker for this index
+                    return updated;
+                  });
+                }}
+              >
+                <Text>{time || "Select Time"}</Text>
+              </TouchableOpacity>
+              <DateTimePickerModal
+                isVisible={isTimePickerVisibleArray[index]}
+                mode="time"
+                date={new Date()} // Ensures the default time is the current real-world time
+                onConfirm={(selectedTime) =>
+                  handleTimeConfirm(selectedTime, index)
+                }
+                onCancel={() => {
+                  setTimePickerVisibleArray((prev) => {
+                    const updated = [...prev];
+                    updated[index] = false; // Hide the time picker for this index
+                    return updated;
+                  });
+                }}
+              />
+            </View>
+          ))}
+
+          {/* <View style={styles.mrrow}>
+            <Ionicons name="repeat" size={18} color="#000" />
+            <Text style={styles.mrlabel}>Notification Frequency</Text>
+          </View>
+          <View style={styles.mrfoodButtons}>
+            {["One time per day", "Twice per day", "Three times per day"].map(
+              (option) => (
+                <TouchableOpacity
+                  key={option}
+                  style={[
+                    styles.mrfoodButton,
+                    notificationFrequency === option &&
+                      styles.mrfoodButtonActive,
+                  ]}
+                  onPress={() => handleFrequencyChange(option)}
+                >
+                  <Text>{option}</Text>
+                </TouchableOpacity>
+              )
+            )}
+          </View>
+          <View style={{ marginVertical: 8 }} /> */}
+          {/* Render input fields for notification times */}
+          {/* {notificationTimes.map((time, index) => (
+            <View key={index}>
+              <View style={styles.mrrow}>
+                <Ionicons name="time" size={18} color="#000" />
+                <Text style={styles.mrlabel}>
+                  Notification Time {index + 1}
+                </Text>
+              </View>
+              <TouchableOpacity
+                style={styles.mrinput}
+                onPress={() => setTimePickerVisibility(true)}
+              >
+                <Text>{time || "Select Time"}</Text>
+              </TouchableOpacity>
+              <DateTimePickerModal
+                isVisible={isTimePickerVisible}
+                mode="time"
+                date={new Date()} // Ensures the default time is the current real-world time
+                onConfirm={(selectedTime) => {
+                  // handleTimeChange(index, formatTimeTo12Hour(selectedTime));
+                  handleTimeChange(index, selectedTime);
+                  setTimePickerVisibility(false);
+                }}
+                onCancel={() => setTimePickerVisibility(false)}
+              />
+            </View>
+          ))} */}
+
+          {/* <View style={styles.mrrow}>
             <Ionicons name="time" size={18} color="#000" />
             <Text style={styles.mrlabel}>Notification Time</Text>
           </View>
@@ -419,14 +516,14 @@ const AddReminder = ({ route, navigation }) => {
             date={new Date()} // Ensures the default time is the current real-world time
             onConfirm={handleTimeConfirm}
             onCancel={() => setTimePickerVisibility(false)}
-          />
+          /> */}
 
           <View style={styles.mrrow}>
             <Ionicons name="repeat" size={18} color="#000" />
             <Text style={styles.mrlabel}>Repeat</Text>
           </View>
           <View style={styles.mrfoodButtons}>
-            {["Everyday", "Monday-Friday", "One-time only"].map((option) => (
+            {["Everyday", "One-time only"].map((option) => (
               <TouchableOpacity
                 key={option}
                 style={[

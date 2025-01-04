@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   ScrollView,
   ImageBackground,
+  Image,
 } from "react-native";
 import styles from "../../components/styles"; // Import shared styles
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -51,11 +52,6 @@ const MedicalReport = () => {
         console.error("No token found");
         return;
       }
-
-      // const userId = await AsyncStorage.getItem("userId"); // Retrieve userId from storage
-      // if (!userId) {
-      //   throw new Error("User ID not found");
-      // }
 
       const response = await fetch(
         `${API_BASE_URL}/user/medicalReports/${userId}`,
@@ -102,7 +98,7 @@ const MedicalReport = () => {
   };
 
   const renderReport = ({ item }) => (
-    <View style={styles.card}>
+    <View style={styles.mrCard}>
       <Text style={styles.reportTitle}>
         Appointment ID: {item.appointment_id}
       </Text>
@@ -131,8 +127,38 @@ const MedicalReport = () => {
     return <Text>Loading...</Text>;
   }
 
+  // if (reports.length === 0) {
+  //   return <Text>No medical reports available.</Text>;
+  // }
+  // If there are no reports, show the image and message
   if (reports.length === 0) {
-    return <Text>No medical reports available.</Text>;
+    return (
+      <ImageBackground
+        source={require("../../../assets/PlainGrey.png")}
+        style={[styles.background, { flex: 1 }]}
+      >
+        {/* Title Section with Back chevron-back */}
+        <View style={styles.smallHeaderContainer}>
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            style={styles.backButton}
+          >
+            <Ionicons name="chevron-back" size={24} color="#000" />
+          </TouchableOpacity>
+          <Text style={styles.title}> Prescription </Text>
+        </View>
+        <View style={styles.emptyContainer}>
+          <Image
+            source={require("../../../assets/NothingDog.png")} // Adjust the path as necessary
+            style={styles.emptyImage}
+          />
+          <Text style={styles.emptyText}>
+            Currently, there are no prescriptions.
+          </Text>
+        </View>
+        <NavigationBar navigation={navigation} activePage="" />
+      </ImageBackground>
+    );
   }
 
   return (
@@ -148,7 +174,7 @@ const MedicalReport = () => {
         >
           <Ionicons name="chevron-back" size={24} color="#000" />
         </TouchableOpacity>
-        <Text style={styles.title}> Medical History </Text>
+        <Text style={styles.title}> Prescription </Text>
       </View>
       <View style={{ flex: 1, paddingBottom: 10 }}>
         <FlatList

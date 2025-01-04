@@ -13,11 +13,6 @@ const {
   updateMedicationStatusCompleted,
   stopAlarm,
   snoozeAlarm,
-  //   createOrUpdateMedicalReport,
-  //   getMedicalReport,
-  //   deleteMedicalReport,
-  //   checkMedicalReportExists,
-  //   getUserMedicalReports,
 } = require("../controllers/medicationController");
 const authenticateToken = require("../middleware/authMiddleware");
 
