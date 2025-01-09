@@ -39,4 +39,4 @@ schedule.scheduleJob("* * * * *", () => {
 });
 
 // Schedule the alarm check every minute
-cron.schedule("* * * * *", checkAlarms); // Runs every minute
+// cron.schedule("* * * * *", checkAlarms); // Runs every minute

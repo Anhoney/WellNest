@@ -41,6 +41,7 @@ import MedicalReport from "../src/screens/ElderlyNCaregivers/MedicalReport";
 import AddReminder from "../src/screens/ElderlyNCaregivers/AddReminder";
 import SocialEventsScreen from "../src/screens/ElderlyNCaregivers/SocialEventsScreen";
 import VolunteerOpportunitiesScreen from "../src/screens/ElderlyNCaregivers/VolunteerOpportunitiesScreen";
+import CollaborationScreen from "../src/screens/ElderlyNCaregivers/CollaborationScreen";
 
 // Healthcare Provider screens
 import HealthcareProviderMainPage from "../src/screens/HealthcareProvider/HealthcareProviderMainPage";
@@ -65,6 +66,8 @@ import HpNotification from "../src/screens/HealthcareProvider/HpNotification";
 import CommunityOrganizerMainPage from "../src/screens/CommunityOrganizers/CommunityOrganizerMainPage";
 import CoProfilePage from "../src/screens/CommunityOrganizers/CoProfilePage";
 import CoEditProfilePage from "../src/screens/CommunityOrganizers/CoEditProfilePage";
+import CoSocialEventsManagement from "../src/screens/CommunityOrganizers/CoSocialEventsManagement";
+import CoCreateEvents from "../src/screens/CommunityOrganizers/CoCreateEvents";
 
 const Stack = createStackNavigator();
 
@@ -265,7 +268,15 @@ const AppNavigator = () => (
         name="VolunteerOpportunitiesScreen"
         component={VolunteerOpportunitiesScreen}
       />
-      {/* <Stack.Screen name="MedicationsScreen" component={MedicationsScreen} /> */}
+      <Stack.Screen
+        name="CollaborationScreen"
+        component={CollaborationScreen}
+      />
+      <Stack.Screen
+        name="SocialEventsManagementScreen"
+        component={CoSocialEventsManagement}
+      />
+      <Stack.Screen name="CoCreateEvents" component={CoCreateEvents} />
     </Stack.Navigator>
   </NavigationContainer>
 );

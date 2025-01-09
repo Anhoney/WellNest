@@ -10,7 +10,7 @@ const createReminder = async (req, res) => {
     pillName,
     amount,
     duration,
-    // time,
+    time,
     foodRelation,
     repeatOption,
     userId,
@@ -32,12 +32,13 @@ const createReminder = async (req, res) => {
 
   try {
     const result = await pool.query(
-      `INSERT INTO medications (pill_name, amount, duration, food_relation, repeat_option, medicine_image, u_id, notification_times, frequency)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *`,
+      `INSERT INTO medications (pill_name, amount, duration,time, food_relation, repeat_option, medicine_image, u_id, notification_times, frequency)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *`,
       [
         pillName,
         amount,
         duration,
+        time,
         foodRelation,
         repeatOption,
         medicineImage,
@@ -242,7 +243,7 @@ const checkAlarms = async () => {
 };
 
 // Schedule the job to check alarms every minute (or adjust as needed)
-cron.schedule("* * * * *", checkAlarms); // Runs every minute
+// cron.schedule("* * * * *", checkAlarms); // Runs every minute
 
 // Stop Alarm
 const stopAlarm = async (req, res) => {

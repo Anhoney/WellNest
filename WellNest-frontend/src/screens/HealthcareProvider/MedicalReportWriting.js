@@ -474,7 +474,7 @@ const MedicalReportWriting = ({ route }) => {
               <Text style={styles.addButtonText}>+ Add Medicine</Text>
             </TouchableOpacity>
 
-            <View style={styles.buttonContainer}>
+            <View style={styles.mrButtonContainer}>
               <TouchableOpacity
                 style={styles.mrDeleteButton}
                 // onPress={handleDeleteReport}

@@ -14,6 +14,7 @@ const favoriteRoutes = require("./routes/favoriteRoutes");
 const medicalReportRoutes = require("./routes/medicalReportRoutes");
 const notificationRoutes = require("./routes/notificationRoutes");
 const medicationRoutes = require("./routes/medicationRoutes");
+const eventsRoutes = require("./routes/eventsRoutes");
 // const chatRoutes = require("./routes/chatRoutes"); // Added chat routes
 const scheduler = require("./scheduler"); // Import the scheduler
 
@@ -42,6 +43,7 @@ app.use("/api", medicalReportRoutes);
 // Use Notification Routes
 app.use("/api", notificationRoutes);
 app.use("/api", medicationRoutes);
+app.use("/api", eventsRoutes);
 
 // Serve static files from the "uploads" directory
 app.use("/uploads", express.static(path.join(__dirname, "uploads"))); // Adjust the path as necessary

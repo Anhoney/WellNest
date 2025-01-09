@@ -1,3 +1,4 @@
+//VolunteerOpportunitiesScreen.js
 import React, { useState } from "react";
 import {
   View,
@@ -7,6 +8,7 @@ import {
   ImageBackground,
   FlatList,
 } from "react-native";
+import EventCard from "../../components/EventCard";
 import styles from "../../components/styles"; // Assume you have a styles.js file for consistent styling
 import { Ionicons } from "@expo/vector-icons";
 import NavigationBar from "../../components/NavigationBar";
@@ -37,23 +39,56 @@ const VolunteerOpportunitiesScreen = () => {
     }
   };
 
+  //   const renderOpportunities = () => (
+  //     <View>
+  //       <Text style={styles.sectionTitle}>Opportunities</Text>
+  //       {/* Replace with dynamic data */}
+  //       <OpportunityCard
+  //         title="Volunteering At Old Folks Home"
+  //         location="Kota Kinabalu"
+  //         date="09 August 2024"
+  //         price="FREE"
+  //       />
+  //       <OpportunityCard
+  //         title="Community Gardens Cleaning Activity"
+  //         location="Kota Kinabalu"
+  //         date="18 August 2024"
+  //         price="FREE"
+  //       />
+  //     </View>
+  //   );
+  const opportunityData = [
+    {
+      image: "https://via.placeholder.com/150",
+      title: "Volunteering At Old Folks Home",
+      location: "Kota Kinabalu",
+      date: "09 August 2024",
+      price: "FREE",
+    },
+    {
+      image: "https://via.placeholder.com/150",
+      title: "Community Gardens Cleaning Activity",
+      location: "Kota Kinabalu",
+      date: "18 August 2024",
+      price: "FREE",
+    },
+  ];
+
   const renderOpportunities = () => (
-    <View>
-      <Text style={styles.sectionTitle}>Opportunities</Text>
-      {/* Replace with dynamic data */}
-      <OpportunityCard
-        title="Volunteering At Old Folks Home"
-        location="Kota Kinabalu"
-        date="09 August 2024"
-        price="FREE"
-      />
-      <OpportunityCard
-        title="Community Gardens Cleaning Activity"
-        location="Kota Kinabalu"
-        date="18 August 2024"
-        price="FREE"
-      />
-    </View>
+    <FlatList
+      data={opportunityData}
+      renderItem={({ item }) => (
+        <OpportunityCard
+          image="https://via.placeholder.com/150"
+          title={item.title}
+          location={item.location}
+          date={item.date}
+          price={item.price}
+        />
+      )}
+      keyExtractor={(item, index) => index.toString()}
+      contentContainerStyle={styles.scrollView}
+    />
   );
 
   const renderUpcomingOpportunities = () => (
@@ -169,12 +204,28 @@ const VolunteerOpportunitiesScreen = () => {
             // onDateChange={(selectedDate) => setDate(selectedDate)}
           />
         </View>
-      </View>
 
-      <TabNavigator activeTab={activeTab} onTabChange={handleTabChange} />
-      <FlatList contentContainerStyle={styles.scrollView}>
+        <View style={styles.volunteerContainer}>
+          <TabNavigator activeTab={activeTab} onTabChange={handleTabChange} />
+          {/* <FlatList contentContainerStyle={styles.scrollView}>
         {renderContent()}
-      </FlatList>
+      </FlatList> */}
+          <FlatList
+            data={activeTab === "opportunities" ? opportunityData : []} // Example data for rendering opportunities
+            renderItem={({ item }) => (
+              <EventCard
+                image={item.image}
+                title={item.title}
+                location={item.location}
+                date={item.date}
+                price={item.price}
+              />
+            )}
+            keyExtractor={(item, index) => index.toString()}
+            contentContainerStyle={styles.scrollView}
+          />
+        </View>
+      </View>
       <NavigationBar navigation={navigation} activePage="Home" />
     </ImageBackground>
   );
@@ -182,10 +233,10 @@ const VolunteerOpportunitiesScreen = () => {
 
 const OpportunityCard = ({ title, location, date, price }) => (
   <View style={styles.card}>
-    <Text style={styles.cardTitle}>{title}</Text>
-    <Text style={styles.cardDetails}>{location}</Text>
-    <Text style={styles.cardDetails}>{date}</Text>
-    <Text style={styles.cardPrice}>{price}</Text>
+    <Text style={styles.coTitle}>{title}</Text>
+    <Text style={styles.coDetails}>{location}</Text>
+    <Text style={styles.coDetails}>{date}</Text>
+    <Text style={styles.coPrice}>{price}</Text>
   </View>
 );
 

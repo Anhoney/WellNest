@@ -6,7 +6,7 @@ const { checkAlarms } = require("./controllers/medicationController");
 const cron = require("node-cron");
 
 // Schedule the alarm check every minute
-cron.schedule("* * * * *", checkAlarms); // Runs every minute
+// cron.schedule("* * * * *", checkAlarms); // Runs every minute
 // Helper function to format the date
 const formatDate = (date) => {
   const options = {

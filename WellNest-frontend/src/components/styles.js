@@ -1540,7 +1540,7 @@ export default StyleSheet.create({
     fontWeight: "bold",
     fontSize: 18,
   },
-  buttonContainer: {
+  mrButtonContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
   },
@@ -1740,9 +1740,9 @@ export default StyleSheet.create({
     borderRadius: 5,
     marginHorizontal: 5,
   },
-  cancelButton: {
-    marginHorizontal: 5,
-  },
+  // cancelButton: {
+  //   marginHorizontal: 5,
+  // },
   // approveText: {
   //   color: "#fff",
   // },
@@ -2115,5 +2115,228 @@ export default StyleSheet.create({
     // flexDirection: 'column', // Use column direction
     // justifyContent: 'flex-start', // Start from the top
     // alignItems: 'stretch', // Allow children to stretch to full width
+  },
+  coCard: {
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    padding: 10,
+    marginBottom: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 3,
+  },
+  coImage: {
+    height: 150,
+    borderRadius: 10,
+  },
+  coTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginTop: 10,
+  },
+  coDetails: {
+    fontSize: 14,
+    marginVertical: 2,
+  },
+  coPrice: {
+    fontSize: 14,
+    fontWeight: "bold",
+    color: "#28a745",
+  },
+  seTabContainer: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    marginVertical: 10,
+  },
+  seTabButton: {
+    padding: 10,
+    borderBottomWidth: 2,
+    borderBottomColor: "transparent",
+    marginTop: -25,
+  },
+  seActiveTab: {
+    borderBottomColor: "#000", // Change to your active tab color
+  },
+  seTabText: {
+    fontSize: 16,
+    color: "#000",
+  },
+  //VolunteerOpportunitiesScreen.js
+  volunteerContainer: {
+    flex: 1,
+    // padding: 20,
+    marginTop: 390,
+    padding: 5,
+  },
+  //CollaborationScreen.js
+  collabContainer: {
+    flex: 1,
+    padding: 16,
+  },
+
+  // title: {
+  //   fontSize: 24,
+  //   fontWeight: "bold",
+  //   textAlign: "center",
+  //   marginBottom: 16,
+  // },
+  requestContainer: {
+    padding: 16,
+    backgroundColor: "#fff",
+    borderRadius: 8,
+    marginBottom: 16,
+  },
+  requestText: {
+    fontSize: 16,
+    marginBottom: 8,
+  },
+  buttonRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  acceptButton: {
+    backgroundColor: "#fcb941",
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 4,
+  },
+  declineButton: {
+    borderColor: "#000",
+    borderWidth: 1,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 4,
+  },
+  coButtonText: {
+    fontSize: 16,
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 8,
+  },
+  collabCard: {
+    padding: 16,
+    backgroundColor: "#fff",
+    borderRadius: 8,
+    marginBottom: 8,
+  },
+  collabCardTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  collabCardDetails: {
+    fontSize: 16,
+  },
+  connectButton: {
+    marginTop: 16,
+    backgroundColor: "#fcb941",
+    padding: 16,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  connectButtonText: {
+    fontSize: 18,
+    color: "#fff",
+  },
+  whiteBgSmallHeaderContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3, // Android shadow
+    alignSelf: "center", // Center the rectangle
+    width: "100%", // Adjust the width to fit the screen better
+    justifyContent: "center",
+    backgroundColor: "white",
+    // height: 70, // Define the height of the rectangle
+    //position: 'absolute', // Use absolute positioning
+    top: 60, // Position the rectangle from the top
+    left: 0, // Position the rectangle from the left
+    right: 0, // Position the rectangle from the right
+    zIndex: 1, // Ensure the rectangle is on top of other components
+    marginBottom: 60,
+    marginTop: 15,
+  },
+  //ElderlyAssessmentPage.js
+  // container: { flex: 1, backgroundColor: "#f2f2f2" },
+  // header: { padding: 20, alignItems: "center", backgroundColor: "#fff" },
+  // title: { fontSize: 20, fontWeight: "bold" },
+  assessmentContainer: {
+    flex: 1,
+    // padding: 20,
+    marginTop: 20,
+    padding: 10,
+  },
+  userInfo: {
+    marginLeft: 30,
+    marginTop: 10,
+    flexDirection: "column", // Stack items vertically
+    alignItems: "flex-start", // Align items to the left
+    padding: 16, // Add some padding for better spacing
+
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2, // For Android shadow
+  },
+  userName: { fontSize: 22, fontWeight: "bold", marginBottom: 10 },
+  tabs: { flexDirection: "row", justifyContent: "center", marginVertical: 10 },
+  tab: { padding: 10, borderBottomWidth: 2, borderBottomColor: "transparent" },
+  activeTab: { borderBottomColor: "#000" },
+  tabText: { fontSize: 16 },
+  assessmentList: { paddingHorizontal: 20, paddingVertical: 10 },
+  assessmentItem: {
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    padding: 15,
+    marginBottom: 15,
+    alignItems: "center",
+  },
+  assessmentImage: { width: 50, height: 50, marginBottom: 10 },
+  assessmentTitle: { fontSize: 16, marginBottom: 10, textAlign: "center" },
+  startButton: {
+    backgroundColor: "#FFA500",
+    borderRadius: 5,
+    paddingHorizontal: 20,
+    paddingVertical: 8,
+  },
+  startButtonText: { color: "#fff", fontWeight: "bold" },
+  historyContainer: { padding: 20 },
+  //CoSocialEventsManagement.js
+  coSearchContainer: {
+    marginTop: 25,
+    marginBottom: 20,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  addEventButton: {
+    position: "absolute",
+    // top: 100,
+    bottom: 20,
+    right: 15,
+    backgroundColor: "#FF9800",
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    borderRadius: 20,
+    flexDirection: "row",
+    alignItems: "center",
+    elevation: 5,
+  },
+  addEventText: {
+    color: "#FFF",
+    fontSize: 16,
+    fontWeight: "bold",
+    marginRight: 10,
   },
 });

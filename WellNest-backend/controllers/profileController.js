@@ -155,6 +155,7 @@ const updateHpProfile = async (req, res) => {
     core_qualifications,
     organizer_details,
   } = req.body;
+  const ageValue = age === "NaN" || age === "" || age === null ? null : age;
 
   // const profileImagePath = req.file ? req.file.path : null;
   // For binary data storage
@@ -215,7 +216,7 @@ VALUES ( $10, $1, $2, $3, $4, $5, $6, $7, $8, $9)
       `;
         queryParams = [
           username,
-          age,
+          ageValue,
           gender,
           date_of_birth,
           phone_number,
@@ -241,7 +242,7 @@ VALUES ( $10, $1, $2, $3, $4, $5, $6, $7, $8, $9)
       `;
         queryParams = [
           username,
-          age,
+          ageValue,
           gender,
           date_of_birth,
           phone_number,
@@ -267,7 +268,7 @@ VALUES ( $10, $1, $2, $3, $4, $5, $6, $7, $8, $9)
       `;
         queryParams = [
           username,
-          age,
+          ageValue,
           gender,
           date_of_birth,
           phone_number,
@@ -287,7 +288,7 @@ VALUES ( $10, $1, $2, $3, $4, $5, $6, $7, $8, $9)
       `;
         queryParams = [
           username,
-          age,
+          ageValue,
           gender,
           date_of_birth,
           phone_number,
@@ -321,7 +322,7 @@ VALUES ( $10, $1, $2, $3, $4, $5, $6, $7, $8, $9)
 
         queryParams = [
           username,
-          age,
+          ageValue,
           gender,
           date_of_birth,
           phone_number,
@@ -362,7 +363,7 @@ VALUES ( $10, $1, $2, $3, $4, $5, $6, $7, $8, $9)
 
         queryParams = [
           username,
-          age,
+          ageValue,
           gender,
           date_of_birth,
           phone_number,

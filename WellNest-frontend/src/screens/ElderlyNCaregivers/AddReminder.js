@@ -21,6 +21,8 @@ import NavigationBar from "../../components/NavigationBar";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import API_BASE_URL from "../../../config/config";
 import { scheduleAlarmNotification } from "../../utils/notificationUtils"; // Custom utility for scheduling notifications
+import * as Calendar from "expo-calendar";
+// import notifee, { TriggerType } from "@notifee/react-native";
 
 const AddReminder = ({ route, navigation }) => {
   const { edit, medicationData, medicationId } = route.params || {}; // Get data from route params
@@ -35,6 +37,164 @@ const AddReminder = ({ route, navigation }) => {
 
     return `${hours}:${minutes} ${ampm}`;
   };
+
+  useEffect(() => {
+    (async () => {
+      const { status } = await Calendar.requestCalendarPermissionsAsync();
+      if (status === "granted") {
+        const calendars = await Calendar.getCalendarsAsync(
+          Calendar.EntityTypes.EVENT
+        );
+        console.log("Here are all your calendars:");
+        console.log({ calendars });
+
+        const expoCalendarIds = calendars
+          .filter((calendar) => calendar.title === "Expo Calendar")
+          .map((calendar) => calendar.id);
+        console.log("Expo Calendar IDs:", expoCalendarIds);
+      }
+    })();
+  }, []);
+
+  async function getDefaultCalendarSource() {
+    const defaultCalendar = await Calendar.getDefaultCalendarAsync();
+    return defaultCalendar.source;
+  }
+
+  async function createCalendar() {
+    // const defaultCalendarSource =
+    //   Platform.OS === 'ios'
+    //     ? await getDefaultCalendarSource()
+    //     : { isLocalAccount: true, name: 'Expo Calendar' };
+    const defaultCalendarSource = await getDefaultCalendarSource();
+    const newCalendarID = await Calendar.createCalendarAsync({
+      title: "Expo Calendar",
+      color: "blue",
+      entityType: Calendar.EntityTypes.EVENT,
+      sourceId: defaultCalendarSource.id,
+      source: defaultCalendarSource,
+      name: "internalCalendarName",
+      ownerAccount: "personal",
+      accessLevel: Calendar.CalendarAccessLevel.OWNER,
+    });
+    console.log(`Your new calendar ID is: ${newCalendarID}`);
+  }
+
+  async function onCreateTriggerNotification() {
+    await notifee.requestPermission();
+    const now = new Date();
+
+    for (let day = 0; day <= duration; day++) {
+      for (const time of notificationTimes) {
+        const [hourMinute, period] = time.split(" ");
+        let [hours, minutes] = hourMinute.split(":").map(Number);
+
+        if (period === "PM" && hours !== 12) {
+          hours += 12;
+        } else if (period === "AM" && hours === 12) {
+          hours = 0;
+        }
+
+        const triggerDate = new Date(now);
+        triggerDate.setDate(triggerDate.getDate() + day); // Set the date for each day in the duration
+        triggerDate.setHours(hours, minutes, 0, 0);
+
+        if (triggerDate < now) {
+          triggerDate.setDate(triggerDate.getDate() + 1);
+        }
+
+        const trigger = {
+          type: TriggerType.TIMESTAMP,
+          timestamp: triggerDate.getTime(),
+        };
+
+        await notifee.createTriggerNotification(
+          {
+            title: "Medication Reminder Title",
+            body: "Medication Reminder Body",
+            ios: {
+              channelId: "your-channel-id",
+              sound: "default",
+            },
+            android: {
+              channelId: "your-channel-id",
+            },
+          },
+          trigger
+        );
+      }
+    }
+  }
+
+  async function setReminder() {
+    const { status } = await Calendar.requestCalendarPermissionsAsync();
+    if (status !== "granted") {
+      console.log("Calendar permission not granted");
+      return;
+    }
+
+    const calendars = await Calendar.getCalendarsAsync(
+      Calendar.EntityTypes.EVENT
+    );
+    const expoCalendar = calendars.find(
+      (calendar) => calendar.title === "Expo Calendar"
+    );
+
+    let calendarId;
+
+    if (expoCalendar) {
+      console.log("Expo Calendar exists:", expoCalendar.id);
+      calendarId = expoCalendar.id;
+    } else {
+      const defaultCalendarSource = await getDefaultCalendarSource();
+
+      calendarId = await Calendar.createCalendarAsync({
+        title: "Expo Calendar",
+        color: "blue",
+        entityType: Calendar.EntityTypes.EVENT,
+        sourceId: defaultCalendarSource.id,
+        source: defaultCalendarSource,
+        name: "internalCalendarName",
+        ownerAccount: "personal",
+        accessLevel: Calendar.CalendarAccessLevel.OWNER,
+      });
+
+      console.log("Created new Expo Calendar with ID:", calendarId);
+    }
+
+    const now = new Date();
+
+    for (let day = 0; day <= duration; day++) {
+      for (const time of notificationTimes) {
+        const [hourMinute, period] = time.split(" ");
+        let [hours, minutes] = hourMinute.split(":").map(Number);
+
+        if (period === "PM" && hours !== 12) {
+          hours += 12;
+        } else if (period === "AM" && hours === 12) {
+          hours = 0;
+        }
+
+        const startDate = new Date(now);
+        startDate.setDate(startDate.getDate() + day); // Set the date for each day in the duration
+        startDate.setHours(hours, minutes, 0, 0);
+
+        const endDate = new Date(startDate);
+        endDate.setMinutes(startDate.getMinutes() + 5);
+
+        const eventId = await Calendar.createEventAsync(calendarId, {
+          title: "Medication Reminder",
+          startDate: startDate,
+          endDate: endDate,
+          timeZone: "GMT",
+          alarms: [{ relativeOffset: 0 }],
+        });
+
+        console.log("Event Id", eventId);
+      }
+    }
+  }
+
   // If editing, set the initial values from the medicationData
   const [pillName, setPillName] = useState("");
   const [amount, setAmount] = useState("");
@@ -216,6 +376,7 @@ const AddReminder = ({ route, navigation }) => {
     const newTimes = [...notificationTimes];
     newTimes[index] = formattedTime;
     setNotificationTimes(newTimes);
+    setTime(getCurrentTime());
   };
 
   const handleSubmit = async () => {
@@ -313,6 +474,8 @@ const AddReminder = ({ route, navigation }) => {
           Authorization: `Bearer ${token}`,
         },
       });
+      // await setReminder();
+      await onCreateTriggerNotification();
       Alert.alert("Success", "Medication reminder deleted successfully!");
       navigation.goBack();
     } catch (error) {
