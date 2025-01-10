@@ -28,5 +28,5 @@ router.put("/events/:event_id", authenticateToken, updateEvent);
 // Route to delete event by ID
 router.delete("/events/:event_id", authenticateToken, deleteEvent);
 
-router.get("/get/events/:u_id", authenticateToken, getEventsByUserId);
+router.get("/get/events/:co_id", authenticateToken, getEventsByUserId);
 module.exports = router;

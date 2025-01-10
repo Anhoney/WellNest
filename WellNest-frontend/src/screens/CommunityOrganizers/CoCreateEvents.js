@@ -39,6 +39,8 @@ const CoCreateEvents = () => {
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [photo, setPhoto] = useState(null);
   const [eventId, setEventId] = useState(null);
+  const [capacity, setCapacity] = useState("");
+  const [eventStatus, setEventStatus] = useState("Active");
   const [showPicker, setShowPicker] = useState(false);
   const navigation = useNavigation();
   const [loading, setLoading] = useState(true);
@@ -71,6 +73,8 @@ const CoCreateEvents = () => {
           setTime(event.event_time);
           setNote(event.notes);
           setTnC(event.terms_and_conditions);
+          setCapacity(event.capacity);
+          setEventStatus(event.event_status);
           setRegistrationDue(new Date(event.registration_due));
           // Assuming photo handling is binary, adjust as needed
         } catch (error) {
@@ -163,6 +167,8 @@ const CoCreateEvents = () => {
       formData.append("time", time);
       formData.append("notes", note);
       formData.append("terms_and_conditions", TnC);
+      formData.append("capacity", capacity);
+      formData.append("event_status", eventStatus);
       // formData.append("registration_due", registrationDue);
 
       // Format registrationDue as a string in 'YYYY-MM-DD' format
@@ -413,6 +419,45 @@ const CoCreateEvents = () => {
             date={registrationDue || new Date()} // Default to current date
             minimumDate={new Date()} // Prevent past dates
           />
+
+          <Text style={styles.label}>Capacity (Number of participants)</Text>
+          <TextInput
+            style={styles.hpInput}
+            placeholder="Capacity"
+            value={capacity}
+            onChangeText={setCapacity}
+            keyboardType="numeric"
+          />
+          {/* <Text style={styles.label}>Event Status</Text>
+          <TextInput
+            style={styles.hpInput}
+            placeholder="Event Status"
+            value={eventStatus}
+            onChangeText={setEventStatus}
+          /> */}
+          <Text style={styles.label}>Event Status</Text>
+          <RadioButton.Group onValueChange={setEventStatus} value={eventStatus}>
+            <View style={styles.hpradioButtonContainer}>
+              <RadioButton.Item
+                label="Active"
+                value="Active"
+                mode="android"
+                position="leading"
+                color="#FFA500" // Replace with your desired color
+                labelStyle={styles.hpradioLabel}
+              />
+            </View>
+            <View style={styles.hpradioButtonContainer}>
+              <RadioButton.Item
+                label="Not Active"
+                value="Not Active"
+                mode="android"
+                position="leading"
+                color="#FFA500"
+                labelStyle={styles.hpradioLabel}
+              />
+            </View>
+          </RadioButton.Group>
         </View>
         <TouchableOpacity style={styles.signOutButton} onPress={handleSubmit}>
           <Text style={styles.signOutButtonText}>Done</Text>

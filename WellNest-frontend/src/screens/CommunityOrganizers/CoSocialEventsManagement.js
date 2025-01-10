@@ -1,5 +1,5 @@
 //SocialEventsManagement.js
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -21,6 +21,7 @@ import API_BASE_URL from "../../../config/config";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const CoSocialEventsManagement = () => {
   const navigation = useNavigation();
@@ -31,6 +32,43 @@ const CoSocialEventsManagement = () => {
   const [selectedTime, setSelectedTime] = useState(null);
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [activeTab, setActiveTab] = useState("events"); // State to manage active tab
+  const [co_id, setCo_id] = useState(null);
+  const [events, setEvents] = useState([]);
+
+  useEffect(() => {
+    const fetchUserIdAndEvents = async () => {
+      const co_id = await getUserIdFromToken();
+      console.log("co_id", co_id);
+      if (co_id) {
+        setCo_id(co_id);
+        fetchEvents(co_id);
+      }
+    };
+    fetchUserIdAndEvents();
+  }, []);
+
+  const fetchEvents = async (co_id) => {
+    try {
+      console.log("Co_id of fetchEvents", co_id);
+      const token = await AsyncStorage.getItem("token");
+      if (!token) {
+        alert("No token found. Please log in.");
+        return;
+      }
+
+      const response = await fetch(`${API_BASE_URL}/get/events/${co_id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`, // Use your actual token
+        },
+      });
+      const data = await response.json();
+      if (data.events) {
+        setEvents(data.events); // Store the fetched events
+      }
+    } catch (error) {
+      console.error("Error fetching events:", error);
+    }
+  };
 
   const handleSearch = () => {
     console.log("Search:", searchQuery, location, date);
@@ -171,17 +209,30 @@ const CoSocialEventsManagement = () => {
           </TouchableOpacity>
         </View>
 
-        <ScrollView contentContainerStyle={styles.scrollView}>
+        <View style={styles.scrollView}>
+          {/* <ScrollView contentContainerStyle={styles.scrollView}> */}
           {activeTab === "events" && (
             <>
               <Text style={styles.sectionTitle}>Events</Text>
               <View style={styles.displayUnderline}></View>
-              <EventCard
+              {/* <EventCard
                 image="https://via.placeholder.com/150"
                 title="Morning Exercise Sabah 2024"
                 location="Kota Kinabalu"
                 date="Every Sunday"
                 price="FREE"
+              /> */}
+              <FlatList
+                data={events}
+                keyExtractor={(item) => item.id.toString()}
+                renderItem={({ item }) => (
+                  <EventCard
+                    title={item.title}
+                    location={item.location}
+                    date={item.event_date}
+                    price={item.fees ? `$${item.fees}` : "FREE"}
+                  />
+                )}
               />
 
               <TouchableOpacity
@@ -230,7 +281,8 @@ const CoSocialEventsManagement = () => {
               ))}
             </>
           )}
-        </ScrollView>
+          {/* </ScrollView> */}
+        </View>
       </View>
       <CoNavigationBar navigation={navigation} activePage="" />
     </ImageBackground>

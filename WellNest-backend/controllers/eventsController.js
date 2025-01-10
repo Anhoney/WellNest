@@ -55,6 +55,8 @@ const createEvent = async (req, res) => {
     notes,
     terms_and_conditions,
     registration_due, // Date string for registration due
+    capacity,
+    event_status,
   } = req.body;
   console.log("Request Body:", req.body);
   // const photo = req.file ? req.file.buffer : null; // Handling binary image data
@@ -77,10 +79,10 @@ const createEvent = async (req, res) => {
   try {
     const query = await pool.query(
       `
-       INSERT INTO co_events (
+       INSERT INTO co_available_events (
       co_id, title, fees, location, event_date, event_time, notes, 
-      terms_and_conditions, photo, registration_due
-    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+      terms_and_conditions, photo, registration_due, capacity, event_status
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
   `,
       [
         co_id,
@@ -94,6 +96,8 @@ const createEvent = async (req, res) => {
         // photo,
         photoData,
         registration_due || null,
+        capacity || null,
+        event_status || null,
       ]
     );
 
@@ -115,14 +119,14 @@ const getEvent = async (req, res) => {
         id, co_id, title, fees, location, 
         TO_CHAR(event_date, 'YYYY-MM-DD') AS event_date, 
         TO_CHAR(event_time, 'HH12:MI AM') AS event_time, 
-        notes, terms_and_conditions, 
+        notes, terms_and_conditions, capacity, event_status,
         CASE 
           WHEN photo IS NOT NULL 
           THEN CONCAT('data:image/png;base64,', ENCODE(photo, 'base64')) 
           ELSE NULL 
         END AS photo, 
         registration_due, created_at
-      FROM co_events
+      FROM co_available_events
       WHERE id = $1
       `;
 
@@ -151,16 +155,19 @@ const updateEvent = async (req, res) => {
     notes,
     terms_and_conditions,
     registration_due,
+    capacity,
+    event_status,
   } = req.body;
   const photo = req.file ? req.file.buffer : null;
 
   try {
     const query = `
-        UPDATE co_events
+        UPDATE co_available_events
         SET 
           title = $1, fees = $2, location = $3, event_date = $4, event_time = $5, 
-          notes = $6, terms_and_conditions = $7, photo = $8, registration_due = $9
-        WHERE id = $10
+          notes = $6, terms_and_conditions = $7, photo = $8, registration_due = $9,
+          capacity = $10, event_status = $11
+        WHERE id = $12
       `;
     const result = await pool.query(query, [
       title,
@@ -172,6 +179,8 @@ const updateEvent = async (req, res) => {
       terms_and_conditions,
       photo,
       registration_due || null,
+      capacity || null,
+      event_status || null,
       event_id,
     ]);
 
@@ -191,7 +200,7 @@ const deleteEvent = async (req, res) => {
   const { event_id } = req.params;
 
   try {
-    const query = `DELETE FROM co_events WHERE id = $1`;
+    const query = `DELETE FROM co_available_events WHERE id = $1`;
     const result = await pool.query(query, [event_id]);
 
     if (result.rowCount === 0) {
@@ -205,32 +214,71 @@ const deleteEvent = async (req, res) => {
   }
 };
 
-// Fetch medications by user ID
 const getEventsByUserId = async (req, res) => {
-  const { u_id } = req.params; // Extract user ID from the route params
+  const { co_id } = req.params; // Extract user ID from the route params
 
   try {
     const query = `
       SELECT 
-        id, pill_name, amount, duration, "time", food_relation, repeat_option, 
-        medicine_image, created_at, u_id, status, notification_times, frequency 
-      FROM public.medications
-      WHERE u_id = $1
+        id, co_id, title, fees, location, 
+        TO_CHAR(event_date, 'YYYY-MM-DD') AS event_date, 
+        TO_CHAR(event_time, 'HH12:MI AM') AS event_time, 
+        notes, terms_and_conditions, capacity, event_status,
+        CASE 
+          WHEN photo IS NOT NULL 
+          THEN CONCAT('data:image/png;base64,', ENCODE(photo, 'base64')) 
+          ELSE NULL 
+        END AS photo, 
+        registration_due, created_at
+      FROM co_available_events
+      WHERE co_id = $1
     `;
-    const result = await pool.query(query, [u_id]);
+    const result = await pool.query(query, [co_id]);
 
     if (result.rows.length === 0) {
-      return res
-        .status(404)
-        .json({ message: "No medications found for this user." });
+      return res.status(200).json({ events: [] });
     }
 
-    res.status(200).json(result.rows); // Send all medications as response
+    res.status(200).json({ events: result.rows });
   } catch (error) {
-    console.error("Error fetching medications:", error);
-    res.status(500).json({ error: "Failed to fetch medications." });
+    console.error("Error fetching events by user ID:", error);
+    res.status(500).json({ error: "Failed to fetch events." });
   }
 };
+
+// const getEventsByUserId = async (req, res) => {
+//   const { co_id } = req.params; // Extract user ID from the route params
+
+//   try {
+//     const query = `
+//       SELECT
+//         id, co_id, title, fees, location,
+//         TO_CHAR(event_date, 'YYYY-MM-DD') AS event_date,
+//         TO_CHAR(event_time, 'HH12:MI AM') AS event_time,
+//         notes, terms_and_conditions,
+//         CASE
+//           WHEN photo IS NOT NULL
+//           THEN CONCAT('data:image/png;base64,', ENCODE(photo, 'base64'))
+//           ELSE NULL
+//         END AS photo,
+//         registration_due, created_at
+//       FROM co_available_events
+//       WHERE co_id = $1
+//     `;
+//     const result = await pool.query(query, [co_id]);
+
+//     if (result.rows.length === 0) {
+//       return res
+//         .status(404)
+//         .json({ message: "No medications found for this user." });
+//     }
+
+//     res.status(200).json(result.rows); // Send all medications as response
+//   } catch (error) {
+//     console.error("Error fetching medications:", error);
+//     res.status(500).json({ error: "Failed to fetch medications." });
+//   }
+// };
 
 module.exports = {
   createEvent,
