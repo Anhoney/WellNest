@@ -1,13 +1,20 @@
 import React from "react";
 import { View, Text, Image, StyleSheet } from "react-native";
 
+// Import a default photo from your assets or provide a URL
+const defaultPhoto = require("../../assets/elderlyEventPhoto.webp"); // Update the path as needed
+
 const EventCard = ({ image, title, location, date, price }) => {
+  const imageSource =
+    image && image.trim() !== "" ? { uri: image } : defaultPhoto;
+
   return (
     <View style={styles.card}>
-      <Image source={{ uri: image }} style={styles.image} />
+      <Image source={imageSource} style={styles.image} resizeMode="cover" />
+      {/* <Image source={{ uri: image }} style={styles.image} /> */}
       <Text style={styles.title}>{title}</Text>
-      <Text style={styles.details}>{location}</Text>
-      <Text style={styles.details}>{date}</Text>
+      <Text style={styles.details}>Location: {location}</Text>
+      <Text style={styles.details}>Date: {date}</Text>
       <Text style={styles.price}>{price}</Text>
     </View>
   );
@@ -28,6 +35,7 @@ const styles = StyleSheet.create({
   image: {
     height: 150,
     borderRadius: 10,
+    width: "100%",
   },
   title: {
     fontSize: 18,

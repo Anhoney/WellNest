@@ -112,22 +112,34 @@ const createEvent = async (req, res) => {
 // Function to get appointment details by hp_app_id
 const getEvent = async (req, res) => {
   const { event_id } = req.params;
-
+  console.log("getEventId", event_id);
   try {
     const query = `
         SELECT 
-        id, co_id, title, fees, location, 
-        TO_CHAR(event_date, 'YYYY-MM-DD') AS event_date, 
-        TO_CHAR(event_time, 'HH12:MI AM') AS event_time, 
-        notes, terms_and_conditions, capacity, event_status,
-        CASE 
-          WHEN photo IS NOT NULL 
-          THEN CONCAT('data:image/png;base64,', ENCODE(photo, 'base64')) 
-          ELSE NULL 
-        END AS photo, 
-        registration_due, created_at
-      FROM co_available_events
-      WHERE id = $1
+          e.id, 
+          e.co_id, 
+          e.title, 
+          e.fees, 
+          e.location, 
+          e.event_date, 
+          e.event_time, 
+          e.notes, 
+          e.terms_and_conditions, 
+          e.capacity, 
+          e.event_status,
+          CASE 
+            WHEN e.photo IS NOT NULL 
+            THEN CONCAT('data:image/png;base64,', ENCODE(e.photo, 'base64')) 
+            ELSE NULL 
+          END AS photo, 
+          e.registration_due, 
+          e.created_at,
+          p.username, 
+          p.organizer_details
+        FROM co_available_events e
+        LEFT JOIN co_profile p ON e.co_id = p.user_id
+        WHERE e.id = $1
+
       `;
 
     const result = await pool.query(query, [event_id]);
@@ -146,6 +158,7 @@ const getEvent = async (req, res) => {
 // Update an existing event
 const updateEvent = async (req, res) => {
   const { event_id } = req.params;
+  console.log("updateEventId", event_id);
   const {
     title,
     fees,
@@ -158,7 +171,20 @@ const updateEvent = async (req, res) => {
     capacity,
     event_status,
   } = req.body;
-  const photo = req.file ? req.file.buffer : null;
+  console.log("Update request Body:", req.body);
+  // For binary data storage
+  const photo = req.file ? req.file.path : null;
+  console.log(photo);
+  let photoData = null;
+  if (photo) {
+    try {
+      // Read the image file as binary data
+      photoData = fs.readFileSync(photo);
+    } catch (error) {
+      console.error("Error reading profile image:", error);
+      return res.status(500).json({ error: "Failed to read profile image" });
+    }
+  }
 
   try {
     const query = `
@@ -177,7 +203,8 @@ const updateEvent = async (req, res) => {
       time,
       notes || null,
       terms_and_conditions,
-      photo,
+      // photo,
+      photoData || null,
       registration_due || null,
       capacity || null,
       event_status || null,
@@ -216,13 +243,14 @@ const deleteEvent = async (req, res) => {
 
 const getEventsByUserId = async (req, res) => {
   const { co_id } = req.params; // Extract user ID from the route params
+  const { search } = req.query; // Get the search query from the request
 
   try {
     const query = `
       SELECT 
         id, co_id, title, fees, location, 
-        TO_CHAR(event_date, 'YYYY-MM-DD') AS event_date, 
-        TO_CHAR(event_time, 'HH12:MI AM') AS event_time, 
+        event_date, 
+        event_time, 
         notes, terms_and_conditions, capacity, event_status,
         CASE 
           WHEN photo IS NOT NULL 
@@ -232,8 +260,13 @@ const getEventsByUserId = async (req, res) => {
         registration_due, created_at
       FROM co_available_events
       WHERE co_id = $1
+      ${
+        search ? "AND title ILIKE $2" : ""
+      } -- Filter by title if search is provided
     `;
-    const result = await pool.query(query, [co_id]);
+
+    const params = search ? [co_id, `%${search}%`] : [co_id]; // Prepare parameters for the query
+    const result = await pool.query(query, params);
 
     if (result.rows.length === 0) {
       return res.status(200).json({ events: [] });
@@ -245,40 +278,6 @@ const getEventsByUserId = async (req, res) => {
     res.status(500).json({ error: "Failed to fetch events." });
   }
 };
-
-// const getEventsByUserId = async (req, res) => {
-//   const { co_id } = req.params; // Extract user ID from the route params
-
-//   try {
-//     const query = `
-//       SELECT
-//         id, co_id, title, fees, location,
-//         TO_CHAR(event_date, 'YYYY-MM-DD') AS event_date,
-//         TO_CHAR(event_time, 'HH12:MI AM') AS event_time,
-//         notes, terms_and_conditions,
-//         CASE
-//           WHEN photo IS NOT NULL
-//           THEN CONCAT('data:image/png;base64,', ENCODE(photo, 'base64'))
-//           ELSE NULL
-//         END AS photo,
-//         registration_due, created_at
-//       FROM co_available_events
-//       WHERE co_id = $1
-//     `;
-//     const result = await pool.query(query, [co_id]);
-
-//     if (result.rows.length === 0) {
-//       return res
-//         .status(404)
-//         .json({ message: "No medications found for this user." });
-//     }
-
-//     res.status(200).json(result.rows); // Send all medications as response
-//   } catch (error) {
-//     console.error("Error fetching medications:", error);
-//     res.status(500).json({ error: "Failed to fetch medications." });
-//   }
-// };
 
 module.exports = {
   createEvent,

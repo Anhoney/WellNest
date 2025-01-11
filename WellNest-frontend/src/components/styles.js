@@ -2323,7 +2323,7 @@ export default StyleSheet.create({
   addEventButton: {
     position: "absolute",
     // top: 100,
-    bottom: 20,
+    bottom: 90,
     right: 15,
     backgroundColor: "#FF9800",
     paddingHorizontal: 20,
@@ -2338,5 +2338,79 @@ export default StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     marginRight: 10,
+  },
+  listContainer: {
+    paddingBottom: 80, // Adjust this value if needed to push content above the navigation bar
+  },
+  //Temporary CoSocialEventsDetails.js
+  // container: {
+  //   padding: 16,
+  // },
+  // header: {
+  //   flexDirection: "row",
+  //   alignItems: "center",
+  //   marginBottom: 16,
+  // },
+  // backButton: {
+  //   marginRight: 10,
+  // },
+  // backText: {
+  //   fontSize: 24,
+  // },
+
+  eventImage: {
+    marginTop: 10,
+    width: "100%",
+    height: 250,
+    borderRadius: 8,
+    marginBottom: 16,
+  },
+  eventDetailsCard: {
+    padding: 16,
+    borderRadius: 8,
+    backgroundColor: "#fff",
+    elevation: 3,
+  },
+  eventRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 8,
+  },
+  eventCardTitle: {
+    fontSize: 24,
+    fontWeight: "bold",
+  },
+  eventPrice: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#F57C00",
+  },
+  eventSectionTitle: {
+    marginTop: 16,
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 8,
+  },
+  eventDetailText: {
+    fontSize: 16,
+    marginBottom: 4,
+  },
+  eventButton: {
+    backgroundColor: "#ff8b49",
+    // paddingVertical: 12,
+    padding: 15,
+    alignItems: "center",
+    borderRadius: 8,
+    margin: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.8,
+    shadowRadius: 2,
+    elevation: 5, // Add hover effect on Android
+  },
+  eventButtonText: {
+    fontSize: 18,
+    color: "#fff",
+    fontWeight: "bold",
   },
 });

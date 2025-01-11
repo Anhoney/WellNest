@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   ImageBackground,
   FlatList,
+  ActivityIndicator,
 } from "react-native";
 import EventCard from "../../components/EventCard";
 import ChatRoomCard from "../../components/ChatRoomCard";
@@ -34,20 +35,26 @@ const CoSocialEventsManagement = () => {
   const [activeTab, setActiveTab] = useState("events"); // State to manage active tab
   const [co_id, setCo_id] = useState(null);
   const [events, setEvents] = useState([]);
+  const [eventPhoto, setEventPhoto] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    const fetchUserIdAndEvents = async () => {
-      const co_id = await getUserIdFromToken();
-      console.log("co_id", co_id);
-      if (co_id) {
-        setCo_id(co_id);
-        fetchEvents(co_id);
-      }
-    };
-    fetchUserIdAndEvents();
-  }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      const fetchUserIdAndEvents = async () => {
+        setLoading(true);
+        const co_id = await getUserIdFromToken();
+        console.log("co_id", co_id);
+        if (co_id) {
+          setCo_id(co_id);
+          await fetchEvents(co_id);
+        }
+        setLoading(false);
+      };
+      fetchUserIdAndEvents();
+    }, [])
+  );
 
-  const fetchEvents = async (co_id) => {
+  const fetchEvents = async (co_id, query = "") => {
     try {
       console.log("Co_id of fetchEvents", co_id);
       const token = await AsyncStorage.getItem("token");
@@ -56,14 +63,17 @@ const CoSocialEventsManagement = () => {
         return;
       }
 
-      const response = await fetch(`${API_BASE_URL}/get/events/${co_id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`, // Use your actual token
-        },
-      });
+      const response = await fetch(
+        `${API_BASE_URL}/get/events/${co_id}?search=${query}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       const data = await response.json();
       if (data.events) {
-        setEvents(data.events); // Store the fetched events
+        setEvents(data.events);
       }
     } catch (error) {
       console.error("Error fetching events:", error);
@@ -73,6 +83,7 @@ const CoSocialEventsManagement = () => {
   const handleSearch = () => {
     console.log("Search:", searchQuery, location, date);
     // Implement search functionality here
+    fetchEvents(co_id, searchQuery);
   };
 
   // Functions to handle date picker
@@ -201,84 +212,157 @@ const CoSocialEventsManagement = () => {
           <TouchableOpacity
             style={[
               styles.seTabButton,
-              activeTab === "past" && styles.seActiveTab,
+              activeTab === "registrationDue" && styles.seActiveTab,
             ]}
-            onPress={() => setActiveTab("past")}
+            onPress={() => {
+              setActiveTab("registrationDue");
+              fetchEvents(co_id); // Fetch events with registration due dates
+            }}
           >
-            <Text style={styles.seTabText}>Past Events</Text>
+            <Text style={styles.seTabText}>Registration Due Events</Text>
           </TouchableOpacity>
         </View>
 
         <View style={styles.scrollView}>
           {/* <ScrollView contentContainerStyle={styles.scrollView}> */}
-          {activeTab === "events" && (
+          {loading ? (
+            <ActivityIndicator size="large" color="#0000ff" />
+          ) : (
             <>
-              <Text style={styles.sectionTitle}>Events</Text>
-              <View style={styles.displayUnderline}></View>
-              {/* <EventCard
-                image="https://via.placeholder.com/150"
-                title="Morning Exercise Sabah 2024"
-                location="Kota Kinabalu"
-                date="Every Sunday"
-                price="FREE"
-              /> */}
-              <FlatList
-                data={events}
-                keyExtractor={(item) => item.id.toString()}
-                renderItem={({ item }) => (
-                  <EventCard
-                    title={item.title}
-                    location={item.location}
-                    date={item.event_date}
-                    price={item.fees ? `$${item.fees}` : "FREE"}
+              {activeTab === "events" && (
+                <>
+                  <Text style={styles.sectionTitle}>Events</Text>
+                  <View style={styles.displayUnderline}></View>
+                  <FlatList
+                    data={events
+                      .filter(
+                        (event) =>
+                          new Date(event.registration_due) >= new Date()
+                      )
+                      .sort(
+                        (a, b) =>
+                          new Date(a.registration_due) -
+                          new Date(b.registration_due)
+                      )}
+                    keyExtractor={(item) => item.id.toString()}
+                    contentContainerStyle={styles.listContainer}
+                    renderItem={({ item }) => {
+                      let price;
+                      if (item.fees && item.fees.toLowerCase() === "free") {
+                        price = "FREE";
+                      } else if (
+                        !isNaN(item.fees) &&
+                        !isNaN(parseFloat(item.fees))
+                      ) {
+                        price = `RM ${item.fees}`;
+                      } else {
+                        price = item.fees; // Show fees as-is if it's not numeric or "free"
+                      }
+
+                      return (
+                        <TouchableOpacity
+                          onPress={() =>
+                            navigation.navigate("CoSocialEventsDetails", {
+                              eventId: item.id,
+                            })
+                          }
+                        >
+                          <EventCard
+                            image={item.photo ? item.photo : null}
+                            title={item.title}
+                            location={item.location}
+                            date={item.event_date}
+                            price={price}
+                          />
+                        </TouchableOpacity>
+                      );
+                    }}
                   />
-                )}
-              />
 
-              <TouchableOpacity
-                style={styles.addEventButton}
-                onPress={() => navigation.navigate("CoCreateEvents")}
-              >
-                <Text style={styles.addEventText}>Add Event</Text>
-                <Ionicons name="add" size={24} color="#FFF" />
-              </TouchableOpacity>
-            </>
-          )}
+                  <TouchableOpacity
+                    style={styles.addEventButton}
+                    onPress={() => navigation.navigate("CoCreateNEditEvents")}
+                  >
+                    <Text style={styles.addEventText}>Add Event</Text>
+                    <Ionicons name="add" size={24} color="#FFF" />
+                  </TouchableOpacity>
+                </>
+              )}
 
-          {activeTab === "chat" && (
-            <>
-              <Text style={styles.sectionTitle}>Let's Chat</Text>
-              <View style={styles.displayUnderline}></View>
-              {chatRooms.map((room) => (
-                <ChatRoomCard
-                  key={room.id}
-                  title={room.title}
-                  onJoin={() => alert(`Joining ${room.title}`)}
-                />
-              ))}
+              {activeTab === "chat" && (
+                <>
+                  <Text style={styles.sectionTitle}>Let's Chat</Text>
+                  <View style={styles.displayUnderline}></View>
+                  {chatRooms.map((room) => (
+                    <ChatRoomCard
+                      key={room.id}
+                      title={room.title}
+                      onJoin={() => alert(`Joining ${room.title}`)}
+                    />
+                  ))}
 
-              <TouchableOpacity
-                style={styles.addEventButton}
-                onPress={() => navigation.navigate("AddChatRoom")}
-              >
-                <Text style={styles.addEventText}>Add Chat Room</Text>
-                <Ionicons name="add" size={24} color="#FFF" />
-              </TouchableOpacity>
-            </>
-          )}
+                  <TouchableOpacity
+                    style={styles.addEventButton}
+                    onPress={() => navigation.navigate("AddChatRoom")}
+                  >
+                    <Text style={styles.addEventText}>Add Chat Room</Text>
+                    <Ionicons name="add" size={24} color="#FFF" />
+                  </TouchableOpacity>
+                </>
+              )}
 
-          {activeTab === "past" && (
-            <>
-              <Text style={styles.sectionTitle}>Past Events</Text>
-              <View style={styles.displayUnderline}></View>
-              {pastEvents.map((event) => (
-                <EventCard
-                  key={event.id}
-                  title={event.title}
-                  location={event.location}
-                  date={event.date}
-                />
-              ))}
+              {activeTab === "registrationDue" && (
+                <>
+                  <Text style={styles.sectionTitle}>
+                    Registration Due Events
+                  </Text>
+                  <View style={styles.displayUnderline}></View>
+                  <FlatList
+                    data={events
+                      .filter(
+                        (event) => new Date(event.registration_due) < new Date()
+                      )
+                      .sort(
+                        (a, b) =>
+                          new Date(b.registration_due) -
+                          new Date(a.registration_due)
+                      )}
+                    keyExtractor={(item) => item.id.toString()}
+                    contentContainerStyle={styles.listContainer}
+                    renderItem={({ item }) => {
+                      let price;
+                      if (item.fees && item.fees.toLowerCase() === "free") {
+                        price = "FREE";
+                      } else if (
+                        !isNaN(item.fees) &&
+                        !isNaN(parseFloat(item.fees))
+                      ) {
+                        price = `RM ${item.fees}`;
+                      } else {
+                        price = item.fees; // Show fees as-is if it's not numeric or "free"
+                      }
+
+                      return (
+                        <TouchableOpacity
+                          onPress={() =>
+                            navigation.navigate("CoSocialEventsDetails", {
+                              eventId: item.id,
+                            })
+                          }
+                        >
+                          <EventCard
+                            image={item.photo ? item.photo : null}
+                            title={item.title}
+                            location={item.location}
+                            date={item.event_date}
+                            price={price}
+                          />
+                        </TouchableOpacity>
+                      );
+                    }}
+                  />
+                </>
+              )}
             </>
           )}
           {/* </ScrollView> */}

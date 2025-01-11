@@ -67,7 +67,8 @@ import CommunityOrganizerMainPage from "../src/screens/CommunityOrganizers/Commu
 import CoProfilePage from "../src/screens/CommunityOrganizers/CoProfilePage";
 import CoEditProfilePage from "../src/screens/CommunityOrganizers/CoEditProfilePage";
 import CoSocialEventsManagement from "../src/screens/CommunityOrganizers/CoSocialEventsManagement";
-import CoCreateEvents from "../src/screens/CommunityOrganizers/CoCreateEvents";
+import CoCreateNEditEvents from "../src/screens/CommunityOrganizers/CoCreateNEditEvents";
+import CoSocialEventsDetails from "../src/screens/CommunityOrganizers/CoSocialEventsDetails";
 
 const Stack = createStackNavigator();
 
@@ -276,7 +277,14 @@ const AppNavigator = () => (
         name="SocialEventsManagementScreen"
         component={CoSocialEventsManagement}
       />
-      <Stack.Screen name="CoCreateEvents" component={CoCreateEvents} />
+      <Stack.Screen
+        name="CoCreateNEditEvents"
+        component={CoCreateNEditEvents}
+      />
+      <Stack.Screen
+        name="CoSocialEventsDetails"
+        component={CoSocialEventsDetails}
+      />
     </Stack.Navigator>
   </NavigationContainer>
 );

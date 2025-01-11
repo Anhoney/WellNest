@@ -20,10 +20,15 @@ router.post(
 );
 
 // Route to get event details by ID
-router.get("/events/:event_id", authenticateToken, getEvent);
+router.get("/single/event/:event_id", authenticateToken, getEvent);
 
 // Route to update event by ID
-router.put("/events/:event_id", authenticateToken, updateEvent);
+router.put(
+  "/update/events/:event_id",
+  authenticateToken,
+  upload.single("photo"),
+  updateEvent
+);
 
 // Route to delete event by ID
 router.delete("/events/:event_id", authenticateToken, deleteEvent);

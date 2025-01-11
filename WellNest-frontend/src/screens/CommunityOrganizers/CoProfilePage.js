@@ -148,20 +148,6 @@ const CoProfilePage = () => {
     );
   };
 
-  // // Sign Out Function
-  // const handleSignOut = async () => {
-  //   try {
-  //     // Remove token from AsyncStorage
-  //     await AsyncStorage.removeItem("authToken");
-  //     // Navigate back to the login page
-  //     navigation.reset({
-  //       index: 0,
-  //       routes: [{ name: "LoginPage" }],
-  //     });
-  //   } catch (error) {
-  //     console.error("Error signing out:", error);
-  //   }
-  // };
   // Confirm and handle Sign Out
   const handleSignOut = () => {
     Alert.alert(

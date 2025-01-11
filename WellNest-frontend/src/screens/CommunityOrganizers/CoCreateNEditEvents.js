@@ -12,7 +12,11 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons"; // Import icons from Expo
 import styles from "../../components/styles"; // Import shared styles
-import { useNavigation } from "@react-navigation/native";
+import {
+  useNavigation,
+  useRoute,
+  useFocusEffect,
+} from "@react-navigation/native";
 import axios from "axios";
 import { RadioButton } from "react-native-paper"; // For the radio button
 import CoNavigationBar from "../../components/CoNavigationBar"; // Import your custom navigation bar component
@@ -27,7 +31,7 @@ import { getUserIdFromToken } from "../../../services/authService";
 import * as ImagePicker from "expo-image-picker";
 import { Buffer } from "buffer";
 
-const CoCreateEvents = () => {
+const CoCreateNEditEvents = () => {
   const [title, setTitle] = useState("");
   const [fee, setFee] = useState("");
   const [location, setLocation] = useState("");
@@ -38,7 +42,7 @@ const CoCreateEvents = () => {
   const [registrationDue, setRegistrationDue] = useState(null);
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [photo, setPhoto] = useState(null);
-  const [eventId, setEventId] = useState(null);
+  const [id, setId] = useState(null);
   const [capacity, setCapacity] = useState("");
   const [eventStatus, setEventStatus] = useState("Active");
   const [showPicker, setShowPicker] = useState(false);
@@ -46,44 +50,85 @@ const CoCreateEvents = () => {
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null); // Add logic for the image if editing
+  const route = useRoute(); // Get route params
+  const { eventId } = route.params || {};
+
   useEffect(() => {
     getUserIdFromToken().then((userId) => {
       setUserId(userId);
     });
   }, []);
-  useEffect(() => {
-    // Load event data if editing an existing event
-    const loadEventData = async () => {
-      const existingEventId = navigation.getParam("eventId"); // Assuming eventId is passed from navigation
-      if (existingEventId) {
-        try {
-          const token = await AsyncStorage.getItem("token");
-          const response = await axios.get(
-            `${API_BASE_URL}/events/${existingEventId}`,
-            {
-              headers: { Authorization: `Bearer ${token}` },
-            }
-          );
-          const event = response.data;
-          setEventId(event.id);
-          setTitle(event.title);
-          setFee(event.fees);
-          setLocation(event.location);
-          setDate(event.event_date);
-          setTime(event.event_time);
-          setNote(event.notes);
-          setTnC(event.terms_and_conditions);
-          setCapacity(event.capacity);
-          setEventStatus(event.event_status);
-          setRegistrationDue(new Date(event.registration_due));
-          // Assuming photo handling is binary, adjust as needed
-        } catch (error) {
-          console.error("Failed to fetch event data:", error);
-        }
+
+  useFocusEffect(
+    React.useCallback(() => {
+      if (eventId) {
+        loadEventData();
       }
-    };
-    loadEventData();
-  }, []);
+    }, [eventId])
+  );
+
+  // useEffect(() => {
+  //   // Load event data if editing an existing event
+  //   const loadEventData = async () => {
+
+  //     // Assuming eventId is passed from navigation
+  //     if (eventId) {
+  //       try {
+  //         console.log("Create Event ID:", eventId);
+  //         const token = await AsyncStorage.getItem("token");
+  //         const response = await axios.get(
+  //           `${API_BASE_URL}/single/event/${eventId}`,
+  //           {
+  //             headers: { Authorization: `Bearer ${token}` },
+  //           }
+  //         );
+  //         console.log("Event Data:", response.data);
+  //         const event = response.data;
+  //         setId(event.id);
+  //         setTitle(event.title);
+  //         setFee(event.fees);
+  //         setLocation(event.location);
+  //         setDate(event.event_date);
+  //         setTime(event.event_time);
+  //         setNote(event.notes);
+  //         setTnC(event.terms_and_conditions);
+  //         setCapacity(event.capacity);
+  //         setEventStatus(event.event_status);
+  //         setRegistrationDue(new Date(event.registration_due));
+  //         // Assuming photo handling is binary, adjust as needed
+  //       } catch (error) {
+  //         console.error("Failed to fetch event data:", error);
+  //       }
+  //     }
+  //   };
+  //   loadEventData();
+  // }, []);
+
+  const loadEventData = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      const response = await axios.get(
+        `${API_BASE_URL}/single/event/${eventId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      const event = response.data;
+      setTitle(event.title);
+      setFee(event.fees);
+      setLocation(event.location);
+      setDate(event.event_date);
+      setTime(event.event_time);
+      setNote(event.notes);
+      setTnC(event.terms_and_conditions);
+      setCapacity(event.capacity);
+      setEventStatus(event.event_status);
+      setRegistrationDue(new Date(event.registration_due));
+      setPhoto(event.photo);
+    } catch (error) {
+      console.error("Failed to fetch event data:", error);
+    }
+  };
 
   const handleDateConfirm = (selectedDate) => {
     setRegistrationDue(selectedDate);
@@ -151,6 +196,16 @@ const CoCreateEvents = () => {
 
   const handleSubmit = async () => {
     console.log("UserId:", userId);
+    console.log("Event ID:", eventId); // Log the event ID
+    console.log("Title:", title); // Log the title
+    console.log("Fees:", fee); // Log the fees
+    console.log("Location:", location); // Log the location
+    console.log("Date:", date); // Log the date
+    console.log("Time:", time); // Log the time
+    console.log("Notes:", note); // Log the notes
+    console.log("Terms and Conditions:", TnC); // Log TnC
+    console.log("Capacity:", capacity); // Log capacity
+    console.log("Event Status:", eventStatus); // Log event status
     if (!validateForm()) return;
     try {
       const token = await AsyncStorage.getItem("token");
@@ -213,7 +268,18 @@ const CoCreateEvents = () => {
       //     type: selectedFile.mimeType,
       //   });
       //   formData.append("photo", photo);
-
+      console.log("Form Data:", {
+        title,
+        fees: fee,
+        location,
+        date,
+        time,
+        notes: note,
+        terms_and_conditions: TnC,
+        capacity,
+        event_status: eventStatus,
+        registration_due: registrationDue,
+      });
       const config = {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -224,10 +290,11 @@ const CoCreateEvents = () => {
       let response;
       if (eventId) {
         response = await axios.put(
-          `${API_BASE_URL}/events/${eventId}`,
+          `${API_BASE_URL}/update/events/${eventId}`,
           formData,
           config
         );
+        console.log("Updated Event:", response.data);
       } else {
         response = await axios.post(
           `${API_BASE_URL}/events/${userId}`,
@@ -262,7 +329,7 @@ const CoCreateEvents = () => {
                 headers: { Authorization: `Bearer ${token}` },
               });
               alert("Event deleted successfully!");
-              navigation.goBack();
+              navigation.navigate("SocialEventsManagementScreen");
             } catch (error) {
               console.error("Error deleting event:", error);
               alert("Failed to delete event.");
@@ -309,7 +376,10 @@ const CoCreateEvents = () => {
         >
           <Ionicons name="chevron-back" size={24} color="#000" />
         </TouchableOpacity>
-        <Text style={styles.hpTitle}>Create Event</Text>
+        <Text style={styles.hpTitle}>
+          {" "}
+          {eventId ? "Edit Event" : "Create Event"}
+        </Text>
       </View>
 
       <ScrollView contentContainerStyle={styles.hpContainer}>
@@ -385,7 +455,9 @@ const CoCreateEvents = () => {
             onPress={handleFileSelection}
           >
             <Text>
-              {selectedFile && selectedFile.assets && selectedFile.assets[0]
+              {eventId && photo
+                ? "Change Event Image"
+                : selectedFile && selectedFile.assets && selectedFile.assets[0]
                 ? selectedFile.assets[0].fileName
                 : "Choose an Event Image"}
             </Text>
@@ -462,7 +534,7 @@ const CoCreateEvents = () => {
         <TouchableOpacity style={styles.signOutButton} onPress={handleSubmit}>
           <Text style={styles.signOutButtonText}>Done</Text>
         </TouchableOpacity>
-
+        <View style={[{ marginTop: -14 }]}></View>
         {eventId && ( // Conditionally render the delete button
           <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
             <Text style={styles.deleteButtonText}>Delete Event</Text>
@@ -475,4 +547,4 @@ const CoCreateEvents = () => {
   );
 };
 
-export default CoCreateEvents;
+export default CoCreateNEditEvents;
