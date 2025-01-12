@@ -42,6 +42,8 @@ import AddReminder from "../src/screens/ElderlyNCaregivers/AddReminder";
 import SocialEventsScreen from "../src/screens/ElderlyNCaregivers/SocialEventsScreen";
 import VolunteerOpportunitiesScreen from "../src/screens/ElderlyNCaregivers/VolunteerOpportunitiesScreen";
 import CollaborationScreen from "../src/screens/ElderlyNCaregivers/CollaborationScreen";
+import SocialEventsDetails from "../src/screens/ElderlyNCaregivers/SocialEventsDetails";
+import SocialEventsRegistration from "../src/screens/ElderlyNCaregivers/SocialEventsRegistration";
 
 // Healthcare Provider screens
 import HealthcareProviderMainPage from "../src/screens/HealthcareProvider/HealthcareProviderMainPage";
@@ -309,6 +311,14 @@ const AppNavigator = () => (
       <Stack.Screen
         name="CoOpportunityParticipants"
         component={CoOpportunityParticipants}
+      />
+      <Stack.Screen
+        name="SocialEventsDetails"
+        component={SocialEventsDetails}
+      />
+      <Stack.Screen
+        name="SocialEventsRegistration"
+        component={SocialEventsRegistration}
       />
     </Stack.Navigator>
   </NavigationContainer>

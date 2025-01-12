@@ -2516,4 +2516,21 @@ export default StyleSheet.create({
     marginTop: 140,
     marginBottom: 1200,
   },
+  eEventsScrollView: {
+    flexGrow: 1,
+    marginBottom: 50,
+  },
+  //SocialEventsDetails.js
+  archiveButton: {
+    backgroundColor: "#f5a623",
+    padding: 8,
+    borderRadius: 5,
+    alignItems: "center",
+    marginTop: -9,
+    marginBottom: 12,
+  },
+  archiveButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
 });

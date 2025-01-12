@@ -45,6 +45,7 @@ const upload = multer({
   },
 }); // Define upload but do not call .single here
 
+//Community Organizers
 const createEvent = async (req, res) => {
   const {
     title,
@@ -291,6 +292,13 @@ const addParticipantToEvent = async (req, res) => {
       participant: result.rows[0],
     });
   } catch (error) {
+    if (error.code === "23505") {
+      // Duplicate key error code
+      console.error("Error adding participant:", error);
+      return res
+        .status(400)
+        .json({ error: "You have already registered for this event." });
+    }
     console.error("Error adding participant:", error);
     res.status(500).json({ error: "Failed to add participant" });
   }
@@ -341,6 +349,250 @@ const getParticipantCount = async (req, res) => {
   }
 };
 
+//Elderly site
+const getEventsElderlySite = async (req, res) => {
+  // const { co_id } = req.params; // Extract user ID from the route params
+  const { search } = req.query; // Get the search query from the request
+
+  try {
+    // Base query
+    let query = `
+      SELECT
+        e.id, e.co_id, e.title, e.fees, e.location,
+        e.event_date, e.event_time, e.notes,
+        e.terms_and_conditions, e.capacity, e.event_status,
+        CASE
+          WHEN e.photo IS NOT NULL
+          THEN CONCAT('data:image/png;base64,', ENCODE(e.photo, 'base64'))
+          ELSE NULL
+        END AS photo,
+        e.registration_due, e.created_at,
+        COUNT(ep.user_id) AS participant_count
+      FROM co_available_events e
+      LEFT JOIN event_participants ep ON e.id = ep.event_id
+      WHERE 
+         e.registration_due >= CURRENT_DATE
+        AND e.event_status = 'Active'
+    `;
+
+    // Add search condition if provided
+    const params = [];
+    if (search) {
+      query += " AND e.title ILIKE $1"; // Append the search condition
+      params.push(`%${search}%`); // Add the search term to params
+    }
+
+    query += " GROUP BY e.id"; // Ensure GROUP BY is always included
+
+    // const query = `
+    //   SELECT
+    //     e.id, e.co_id, e.title, e.fees, e.location,
+    //     e.event_date, e.event_time, e.notes,
+    //     e.terms_and_conditions, e.capacity, e.event_status,
+    //     CASE
+    //       WHEN e.photo IS NOT NULL
+    //       THEN CONCAT('data:image/png;base64,', ENCODE(e.photo, 'base64'))
+    //       ELSE NULL
+    //     END AS photo,
+    //     e.registration_due, e.created_at,
+    //     COUNT(ep.user_id) AS participant_count
+    //   FROM co_available_events e
+    //   LEFT JOIN event_participants ep ON e.id = ep.event_id
+    //   WHERE
+    //      e.registration_due >= CURRENT_DATE
+    //     AND e.event_status = 'Active'
+    //   GROUP BY e.id
+    //   ${search ? "AND e.title ILIKE $1" : ""}
+    // `;
+
+    // const params = search ? [`%${search}%`] : []; // Prepare parameters for the query
+    const result = await pool.query(query, params);
+
+    if (result.rows.length === 0) {
+      return res.status(200).json({ events: [] });
+    }
+
+    // Filter out events where participant count is greater than or equal to capacity
+    const filteredEvents = result.rows.filter(
+      (event) => event.participant_count < event.capacity
+    );
+
+    res.status(200).json({ events: filteredEvents });
+  } catch (error) {
+    console.error("Error fetching events by user ID:", error);
+    res.status(500).json({ error: "Failed to fetch events." });
+  }
+};
+
+const getRegisteredEventsByUserId = async (req, res) => {
+  const { user_id } = req.params; // Extract user ID from the route params
+  const { search } = req.query;
+
+  try {
+    // const query = `
+    //   SELECT
+    //     e.id, e.co_id, e.title, e.fees, e.location,
+    //     e.event_date, e.event_time, e.notes,
+    //     e.terms_and_conditions,
+    //     CASE
+    //       WHEN e.photo IS NOT NULL
+    //       THEN CONCAT('data:image/png;base64,', ENCODE(e.photo, 'base64'))
+    //       ELSE NULL
+    //     END AS photo,
+    //     e.registration_due, e.created_at,
+    //     e.capacity, e.event_status, ep.joined_at
+    //   FROM event_participants ep
+    //   JOIN co_available_events e ON ep.event_id = e.id
+    //   WHERE ep.user_id = $1 AND e.event_status = 'Active' AND ep.status = 'Ongoing'
+    // `;
+    let query = `
+    SELECT 
+      e.id, e.co_id, e.title, e.fees, e.location, 
+      e.event_date, e.event_time, e.notes, 
+      e.terms_and_conditions, 
+      CASE
+        WHEN e.photo IS NOT NULL
+        THEN CONCAT('data:image/png;base64,', ENCODE(e.photo, 'base64'))
+        ELSE NULL
+      END AS photo, 
+      e.registration_due, e.created_at, 
+      e.capacity, e.event_status, ep.joined_at
+    FROM event_participants ep
+    JOIN co_available_events e ON ep.event_id = e.id
+    WHERE ep.user_id = $1 AND e.event_status = 'Active' AND ep.status = 'Ongoing'
+  `;
+    const params = [user_id];
+    if (search) {
+      query += " AND e.title ILIKE $2"; // Add search condition
+      params.push(`%${search}%`); // Add search term to params
+    }
+
+    const result = await pool.query(query, params);
+
+    if (result.rows.length === 0) {
+      return res.status(200).json({ events: [] });
+    }
+
+    res.status(200).json({ events: result.rows });
+    // const result = await pool.query(query, [user_id]);
+
+    // if (result.rows.length === 0) {
+    //   return res.status(200).json({ events: [] });
+    // }
+
+    // res.status(200).json({ events: result.rows });
+  } catch (error) {
+    console.error("Error fetching registered events by user ID:", error);
+    res.status(500).json({ error: "Failed to fetch registered events." });
+  }
+};
+
+const archiveEvent = async (req, res) => {
+  const { event_id, user_id } = req.params;
+
+  try {
+    const query = `
+      UPDATE event_participants
+      SET status = 'Past'
+      WHERE event_id = $1 AND user_id = $2
+    `;
+    const result = await pool.query(query, [event_id, user_id]);
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: "Event not found." });
+    }
+
+    res.status(200).json({ message: "Event archived successfully!" });
+  } catch (error) {
+    console.error("Error archiving event:", error);
+    res.status(500).json({ error: "Failed to archive event." });
+  }
+};
+
+const getPastEventsByUserId = async (req, res) => {
+  const { user_id } = req.params;
+  const { search } = req.query;
+
+  try {
+    let query = `
+      SELECT 
+        e.id, e.co_id, e.title, e.fees, e.location, 
+        e.event_date, e.event_time, e.notes, 
+        e.terms_and_conditions, 
+        CASE
+          WHEN e.photo IS NOT NULL
+          THEN CONCAT('data:image/png;base64,', ENCODE(e.photo, 'base64'))
+          ELSE NULL
+        END AS photo, 
+        e.registration_due, e.created_at, 
+        e.capacity, e.event_status
+      FROM event_participants ep
+      JOIN co_available_events e ON ep.event_id = e.id
+      WHERE ep.user_id = $1 AND ep.status = 'Past'
+    `;
+    // const query = `
+    //   SELECT
+    //     e.id, e.co_id, e.title, e.fees, e.location,
+    //     e.event_date, e.event_time, e.notes,
+    //     e.terms_and_conditions,
+    //     CASE
+    //       WHEN e.photo IS NOT NULL
+    //       THEN CONCAT('data:image/png;base64,', ENCODE(e.photo, 'base64'))
+    //       ELSE NULL
+    //     END AS photo,
+    //     e.registration_due, e.created_at,
+    //     e.capacity, e.event_status
+    //   FROM event_participants ep
+    //   JOIN co_available_events e ON ep.event_id = e.id
+    //   WHERE ep.user_id = $1 AND ep.status = 'Past'
+    // `;
+    const params = [user_id];
+    if (search) {
+      query += " AND e.title ILIKE $2"; // Add search condition
+      params.push(`%${search}%`); // Add search term to params
+    }
+
+    const result = await pool.query(query, params);
+
+    if (result.rows.length === 0) {
+      return res.status(200).json({ events: [] });
+    }
+
+    res.status(200).json({ events: result.rows });
+    // const result = await pool.query(query, [user_id]);
+
+    // if (result.rows.length === 0) {
+    //   return res.status(200).json({ events: [] });
+    // }
+    // console.log(result.rows);
+    // res.status(200).json({ events: result.rows });
+  } catch (error) {
+    console.error("Error fetching past events by user ID:", error);
+    res.status(500).json({ error: "Failed to fetch past events." });
+  }
+};
+const unarchiveEvent = async (req, res) => {
+  const { event_id, user_id } = req.params;
+
+  try {
+    const query = `
+      UPDATE event_participants
+      SET status = 'Ongoing'
+      WHERE event_id = $1 AND user_id = $2
+    `;
+    const result = await pool.query(query, [event_id, user_id]);
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: "Event not found." });
+    }
+
+    res.status(200).json({ message: "Event archived successfully!" });
+  } catch (error) {
+    console.error("Error archiving event:", error);
+    res.status(500).json({ error: "Failed to archive event." });
+  }
+};
+
 module.exports = {
   createEvent,
   upload,
@@ -351,4 +603,9 @@ module.exports = {
   addParticipantToEvent,
   getEventParticipants,
   getParticipantCount,
+  getEventsElderlySite,
+  getRegisteredEventsByUserId,
+  archiveEvent,
+  getPastEventsByUserId,
+  unarchiveEvent,
 };

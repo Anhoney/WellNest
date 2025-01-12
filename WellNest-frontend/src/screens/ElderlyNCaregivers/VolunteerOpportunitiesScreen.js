@@ -8,7 +8,7 @@ import {
   ImageBackground,
   FlatList,
 } from "react-native";
-import EventCard from "../../components/EventCard";
+import OpportunityCard from "../../components/OpportunityCard";
 import styles from "../../components/styles"; // Assume you have a styles.js file for consistent styling
 import { Ionicons } from "@expo/vector-icons";
 import NavigationBar from "../../components/NavigationBar";
@@ -213,7 +213,7 @@ const VolunteerOpportunitiesScreen = () => {
           <FlatList
             data={activeTab === "opportunities" ? opportunityData : []} // Example data for rendering opportunities
             renderItem={({ item }) => (
-              <EventCard
+              <OpportunityCard
                 image={item.image}
                 title={item.title}
                 location={item.location}
@@ -231,13 +231,13 @@ const VolunteerOpportunitiesScreen = () => {
   );
 };
 
-const OpportunityCard = ({ title, location, date, price }) => (
-  <View style={styles.card}>
-    <Text style={styles.coTitle}>{title}</Text>
-    <Text style={styles.coDetails}>{location}</Text>
-    <Text style={styles.coDetails}>{date}</Text>
-    <Text style={styles.coPrice}>{price}</Text>
-  </View>
-);
+// const OpportunityCard = ({ title, location, date, price }) => (
+//   <View style={styles.card}>
+//     <Text style={styles.coTitle}>{title}</Text>
+//     <Text style={styles.coDetails}>{location}</Text>
+//     <Text style={styles.coDetails}>{date}</Text>
+//     <Text style={styles.coPrice}>{price}</Text>
+//   </View>
+// );
 
 export default VolunteerOpportunitiesScreen;

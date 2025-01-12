@@ -11,6 +11,11 @@ const {
   addParticipantToEvent,
   getEventParticipants,
   getParticipantCount,
+  getEventsElderlySite,
+  getRegisteredEventsByUserId,
+  archiveEvent,
+  getPastEventsByUserId,
+  unarchiveEvent,
 } = require("../controllers/eventsController");
 const authenticateToken = require("../middleware/authMiddleware");
 
@@ -40,7 +45,7 @@ router.get("/get/events/:co_id", authenticateToken, getEventsByUserId);
 
 // Add participant to an event
 router.post(
-  "/events/:event_id/participants",
+  "/events/:event_id/register",
   authenticateToken,
   addParticipantToEvent
 );
@@ -58,5 +63,16 @@ router.get(
   authenticateToken,
   getParticipantCount
 );
+
+router.get("/user/getEvents", authenticateToken, getEventsElderlySite);
+
+router.get(
+  "/user/:user_id/registered-events",
+  authenticateToken,
+  getRegisteredEventsByUserId
+);
+router.patch("/user/:user_id/archive-event/:event_id", archiveEvent);
+router.get("/user/:user_id/past-events", getPastEventsByUserId);
+router.patch("/user/:user_id/unarchive-event/:event_id", unarchiveEvent);
 
 module.exports = router;
