@@ -2413,4 +2413,107 @@ export default StyleSheet.create({
     color: "#fff",
     fontWeight: "bold",
   },
+  participantItem: {
+    padding: 10,
+    borderBottomWidth: 1,
+    borderColor: "#ccc",
+  },
+  participantContainer: {
+    padding: 15,
+    marginVertical: 5,
+    marginHorizontal: 10,
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 2.5,
+    elevation: 3, // For Android shadow
+  },
+  participantUsername: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#333",
+  },
+  participantEmail: {
+    fontSize: 14,
+    color: "#666",
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  participantCountText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#000",
+    margin: 10,
+  },
+  //CoOpportunityDetails.js
+  opportunityImage: {
+    marginTop: 10,
+    width: "100%",
+    height: 250,
+    borderRadius: 8,
+    marginBottom: 16,
+  },
+  opportunityDetailsCard: {
+    padding: 16,
+    borderRadius: 8,
+    backgroundColor: "#fff",
+    elevation: 3,
+  },
+  opportunityRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 8,
+  },
+  opportunityCardTitle: {
+    fontSize: 24,
+    fontWeight: "bold",
+  },
+  opportunityPrice: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#F57C00",
+  },
+  opportunitySectionTitle: {
+    marginTop: 16,
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 8,
+  },
+  opportunityDetailText: {
+    fontSize: 16,
+    marginBottom: 4,
+  },
+  opportunityButton: {
+    backgroundColor: "#ff8b49",
+    // paddingVertical: 12,
+    padding: 15,
+    alignItems: "center",
+    borderRadius: 8,
+    margin: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.8,
+    shadowRadius: 2,
+    elevation: 5, // Add hover effect on Android
+  },
+  opportunityButtonText: {
+    fontSize: 18,
+    color: "#fff",
+    fontWeight: "bold",
+  },
+  coEmptyContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 140,
+    marginBottom: 1200,
+  },
 });

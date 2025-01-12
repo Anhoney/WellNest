@@ -1,4 +1,4 @@
-// eventsController.js
+// opportunitiesController.js
 const pool = require("../config/db");
 const { format } = require("date-fns"); // Install via `npm install date-fns`
 // const {
@@ -41,11 +41,12 @@ const upload = multer({
     if (extname && mimetype) {
       return cb(null, true);
     }
+    console.error("File type not allowed:", file.mimetype);
     cb(new Error("Only image files are allowed!"), false);
   },
 }); // Define upload but do not call .single here
 
-const createEvent = async (req, res) => {
+const createOpportunity = async (req, res) => {
   const {
     title,
     fees,
@@ -56,7 +57,7 @@ const createEvent = async (req, res) => {
     terms_and_conditions,
     registration_due, // Date string for registration due
     capacity,
-    event_status,
+    opportunity_status,
   } = req.body;
   console.log("Request Body:", req.body);
   // const photo = req.file ? req.file.buffer : null; // Handling binary image data
@@ -79,9 +80,9 @@ const createEvent = async (req, res) => {
   try {
     const query = await pool.query(
       `
-       INSERT INTO co_available_events (
-      co_id, title, fees, location, event_date, event_time, notes, 
-      terms_and_conditions, photo, registration_due, capacity, event_status
+       INSERT INTO co_available_opportunities (
+      co_id, title, fees, location, opportunity_date, opportunity_time, notes, 
+      terms_and_conditions, photo, registration_due, capacity, opportunity_status
     ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
   `,
       [
@@ -97,68 +98,68 @@ const createEvent = async (req, res) => {
         photoData,
         registration_due || null,
         capacity || null,
-        event_status || null,
+        opportunity_status || null,
       ]
     );
 
     res.status(201).json({ message: "Event created successfully!" });
     // res.status(200).json(result.rows[0]);
   } catch (error) {
-    console.error("Error creating event:", error);
-    res.status(500).json({ error: "Failed to create event" });
+    console.error("Error creating opportunity:", error);
+    res.status(500).json({ error: "Failed to create opportunity" });
   }
 };
 
 // Function to get appointment details by hp_app_id
-const getEvent = async (req, res) => {
-  const { event_id } = req.params;
-  console.log("getEventId", event_id);
+const getOpportunity = async (req, res) => {
+  const { opportunity_id } = req.params;
+  console.log("getEventId", opportunity_id);
   try {
     const query = `
         SELECT 
-          e.id, 
-          e.co_id, 
-          e.title, 
-          e.fees, 
-          e.location, 
-          e.event_date, 
-          e.event_time, 
-          e.notes, 
-          e.terms_and_conditions, 
-          e.capacity, 
-          e.event_status,
+          o.id, 
+          o.co_id, 
+          o.title, 
+          o.fees, 
+          o.location, 
+          o.opportunity_date, 
+          o.opportunity_time, 
+          o.notes, 
+          o.terms_and_conditions, 
+          o.capacity, 
+          o.opportunity_status,
           CASE 
-            WHEN e.photo IS NOT NULL 
-            THEN CONCAT('data:image/png;base64,', ENCODE(e.photo, 'base64')) 
+            WHEN o.photo IS NOT NULL 
+            THEN CONCAT('data:image/png;base64,', ENCODE(o.photo, 'base64')) 
             ELSE NULL 
           END AS photo, 
-          e.registration_due, 
-          e.created_at,
+          o.registration_due, 
+          o.created_at,
           p.username, 
           p.organizer_details
-        FROM co_available_events e
-        LEFT JOIN co_profile p ON e.co_id = p.user_id
-        WHERE e.id = $1
+        FROM co_available_opportunities o
+        LEFT JOIN co_profile p ON o.co_id = p.user_id
+        WHERE o.id = $1
 
       `;
 
-    const result = await pool.query(query, [event_id]);
+    const result = await pool.query(query, [opportunity_id]);
 
     if (result.rows.length === 0) {
-      return res.status(404).json({ message: "Event not found." });
+      return res.status(404).json({ message: "Opportunity not found." });
     }
 
     res.status(200).json(result.rows[0]); // Return the first row of the result
   } catch (error) {
-    console.error("Error fetching appointment details:", error);
-    res.status(500).json({ error: "Failed to fetch appointment details." });
+    console.error("Error fetching opportunity details:", error);
+    res.status(500).json({ error: "Failed to fetch opportunity details." });
   }
 };
 
-// Update an existing event
-const updateEvent = async (req, res) => {
-  const { event_id } = req.params;
-  console.log("updateEventId", event_id);
+// Update an existing opportunity
+const updateOpportunity = async (req, res) => {
+  const { opportunity_id } = req.params;
+  console.log("updateOpportunityId", opportunity_id);
   const {
     title,
     fees,
@@ -169,7 +170,7 @@ const updateEvent = async (req, res) => {
     terms_and_conditions,
     registration_due,
     capacity,
-    event_status,
+    opportunity_status,
   } = req.body;
   console.log("Update request Body:", req.body);
   // For binary data storage
@@ -188,11 +189,11 @@ const updateEvent = async (req, res) => {
 
   try {
     const query = `
-        UPDATE co_available_events
+        UPDATE co_available_opportunities
         SET 
-          title = $1, fees = $2, location = $3, event_date = $4, event_time = $5, 
+          title = $1, fees = $2, location = $3, opportunity_date = $4, opportunity_time = $5, 
           notes = $6, terms_and_conditions = $7, photo = $8, registration_due = $9,
-          capacity = $10, event_status = $11
+          capacity = $10, opportunity_status = $11
         WHERE id = $12
       `;
     const result = await pool.query(query, [
@@ -207,28 +208,28 @@ const updateEvent = async (req, res) => {
       photoData || null,
       registration_due || null,
       capacity || null,
-      event_status || null,
-      event_id,
+      opportunity_status || null,
+      opportunity_id,
     ]);
 
     if (result.rowCount === 0) {
-      return res.status(404).json({ message: "Event not found." });
+      return res.status(404).json({ message: "Opportunity not found." });
     }
 
-    res.status(200).json({ message: "Event updated successfully!" });
+    res.status(200).json({ message: "Opportunity updated successfully!" });
   } catch (error) {
-    console.error("Error updating event:", error);
-    res.status(500).json({ error: "Failed to update event." });
+    console.error("Error updating opportunity:", error);
+    res.status(500).json({ error: "Failed to update opportunity." });
   }
 };
 
-// Delete an event
-const deleteEvent = async (req, res) => {
-  const { event_id } = req.params;
+// Delete an opportunity
+const deleteOpportunity = async (req, res) => {
+  const { opportunity_id } = req.params;
 
   try {
-    const query = `DELETE FROM co_available_events WHERE id = $1`;
-    const result = await pool.query(query, [event_id]);
+    const query = `DELETE FROM co_available_opportunities WHERE id = $1`;
+    const result = await pool.query(query, [opportunity_id]);
 
     if (result.rowCount === 0) {
       return res.status(404).json({ message: "Event not found." });
@@ -236,29 +237,29 @@ const deleteEvent = async (req, res) => {
 
     res.status(200).json({ message: "Event deleted successfully!" });
   } catch (error) {
-    console.error("Error deleting event:", error);
-    res.status(500).json({ error: "Failed to delete event." });
+    console.error("Error deleting opportunity:", error);
+    res.status(500).json({ error: "Failed to delete opportunity." });
   }
 };
 
-const getEventsByUserId = async (req, res) => {
+const getOpportunitiesByUserId = async (req, res) => {
   const { co_id } = req.params; // Extract user ID from the route params
   const { search } = req.query; // Get the search query from the request
-
+  console.log("getOpportunitiesByUserId", co_id);
   try {
     const query = `
       SELECT 
         id, co_id, title, fees, location, 
-        event_date, 
-        event_time, 
-        notes, terms_and_conditions, capacity, event_status,
+        opportunity_date, 
+        opportunity_time, 
+        notes, terms_and_conditions, capacity, opportunity_status,
         CASE 
           WHEN photo IS NOT NULL 
           THEN CONCAT('data:image/png;base64,', ENCODE(photo, 'base64')) 
           ELSE NULL 
         END AS photo, 
         registration_due, created_at
-      FROM co_available_events
+      FROM co_available_opportunities
       WHERE co_id = $1
       ${
         search ? "AND title ILIKE $2" : ""
@@ -269,23 +270,23 @@ const getEventsByUserId = async (req, res) => {
     const result = await pool.query(query, params);
 
     if (result.rows.length === 0) {
-      return res.status(200).json({ events: [] });
+      return res.status(200).json({ opportunities: [] });
     }
-
-    res.status(200).json({ events: result.rows });
+    // console.log("result.rows", result.rows);
+    res.status(200).json({ opportunities: result.rows });
   } catch (error) {
-    console.error("Error fetching events by user ID:", error);
-    res.status(500).json({ error: "Failed to fetch events." });
+    console.error("Error fetching opportunitys by user ID:", error);
+    res.status(500).json({ error: "Failed to fetch opportunitys." });
   }
 };
 
-const addParticipantToEvent = async (req, res) => {
-  const { event_id } = req.params;
+const addParticipantToOpportunity = async (req, res) => {
+  const { opportunity_id } = req.params;
   const { user_id } = req.body; // Assuming user_id is passed in the body
 
   try {
-    const query = `INSERT INTO event_participants (event_id, user_id) VALUES ($1, $2) RETURNING *`;
-    const result = await pool.query(query, [event_id, user_id]);
+    const query = `INSERT INTO opportunity_participants (opportunity_id, user_id) VALUES ($1, $2) RETURNING *`;
+    const result = await pool.query(query, [opportunity_id, user_id]);
     res.status(201).json({
       message: "Participant added successfully",
       participant: result.rows[0],
@@ -296,29 +297,29 @@ const addParticipantToEvent = async (req, res) => {
   }
 };
 
-const getEventParticipants = async (req, res) => {
-  const { event_id } = req.params;
-  console.log("Fetching participants for event_id:", event_id); // Log the event_id
+const getOpportunityParticipants = async (req, res) => {
+  const { opportunity_id } = req.params;
+  console.log("Fetching participants for opportunity_id:", opportunity_id); // Log the opportunity_id
 
   try {
     const query = `
       SELECT 
-        ep.id AS participant_id,
+        op.id AS participant_id,
         u.id AS user_id,
         pro.username,
         u.email
-      FROM event_participants ep
-      JOIN users u ON ep.user_id = u.id
-      LEFT JOIN profile pro ON ep.user_id = pro.user_id
-      WHERE ep.event_id = $1;
+      FROM opportunity_participants op
+      JOIN users u ON op.user_id = u.id
+      LEFT JOIN profile pro ON op.user_id = pro.user_id
+      WHERE op.opportunity_id = $1;
 
     `;
-    const result = await pool.query(query, [event_id]);
+    const result = await pool.query(query, [opportunity_id]);
 
     console.log("Query result:", result.rows); // Log the result of the query
 
     if (result.rows.length === 0) {
-      console.log("No participants found for this event."); // Log if no participants found
+      console.log("No participants found for this opportunity."); // Log if no participants found
     }
 
     res.status(200).json({ participants: result.rows });
@@ -329,11 +330,11 @@ const getEventParticipants = async (req, res) => {
 };
 
 const getParticipantCount = async (req, res) => {
-  const { event_id } = req.params;
-
+  const { opportunity_id } = req.params;
+  console.log("getParticipantCount", opportunity_id);
   try {
-    const query = `SELECT COUNT(*) FROM event_participants WHERE event_id = $1`;
-    const result = await pool.query(query, [event_id]);
+    const query = `SELECT COUNT(*) FROM opportunity_participants WHERE opportunity_id = $1`;
+    const result = await pool.query(query, [opportunity_id]);
     res.status(200).json({ count: result.rows[0].count });
   } catch (error) {
     console.error("Error fetching participant count:", error);
@@ -342,13 +343,13 @@ const getParticipantCount = async (req, res) => {
 };
 
 module.exports = {
-  createEvent,
+  createOpportunity,
   upload,
-  getEvent,
-  updateEvent,
-  deleteEvent,
-  getEventsByUserId,
-  addParticipantToEvent,
-  getEventParticipants,
+  getOpportunity,
+  updateOpportunity,
+  deleteOpportunity,
+  getOpportunitiesByUserId,
+  addParticipantToOpportunity,
+  getOpportunityParticipants,
   getParticipantCount,
 };

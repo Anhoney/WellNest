@@ -10,8 +10,7 @@ import {
   Image,
   ActivityIndicator,
 } from "react-native";
-import EventCard from "../../components/EventCard";
-import ChatRoomCard from "../../components/ChatRoomCard";
+import OpportunityCard from "../../components/OpportunityCard";
 import styles from "../../components/styles";
 import { Ionicons } from "@expo/vector-icons";
 import { getUserIdFromToken } from "../../../services/authService";
@@ -21,35 +20,33 @@ import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const CoSocialEventsManagement = () => {
+const CoVolunteerOpportunities = () => {
   const navigation = useNavigation();
   const [searchQuery, setSearchQuery] = useState("");
   const [location, setLocation] = useState("");
-  const [activeTab, setActiveTab] = useState("events"); // State to manage active tab
+  const [activeTab, setActiveTab] = useState("upcomingOpportunities"); // State to manage active tab
   const [co_id, setCo_id] = useState(null);
-  const [events, setEvents] = useState([]);
-  const [eventPhoto, setEventPhoto] = useState(null);
+  const [opportunities, setOpportunities] = useState([]);
   const [loading, setLoading] = useState(false);
 
   useFocusEffect(
     React.useCallback(() => {
-      const fetchUserIdAndEvents = async () => {
+      const fetchUserIdAndOpportunities = async () => {
         setLoading(true);
         const co_id = await getUserIdFromToken();
         console.log("co_id", co_id);
         if (co_id) {
           setCo_id(co_id);
-          await fetchEvents(co_id);
+          await fetchOpportunities(co_id);
         }
         setLoading(false);
       };
-      fetchUserIdAndEvents();
+      fetchUserIdAndOpportunities();
     }, [])
   );
 
-  const fetchEvents = async (co_id, query = "") => {
+  const fetchOpportunities = async (co_id, query = "") => {
     try {
-      console.log("Co_id of fetchEvents", co_id);
       const token = await AsyncStorage.getItem("token");
       if (!token) {
         alert("No token found. Please log in.");
@@ -57,7 +54,7 @@ const CoSocialEventsManagement = () => {
       }
 
       const response = await fetch(
-        `${API_BASE_URL}/get/events/${co_id}?search=${query}`,
+        `${API_BASE_URL}/get/opportunities/${co_id}?search=${query}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -65,12 +62,19 @@ const CoSocialEventsManagement = () => {
         }
       );
       const data = await response.json();
-      if (data.events) {
-        setEvents(data.events);
+
+      if (data.opportunities) {
+        setOpportunities(data.opportunities);
       }
     } catch (error) {
-      console.error("Error fetching events:", error);
+      console.error("Error fetching opportunities:", error);
     }
+  };
+
+  const handleSearch = () => {
+    console.log("Search:", searchQuery);
+    // Implement search functionality here
+    fetchOpportunities(co_id, searchQuery);
   };
 
   const renderEmptyComponent = () => (
@@ -79,15 +83,9 @@ const CoSocialEventsManagement = () => {
         source={require("../../../assets/NothingDog.png")}
         style={styles.emptyImage}
       />
-      <Text style={styles.emptyText}>No Social Events or Chat Rooms.</Text>
+      <Text style={styles.emptyText}>No volunteer opportunity yet.</Text>
     </View>
   );
-
-  const handleSearch = () => {
-    console.log("Search:", searchQuery);
-    // Implement search functionality here
-    fetchEvents(co_id, searchQuery);
-  };
 
   // Get today's date
   const today = new Date();
@@ -116,7 +114,7 @@ const CoSocialEventsManagement = () => {
         >
           <Ionicons name="chevron-back" size={24} color="#000" />
         </TouchableOpacity>
-        <Text style={styles.title}>Social Events and{"\n"} Support Groups</Text>
+        <Text style={styles.title}>Volunteer Opportunities</Text>
       </View>
 
       <View style={styles.coSearchContainer}>
@@ -126,7 +124,7 @@ const CoSocialEventsManagement = () => {
         <TextInput
           style={styles.searchInput}
           // {styles.searchInput}
-          placeholder="Search Event ..."
+          placeholder="Search Opportunity ..."
           value={searchQuery}
           onChangeText={setSearchQuery}
         />
@@ -137,33 +135,24 @@ const CoSocialEventsManagement = () => {
           <TouchableOpacity
             style={[
               styles.seTabButton,
-              activeTab === "events" && styles.seActiveTab,
+              activeTab === "upcomingOpportunities" && styles.seActiveTab,
             ]}
-            onPress={() => setActiveTab("events")}
+            onPress={() => setActiveTab("upcomingOpportunities")}
           >
-            <Text style={styles.seTabText}>Events</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.seTabButton,
-              activeTab === "chat" && styles.seActiveTab,
-            ]}
-            onPress={() => setActiveTab("chat")}
-          >
-            <Text style={styles.seTabText}>Chat Room</Text>
+            <Text style={styles.seTabText}>Upcoming Opportunities</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={[
               styles.seTabButton,
-              activeTab === "registrationDue" && styles.seActiveTab,
+              activeTab === "registrationDueOportunities" && styles.seActiveTab,
             ]}
             onPress={() => {
-              setActiveTab("registrationDue");
-              fetchEvents(co_id); // Fetch events with registration due dates
+              setActiveTab("registrationDueOportunities");
+              fetchOpportunities(co_id); // Fetch opportunities with registration due dates
             }}
           >
-            <Text style={styles.seTabText}>Registration Due Events</Text>
+            <Text style={styles.seTabText}>Closed Registration</Text>
           </TouchableOpacity>
         </View>
 
@@ -173,12 +162,14 @@ const CoSocialEventsManagement = () => {
             <ActivityIndicator size="large" color="#0000ff" />
           ) : (
             <>
-              {activeTab === "events" && (
+              {activeTab === "upcomingOpportunities" && (
                 <>
-                  <Text style={styles.sectionTitle}>Events</Text>
+                  <Text style={styles.sectionTitle}>
+                    Upcoming Opportunities
+                  </Text>
                   <View style={styles.displayUnderline}></View>
                   <FlatList
-                    data={events
+                    data={opportunities
                       .filter(
                         (event) =>
                           new Date(event.registration_due) >= new Date()
@@ -207,16 +198,16 @@ const CoSocialEventsManagement = () => {
                       return (
                         <TouchableOpacity
                           onPress={() =>
-                            navigation.navigate("CoSocialEventsDetails", {
-                              eventId: item.id,
+                            navigation.navigate("CoOpportunityDetails", {
+                              opportunityId: item.id,
                             })
                           }
                         >
-                          <EventCard
+                          <OpportunityCard
                             image={item.photo ? item.photo : null}
                             title={item.title}
                             location={item.location}
-                            date={item.event_date}
+                            date={item.opportunity_date}
                             price={price}
                           />
                         </TouchableOpacity>
@@ -226,44 +217,24 @@ const CoSocialEventsManagement = () => {
 
                   <TouchableOpacity
                     style={styles.addEventButton}
-                    onPress={() => navigation.navigate("CoCreateNEditEvents")}
+                    onPress={() =>
+                      navigation.navigate("CoCreateNEditOpportunity")
+                    }
                   >
-                    <Text style={styles.addEventText}>Add Event</Text>
+                    <Text style={styles.addEventText}>Add Opportunity</Text>
                     <Ionicons name="add" size={24} color="#FFF" />
                   </TouchableOpacity>
                 </>
               )}
 
-              {activeTab === "chat" && (
-                <>
-                  <Text style={styles.sectionTitle}>Let's Chat</Text>
-                  <View style={styles.displayUnderline}></View>
-                  {chatRooms.map((room) => (
-                    <ChatRoomCard
-                      key={room.id}
-                      title={room.title}
-                      onJoin={() => alert(`Joining ${room.title}`)}
-                    />
-                  ))}
-
-                  <TouchableOpacity
-                    style={styles.addEventButton}
-                    onPress={() => navigation.navigate("AddChatRoom")}
-                  >
-                    <Text style={styles.addEventText}>Add Chat Room</Text>
-                    <Ionicons name="add" size={24} color="#FFF" />
-                  </TouchableOpacity>
-                </>
-              )}
-
-              {activeTab === "registrationDue" && (
+              {activeTab === "registrationDueOportunities" && (
                 <>
                   <Text style={styles.sectionTitle}>
-                    Registration Due Events
+                    Registration Due Opportunities
                   </Text>
                   <View style={styles.displayUnderline}></View>
                   <FlatList
-                    data={events
+                    data={opportunities
                       .filter(
                         (event) => new Date(event.registration_due) < new Date()
                       )
@@ -291,16 +262,16 @@ const CoSocialEventsManagement = () => {
                       return (
                         <TouchableOpacity
                           onPress={() =>
-                            navigation.navigate("CoSocialEventsDetails", {
-                              eventId: item.id,
+                            navigation.navigate("CoOpportunityDetails", {
+                              opportunityId: item.id,
                             })
                           }
                         >
-                          <EventCard
+                          <OpportunityCard
                             image={item.photo ? item.photo : null}
                             title={item.title}
                             location={item.location}
-                            date={item.event_date}
+                            date={item.opportunity_date}
                             price={price}
                           />
                         </TouchableOpacity>
@@ -319,4 +290,4 @@ const CoSocialEventsManagement = () => {
   );
 };
 
-export default CoSocialEventsManagement;
+export default CoVolunteerOpportunities;

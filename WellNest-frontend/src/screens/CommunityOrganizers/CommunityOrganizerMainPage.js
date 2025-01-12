@@ -100,7 +100,7 @@ const CommunityOrganizerMainPage = ({}) => {
 
               <TouchableOpacity
                 onPress={() =>
-                  navigation.navigate("VolunteerOpportunitiesManagementPage")
+                  navigation.navigate("CoVolunteerOpportunitiesManagement")
                 }
               >
                 <Image
@@ -121,9 +121,7 @@ const CommunityOrganizerMainPage = ({}) => {
                   source={require("../../../assets/ElderlyAssessment.png")}
                   style={styles.icon}
                 />
-                <Text style={styles.iconText}>
-                  Volunteer {"\n"} Opportunities
-                </Text>
+                <Text style={styles.iconText}>Elderly {"\n"} Assessment</Text>
               </TouchableOpacity>
             </View>
           </View>

@@ -69,6 +69,11 @@ import CoEditProfilePage from "../src/screens/CommunityOrganizers/CoEditProfileP
 import CoSocialEventsManagement from "../src/screens/CommunityOrganizers/CoSocialEventsManagement";
 import CoCreateNEditEvents from "../src/screens/CommunityOrganizers/CoCreateNEditEvents";
 import CoSocialEventsDetails from "../src/screens/CommunityOrganizers/CoSocialEventsDetails";
+import CoEventParticipants from "../src/screens/CommunityOrganizers/CoEventParticipants";
+import CoVolunteerOpportunitiesManagement from "../src/screens/CommunityOrganizers/CoVolunteerOpportunitiesManagement";
+import CoCreateNEditOpportunity from "../src/screens/CommunityOrganizers/CoCreateNEditOpportunity";
+import CoOpportunityDetails from "../src/screens/CommunityOrganizers/CoOpportunityDetails";
+import CoOpportunityParticipants from "../src/screens/CommunityOrganizers/CoOpportunityParticipants";
 
 const Stack = createStackNavigator();
 
@@ -284,6 +289,26 @@ const AppNavigator = () => (
       <Stack.Screen
         name="CoSocialEventsDetails"
         component={CoSocialEventsDetails}
+      />
+      <Stack.Screen
+        name="CoEventParticipants"
+        component={CoEventParticipants}
+      />
+      <Stack.Screen
+        name="CoVolunteerOpportunitiesManagement"
+        component={CoVolunteerOpportunitiesManagement}
+      />
+      <Stack.Screen
+        name="CoCreateNEditOpportunity"
+        component={CoCreateNEditOpportunity}
+      />
+      <Stack.Screen
+        name="CoOpportunityDetails"
+        component={CoOpportunityDetails}
+      />
+      <Stack.Screen
+        name="CoOpportunityParticipants"
+        component={CoOpportunityParticipants}
       />
     </Stack.Navigator>
   </NavigationContainer>

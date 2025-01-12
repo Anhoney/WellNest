@@ -8,6 +8,9 @@ const {
   updateEvent,
   deleteEvent,
   getEventsByUserId,
+  addParticipantToEvent,
+  getEventParticipants,
+  getParticipantCount,
 } = require("../controllers/eventsController");
 const authenticateToken = require("../middleware/authMiddleware");
 
@@ -34,4 +37,26 @@ router.put(
 router.delete("/events/:event_id", authenticateToken, deleteEvent);
 
 router.get("/get/events/:co_id", authenticateToken, getEventsByUserId);
+
+// Add participant to an event
+router.post(
+  "/events/:event_id/participants",
+  authenticateToken,
+  addParticipantToEvent
+);
+
+// Get participants for an event
+router.get(
+  "/events/:event_id/participants",
+  authenticateToken,
+  getEventParticipants
+);
+
+// Get participant count for an event
+router.get(
+  "/events/:event_id/participants/count",
+  authenticateToken,
+  getParticipantCount
+);
+
 module.exports = router;

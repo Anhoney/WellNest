@@ -2,9 +2,9 @@ import React from "react";
 import { View, Text, Image, StyleSheet } from "react-native";
 
 // Import a default photo from your assets or provide a URL
-const defaultPhoto = require("../../assets/elderlyEventPhoto.webp"); // Update the path as needed
+const defaultPhoto = require("../../assets/elderlyOpportunityPhoto.webp"); // Update the path as needed
 
-const EventCard = ({ image, title, location, date, price }) => {
+const OpportunityCard = ({ image, title, location, date, price }) => {
   const imageSource =
     typeof image === "string" && image && image.trim() !== ""
       ? { uri: image }
@@ -55,4 +55,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default EventCard;
+export default OpportunityCard;
