@@ -28,11 +28,6 @@ import axios from "axios";
 const SocialEventsScreen = () => {
   const navigation = useNavigation();
   const [searchQuery, setSearchQuery] = useState("");
-  const [location, setLocation] = useState("");
-  const [date, setDate] = useState(new Date()); // Initialize with today's date
-  const [selectedDoctor, setSelectedDoctor] = useState(null);
-  const [selectedTime, setSelectedTime] = useState(null);
-  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [activeTab, setActiveTab] = useState("events"); // State to manage active tab
   const [loading, setLoading] = useState(false);
   const [events, setEvents] = useState([]);
@@ -57,7 +52,7 @@ const SocialEventsScreen = () => {
   const fetchEvents = async (query = "") => {
     try {
       setLoading(true);
-      const userId = await getUserIdFromToken();
+      // const userId = await getUserIdFromToken();
       const token = await AsyncStorage.getItem("token");
       if (!token) {
         alert("No token found. Please log in.");
@@ -175,37 +170,6 @@ const SocialEventsScreen = () => {
     // Implement search functionality here
     // setSearchQuery(query);
     fetchEvents(searchQuery);
-  };
-
-  // Functions to handle date picker
-  const showDatePicker = () => {
-    setDatePickerVisibility(true);
-  };
-
-  const hideDatePicker = () => {
-    setDatePickerVisibility(false);
-  };
-
-  const handleConfirm = (selectedDate) => {
-    setDate(selectedDate);
-    hideDatePicker();
-    // Fetch available times for the newly selected date
-    if (selectedDoctor) {
-      handleDoctorSelect(selectedDoctor);
-    }
-  };
-
-  // Get today's date
-  const today = new Date();
-
-  // Function to format the date with commas
-  const formatDate = (date) => {
-    return date.toLocaleDateString("en-US", {
-      weekday: "short",
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
   };
 
   const chatRooms = [

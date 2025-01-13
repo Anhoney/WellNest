@@ -165,7 +165,7 @@ const CoVolunteerOpportunities = () => {
               {activeTab === "upcomingOpportunities" && (
                 <>
                   <Text style={styles.sectionTitle}>
-                    Upcoming Opportunities
+                    My Upcoming Opportunities
                   </Text>
                   <View style={styles.displayUnderline}></View>
                   <FlatList
@@ -230,7 +230,7 @@ const CoVolunteerOpportunities = () => {
               {activeTab === "registrationDueOportunities" && (
                 <>
                   <Text style={styles.sectionTitle}>
-                    Registration Due Opportunities
+                    My Registration Due Opportunities
                   </Text>
                   <View style={styles.displayUnderline}></View>
                   <FlatList

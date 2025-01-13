@@ -175,7 +175,7 @@ const CoSocialEventsManagement = () => {
             <>
               {activeTab === "events" && (
                 <>
-                  <Text style={styles.sectionTitle}>Events</Text>
+                  <Text style={styles.sectionTitle}>My Events</Text>
                   <View style={styles.displayUnderline}></View>
                   <FlatList
                     data={events
@@ -259,7 +259,7 @@ const CoSocialEventsManagement = () => {
               {activeTab === "registrationDue" && (
                 <>
                   <Text style={styles.sectionTitle}>
-                    Registration Due Events
+                    My Registration Due Events
                   </Text>
                   <View style={styles.displayUnderline}></View>
                   <FlatList

@@ -11,6 +11,13 @@ const {
   addParticipantToOpportunity,
   getOpportunityParticipants,
   getParticipantCount,
+  getOpportunitiesElderlySite,
+  getRegisteredOpportunitiesByUserId,
+  archiveOpportunity,
+  getPastOpportunitiesByUserId,
+  unarchiveOpportunity,
+  checkOpportunityRegistration,
+  deleteParticipant,
 } = require("../controllers/opportunitiesController");
 const authenticateToken = require("../middleware/authMiddleware");
 
@@ -69,6 +76,38 @@ router.get(
   "/opportunities/:opportunity_id/participants/count",
   authenticateToken,
   getParticipantCount
+);
+
+router.get(
+  "/user/getOpportunities",
+  authenticateToken,
+  getOpportunitiesElderlySite
+);
+
+router.get(
+  "/user/:user_id/registered-opportunities",
+  authenticateToken,
+  getRegisteredOpportunitiesByUserId
+);
+router.patch(
+  "/user/:user_id/archive-opportunity/:opportunity_id",
+  archiveOpportunity
+);
+router.get("/user/:user_id/past-opportunities", getPastOpportunitiesByUserId);
+router.patch(
+  "/user/:user_id/unarchive-opportunity/:opportunity_id",
+  unarchiveOpportunity
+);
+router.get(
+  "/user/:user_id/opportunity/:opportunity_id/registration",
+  authenticateToken,
+  checkOpportunityRegistration
+);
+
+router.delete(
+  "/opportunities/:opportunity_id/participants/:user_id", // Route to delete a participant by ID
+  authenticateToken,
+  deleteParticipant
 );
 
 module.exports = router;

@@ -43,7 +43,7 @@ import SocialEventsScreen from "../src/screens/ElderlyNCaregivers/SocialEventsSc
 import VolunteerOpportunitiesScreen from "../src/screens/ElderlyNCaregivers/VolunteerOpportunitiesScreen";
 import CollaborationScreen from "../src/screens/ElderlyNCaregivers/CollaborationScreen";
 import SocialEventsDetails from "../src/screens/ElderlyNCaregivers/SocialEventsDetails";
-import SocialEventsRegistration from "../src/screens/ElderlyNCaregivers/SocialEventsRegistration";
+import VolunteerOpportunityDetails from "../src/screens/ElderlyNCaregivers/VolunteerOpportunityDetails";
 
 // Healthcare Provider screens
 import HealthcareProviderMainPage from "../src/screens/HealthcareProvider/HealthcareProviderMainPage";
@@ -317,8 +317,8 @@ const AppNavigator = () => (
         component={SocialEventsDetails}
       />
       <Stack.Screen
-        name="SocialEventsRegistration"
-        component={SocialEventsRegistration}
+        name="VolunteerOpportunityDetails"
+        component={VolunteerOpportunityDetails}
       />
     </Stack.Navigator>
   </NavigationContainer>

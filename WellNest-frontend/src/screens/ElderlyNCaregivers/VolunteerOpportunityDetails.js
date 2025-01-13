@@ -1,4 +1,4 @@
-//SocialEventDetails,js
+//VolunteerOpportunityDetails,js
 import React, { useEffect, useState } from "react";
 import {
   View,
@@ -26,13 +26,13 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getUserIdFromToken } from "../../../services/authService";
 
 // Import a default photo from your assets or provide a URL
-const defaultPhoto = require("../../../assets/elderlyEventPhoto.webp");
+const defaultPhoto = require("../../../assets/elderlyOpportunityPhoto.webp");
 
-const SocialEventDetails = () => {
-  const [eventDetails, setEventDetails] = useState(null);
+const VolunteerOpportunityDetails = () => {
+  const [opportunityDetails, setOpportunityDetails] = useState(null);
   const route = useRoute(); // Get route params
   const navigation = useNavigation();
-  const { eventId } = route.params; // Assume eventId is passed as a param
+  const { opportunityId } = route.params; // Assume opportunityId is passed as a param
   const [userId, setUserId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
@@ -42,41 +42,26 @@ const SocialEventDetails = () => {
 
   useFocusEffect(
     React.useCallback(() => {
-      const fetchUserIdAndEvents = async () => {
+      const fetchUserIdAndOpportunities = async () => {
         setLoading(true);
         const userId = await getUserIdFromToken();
         console.log("userId", userId);
         if (userId) {
           setUserId(userId);
-          await checkUserRegistration(userId, eventId);
-          //   await fetchEvents(co_id);
+          //   await fetchOpportunities(co_id);
+          await fetchOpportunityDetails();
+          await checkUserRegistration(userId, opportunityId); // Check if user is registered
+          setLoading(false);
         }
         setLoading(false);
       };
-      fetchUserIdAndEvents();
-      fetchEventDetails();
+      fetchUserIdAndOpportunities();
+      fetchOpportunityDetails();
+      fetchUserIdAndOpportunities();
     }, [])
   );
 
-  const fetchEventDetails = async () => {
-    try {
-      const token = await AsyncStorage.getItem("token");
-      if (!token) {
-        alert("No token found. Please log in.");
-        return;
-      }
-      const response = await fetch(`${API_BASE_URL}/single/event/${eventId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`, // Use your actual token
-        },
-      });
-      const data = await response.json();
-      setEventDetails(data);
-    } catch (error) {
-      console.error("Failed to fetch event details:", error);
-    }
-  };
-  const checkUserRegistration = async (userId, eventId) => {
+  const fetchOpportunityDetails = async () => {
     try {
       const token = await AsyncStorage.getItem("token");
       if (!token) {
@@ -84,7 +69,29 @@ const SocialEventDetails = () => {
         return;
       }
       const response = await fetch(
-        `${API_BASE_URL}/user/${userId}/event/${eventId}/registration`,
+        `${API_BASE_URL}/single/opportunity/${opportunityId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Use your actual token
+          },
+        }
+      );
+      const data = await response.json();
+      setOpportunityDetails(data);
+    } catch (error) {
+      console.error("Failed to fetch opportunity details:", error);
+    }
+  };
+
+  const checkUserRegistration = async (userId, opportunityId) => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      if (!token) {
+        alert("No token found. Please log in.");
+        return;
+      }
+      const response = await fetch(
+        `${API_BASE_URL}/user/${userId}/opportunity/${opportunityId}/registration`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -98,6 +105,37 @@ const SocialEventDetails = () => {
     }
   };
 
+  //   const handleCancelRegistration = async () => {
+  //     try {
+  //       const token = await AsyncStorage.getItem("token");
+  //       if (!token) {
+  //         alert("No token found. Please log in.");
+  //         return;
+  //       }
+  //       const response = await axios.delete(
+  //         `${API_BASE_URL}/opportunities/${opportunityId}/participants/${userId}`, // Adjust the endpoint as needed
+  //         {
+  //           headers: {
+  //             Authorization: `Bearer ${token}`,
+  //           },
+  //         }
+  //       );
+
+  //       if (response.status === 200) {
+  //         Alert.alert(
+  //           "Success",
+  //           "You have successfully canceled your registration."
+  //         );
+  //         setIsRegistered(false); // Update registration status
+  //       } else {
+  //         Alert.alert("Error", "Failed to cancel registration.");
+  //       }
+  //     } catch (error) {
+  //       console.error("Failed to cancel registration:", error);
+  //       Alert.alert("Error", "Failed to cancel registration.");
+  //     }
+  //   };
+
   const handleCancelRegistration = () => {
     setDeleteModalVisible(true); // Show the confirmation modal for cancellation
   };
@@ -110,7 +148,7 @@ const SocialEventDetails = () => {
         return;
       }
       const response = await axios.delete(
-        `${API_BASE_URL}/events/${eventId}/participants/${userId}`, // Adjust the endpoint as needed
+        `${API_BASE_URL}/opportunities/${opportunityId}/participants/${userId}`, // Adjust the endpoint as needed
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -127,8 +165,8 @@ const SocialEventDetails = () => {
               text: "OK",
               onPress: () => {
                 setIsRegistered(false); // Update registration status
-                navigation.navigate("SocialEventsScreen", {
-                  activeTab: "ongoing", // Navigate back to the upcoming tab
+                navigation.navigate("VolunteerOpportunitiesScreen", {
+                  activeTab: "upcoming", // Navigate back to the upcoming tab
                 });
               },
             },
@@ -167,7 +205,7 @@ const SocialEventDetails = () => {
         return;
       }
       const response = await axios.post(
-        `${API_BASE_URL}/events/${eventId}/register`, // Adjust the endpoint as needed
+        `${API_BASE_URL}/opportunities/${opportunityId}/participants`, // Adjust the endpoint as needed
         { user_id: userId },
         {
           headers: {
@@ -179,37 +217,38 @@ const SocialEventDetails = () => {
       if (response.status === 201) {
         setModalVisible(false); // Close the confirmation modal
         setSuccessModalVisible(true); // Show success modal
+        setIsRegistered(true); // Update registration status
         // Alert.alert(
         //   "Success",
-        //   "You have successfully registered for the event."
+        //   "You have successfully registered for the opportunity."
         // );
       } else {
-        Alert.alert("Error", "Failed to register for the event.");
+        Alert.alert("Error", "Failed to register for the opportunity.");
       }
     } catch (error) {
-      console.error("Failed to register for the event:", error);
+      console.error("Failed to register for the opportunity:", error);
       // Check for duplicate registration error
       if (error.response && error.response.status === 400) {
         Alert.alert(
           "Registration Error",
-          "You have already registered for this event."
+          "You have already registered for this opportunity."
         );
       } else {
-        console.error("Failed to register for the event:", error);
-        Alert.alert("Error", "Failed to register for the event.");
+        console.error("Failed to register for the opportunity:", error);
+        Alert.alert("Error", "Failed to register for the opportunity.");
       }
       //   if (error.response && error.response.data.error) {
       //     Alert.alert("Error", error.response.data.error); // Show the error message from the backend
       //   } else {
-      //     Alert.alert("Error", "Failed to register for the event.");
+      //     Alert.alert("Error", "Failed to register for the opportunity.");
       //   }
     } finally {
       setModalVisible(false); // Close the modal after registration
     }
   };
 
-  if (!eventDetails) {
-    return <Text>Loading event details...</Text>;
+  if (!opportunityDetails) {
+    return <Text>Loading opportunity details...</Text>;
   }
 
   const formatDate = (dateString) => {
@@ -235,8 +274,8 @@ const SocialEventDetails = () => {
     }
   };
 
-  if (!eventDetails) {
-    return <Text>Loading event details...</Text>;
+  if (!opportunityDetails) {
+    return <Text>Loading opportunity details...</Text>;
   }
 
   return (
@@ -252,22 +291,26 @@ const SocialEventDetails = () => {
         >
           <Ionicons name="chevron-back" size={24} color="#000" />
         </TouchableOpacity>
-        <Text style={styles.hpTitle}>{eventDetails.title}</Text>
+        <Text style={styles.hpTitle}>{opportunityDetails.title}</Text>
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollView}>
         <Image
           source={
-            eventDetails.photo ? { uri: eventDetails.photo } : defaultPhoto
+            opportunityDetails.photo
+              ? { uri: opportunityDetails.photo }
+              : defaultPhoto
           }
           style={styles.eventImage}
         />
         <View style={styles.hpContainer}>
           <View style={styles.eventDetailsCard}>
             <View style={styles.eventRow}>
-              <Text style={styles.eventCardTitle}>{eventDetails.title}</Text>
+              <Text style={styles.eventCardTitle}>
+                {opportunityDetails.title}
+              </Text>
               <Text style={styles.eventPrice}>
-                {formatFees(eventDetails.fees)}
+                {formatFees(opportunityDetails.fees)}
               </Text>
             </View>
             <View style={styles.displayUnderline} />
@@ -275,43 +318,43 @@ const SocialEventDetails = () => {
             <View style={styles.displayUnderline} />
             <Text style={styles.eventDetailText}>
               Location: {"\n"}
-              {eventDetails.location}
+              {opportunityDetails.location}
               {"\n"}
             </Text>
             <Text style={styles.eventDetailText}>
               Date: {"\n"}
-              {eventDetails.event_date}
+              {opportunityDetails.opportunity_date}
               {"\n"}
             </Text>
             <Text style={styles.eventDetailText}>
               Time: {"\n"}
-              {eventDetails.event_time}
+              {opportunityDetails.opportunity_time}
               {"\n"}
             </Text>
             <Text style={styles.eventDetailText}>
               Registration Due: {"\n"}
-              {formatDate(eventDetails.registration_due)}
+              {formatDate(opportunityDetails.registration_due)}
               {"\n"}
             </Text>
             <Text style={styles.eventDetailText}>
               Capacity: {"\n"}
-              {eventDetails.capacity || "N/A"}
+              {opportunityDetails.capacity || "N/A"}
               {"\n"}
             </Text>
 
             <Text style={styles.eventSectionTitle}>Terms And Conditions</Text>
             <View style={styles.displayUnderline} />
             <Text style={styles.eventDetailText}>
-              {eventDetails.terms_and_conditions}
+              {opportunityDetails.terms_and_conditions}
             </Text>
 
             <Text style={styles.eventSectionTitle}>Organizers</Text>
             <View style={styles.displayUnderline} />
             <Text style={[styles.eventDetailText, { fontWeight: "bold" }]}>
-              {eventDetails.username}
+              {opportunityDetails.username}
             </Text>
             <Text style={styles.eventDetailText}>
-              {eventDetails.organizer_details}
+              {opportunityDetails.organizer_details}
             </Text>
           </View>
 
@@ -351,7 +394,7 @@ const SocialEventDetails = () => {
               style={styles.successImage}
             />
             <Text style={styles.modalMessage}>
-              Are you sure you want to register for this event?
+              Are you sure you want to register for this opportunity?
             </Text>
             <View style={styles.modalButtons}>
               <TouchableOpacity
@@ -384,24 +427,26 @@ const SocialEventDetails = () => {
           <View style={styles.modalView}>
             <Text style={styles.modalTitle}>Congratulations!</Text>
             <Image
-              source={require("../../../assets/OrangeSinging.png")}
+              source={require("../../../assets/VolunteerSuccess.png")}
               style={styles.successImage}
             />
             <Text style={styles.modalMessage}>
-              You have successfully registered for the event. You can always
-              refer back to the event details in your ongoing events and groups
-              section.
+              You have successfully registered for the volunteer event. You can
+              always refer back to the opportunities details at your upcoming
+              opportunities section.
             </Text>
             <TouchableOpacity
               style={styles.closeButton}
               onPress={() => {
                 setSuccessModalVisible(false); // Close the success modal
-                navigation.navigate("SocialEventsScreen", {
-                  activeTab: "ongoing",
+                navigation.navigate("VolunteerOpportunitiesScreen", {
+                  activeTab: "upcoming",
                 });
               }}
             >
-              <Text style={styles.modalConfirmButtonText}>Back to Events</Text>
+              <Text style={styles.modalConfirmButtonText}>
+                Back to Opportunities
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -421,7 +466,8 @@ const SocialEventDetails = () => {
               style={styles.successImage} // Style for the image
             />
             <Text style={styles.modalMessage}>
-              Are you sure you want to cancel your registration for this event?
+              Are you sure you want to cancel your registration for this
+              opportunity?
             </Text>
             <View style={styles.modalButtons}>
               <TouchableOpacity
@@ -451,4 +497,4 @@ const SocialEventDetails = () => {
   );
 };
 
-export default SocialEventDetails;
+export default VolunteerOpportunityDetails;

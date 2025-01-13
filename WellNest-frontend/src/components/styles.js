@@ -2149,6 +2149,7 @@ export default StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-around",
     marginVertical: 10,
+    alignItems: "center",
   },
   seTabButton: {
     padding: 10,
@@ -2162,6 +2163,7 @@ export default StyleSheet.create({
   seTabText: {
     fontSize: 16,
     color: "#000",
+    textAlign: "center",
   },
   //VolunteerOpportunitiesScreen.js
   volunteerContainer: {
@@ -2526,11 +2528,32 @@ export default StyleSheet.create({
     padding: 8,
     borderRadius: 5,
     alignItems: "center",
-    marginTop: -9,
+    marginTop: -15,
     marginBottom: 12,
   },
   archiveButtonText: {
     color: "#fff",
     fontWeight: "bold",
+  },
+  voTabContainer: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    marginVertical: 10,
+    paddingHorizontal: 5,
+    marginTop: 35,
+    alignItems: "center",
+  },
+  voTabButton: {
+    padding: 10,
+    borderBottomWidth: 2,
+    borderBottomColor: "transparent",
+    marginTop: -25,
+    flexGrow: 1,
+    paddingHorizontal: 10, // Adjust padding for better spacing
+    alignItems: "center",
+  },
+  oEventsScrollView: {
+    flexGrow: 1,
+    marginBottom: 75,
   },
 });

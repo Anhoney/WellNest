@@ -16,6 +16,8 @@ const {
   archiveEvent,
   getPastEventsByUserId,
   unarchiveEvent,
+  checkEventRegistration,
+  deleteParticipant,
 } = require("../controllers/eventsController");
 const authenticateToken = require("../middleware/authMiddleware");
 
@@ -74,5 +76,16 @@ router.get(
 router.patch("/user/:user_id/archive-event/:event_id", archiveEvent);
 router.get("/user/:user_id/past-events", getPastEventsByUserId);
 router.patch("/user/:user_id/unarchive-event/:event_id", unarchiveEvent);
+
+router.get(
+  "/user/:user_id/event/:event_id/registration",
+  authenticateToken,
+  checkEventRegistration
+);
+router.delete(
+  "/events/:event_id/participants/:user_id", // Route to delete a participant by ID
+  authenticateToken,
+  deleteParticipant
+);
 
 module.exports = router;

@@ -487,28 +487,6 @@ const getRegisteredEventsByUserId = async (req, res) => {
   }
 };
 
-const archiveEvent = async (req, res) => {
-  const { event_id, user_id } = req.params;
-
-  try {
-    const query = `
-      UPDATE event_participants
-      SET status = 'Past'
-      WHERE event_id = $1 AND user_id = $2
-    `;
-    const result = await pool.query(query, [event_id, user_id]);
-
-    if (result.rowCount === 0) {
-      return res.status(404).json({ message: "Event not found." });
-    }
-
-    res.status(200).json({ message: "Event archived successfully!" });
-  } catch (error) {
-    console.error("Error archiving event:", error);
-    res.status(500).json({ error: "Failed to archive event." });
-  }
-};
-
 const getPastEventsByUserId = async (req, res) => {
   const { user_id } = req.params;
   const { search } = req.query;
@@ -571,6 +549,29 @@ const getPastEventsByUserId = async (req, res) => {
     res.status(500).json({ error: "Failed to fetch past events." });
   }
 };
+
+const archiveEvent = async (req, res) => {
+  const { event_id, user_id } = req.params;
+
+  try {
+    const query = `
+      UPDATE event_participants
+      SET status = 'Past'
+      WHERE event_id = $1 AND user_id = $2
+    `;
+    const result = await pool.query(query, [event_id, user_id]);
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: "Event not found." });
+    }
+
+    res.status(200).json({ message: "Event archived successfully!" });
+  } catch (error) {
+    console.error("Error archiving event:", error);
+    res.status(500).json({ error: "Failed to archive event." });
+  }
+};
+
 const unarchiveEvent = async (req, res) => {
   const { event_id, user_id } = req.params;
 
@@ -593,6 +594,52 @@ const unarchiveEvent = async (req, res) => {
   }
 };
 
+const checkEventRegistration = async (req, res) => {
+  const { user_id, event_id } = req.params; // Extract user ID and opportunity ID from the route params
+
+  try {
+    const query = `
+      SELECT * FROM event_participants 
+      WHERE user_id = $1 AND event_id = $2
+    `;
+    const result = await pool.query(query, [user_id, event_id]);
+
+    if (result.rows.length > 0) {
+      return res.status(200).json({ registered: true });
+    } else {
+      return res.status(200).json({ registered: false });
+    }
+  } catch (error) {
+    console.error("Error checking event registration:", error);
+    res.status(500).json({ error: "Failed to check registration." });
+  }
+};
+
+const deleteParticipant = async (req, res) => {
+  const { event_id, user_id } = req.params; // Extract the participant ID from the route params
+
+  try {
+    const query = `
+      DELETE FROM event_participants 
+      WHERE event_id = $1 AND user_id = $2
+      RETURNING *;  -- Return the deleted row for confirmation
+    `;
+    const result = await pool.query(query, [event_id, user_id]);
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: "Participant not found." });
+    }
+
+    res.status(200).json({
+      message: "Participant deleted successfully!",
+      participant: result.rows[0],
+    });
+  } catch (error) {
+    console.error("Error deleting participant:", error);
+    res.status(500).json({ error: "Failed to delete participant." });
+  }
+};
+
 module.exports = {
   createEvent,
   upload,
@@ -608,4 +655,6 @@ module.exports = {
   archiveEvent,
   getPastEventsByUserId,
   unarchiveEvent,
+  checkEventRegistration,
+  deleteParticipant,
 };

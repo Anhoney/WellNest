@@ -102,7 +102,7 @@ const createOpportunity = async (req, res) => {
       ]
     );
 
-    res.status(201).json({ message: "Event created successfully!" });
+    res.status(201).json({ message: "Opportunity created successfully!" });
     // res.status(200).json(result.rows[0]);
   } catch (error) {
     console.error("Error creating opportunity:", error);
@@ -113,7 +113,7 @@ const createOpportunity = async (req, res) => {
 // Function to get appointment details by hp_app_id
 const getOpportunity = async (req, res) => {
   const { opportunity_id } = req.params;
-  console.log("getEventId", opportunity_id);
+  console.log("getOpportunityId", opportunity_id);
   try {
     const query = `
         SELECT 
@@ -232,10 +232,10 @@ const deleteOpportunity = async (req, res) => {
     const result = await pool.query(query, [opportunity_id]);
 
     if (result.rowCount === 0) {
-      return res.status(404).json({ message: "Event not found." });
+      return res.status(404).json({ message: "Opportunity not found." });
     }
 
-    res.status(200).json({ message: "Event deleted successfully!" });
+    res.status(200).json({ message: "Opportunity deleted successfully!" });
   } catch (error) {
     console.error("Error deleting opportunity:", error);
     res.status(500).json({ error: "Failed to delete opportunity." });
@@ -292,6 +292,13 @@ const addParticipantToOpportunity = async (req, res) => {
       participant: result.rows[0],
     });
   } catch (error) {
+    if (error.code === "23505") {
+      // Duplicate key error code
+      console.error("Error adding participant:", error);
+      return res
+        .status(400)
+        .json({ error: "You have already registered for this event." });
+    }
     console.error("Error adding participant:", error);
     res.status(500).json({ error: "Failed to add participant" });
   }
@@ -342,6 +349,231 @@ const getParticipantCount = async (req, res) => {
   }
 };
 
+//Elderly
+const getOpportunitiesElderlySite = async (req, res) => {
+  // const { co_id } = req.params; // Extract user ID from the route params
+  const { search } = req.query; // Get the search query from the request
+
+  try {
+    // Base query
+    let query = `
+      SELECT
+        e.id, e.co_id, e.title, e.fees, e.location,
+        e.opportunity_date, e.opportunity_time, e.notes,
+        e.terms_and_conditions, e.capacity, e.opportunity_status,
+        CASE
+          WHEN e.photo IS NOT NULL
+          THEN CONCAT('data:image/png;base64,', ENCODE(e.photo, 'base64'))
+          ELSE NULL
+        END AS photo,
+        e.registration_due, e.created_at,
+        COUNT(ep.user_id) AS participant_count
+      FROM co_available_opportunities e
+      LEFT JOIN opportunity_participants ep ON e.id = ep.opportunity_id
+      WHERE 
+         e.registration_due >= CURRENT_DATE
+        AND e.opportunity_status = 'Active'
+    `;
+
+    // Add search condition if provided
+    const params = [];
+    if (search) {
+      query += " AND e.title ILIKE $1"; // Append the search condition
+      params.push(`%${search}%`); // Add the search term to params
+    }
+
+    query += " GROUP BY e.id"; // Ensure GROUP BY is always included
+
+    const result = await pool.query(query, params);
+
+    if (result.rows.length === 0) {
+      return res.status(200).json({ opportunities: [] });
+    }
+
+    // Filter out opportunities where participant count is greater than or equal to capacity
+    const filteredOpportunities = result.rows.filter(
+      (opportunity) => opportunity.participant_count < opportunity.capacity
+    );
+
+    res.status(200).json({ opportunities: filteredOpportunities });
+  } catch (error) {
+    console.error("Error fetching opportunities by user ID:", error);
+    res.status(500).json({ error: "Failed to fetch opportunities." });
+  }
+};
+
+const getRegisteredOpportunitiesByUserId = async (req, res) => {
+  const { user_id } = req.params; // Extract user ID from the route params
+  const { search } = req.query;
+
+  try {
+    let query = `
+    SELECT 
+      e.id, e.co_id, e.title, e.fees, e.location, 
+      e.opportunity_date, e.opportunity_time, e.notes, 
+      e.terms_and_conditions, 
+      CASE
+        WHEN e.photo IS NOT NULL
+        THEN CONCAT('data:image/png;base64,', ENCODE(e.photo, 'base64'))
+        ELSE NULL
+      END AS photo, 
+      e.registration_due, e.created_at, 
+      e.capacity, e.opportunity_status, ep.joined_at
+    FROM opportunity_participants ep
+    JOIN co_available_opportunities e ON ep.opportunity_id = e.id
+    WHERE ep.user_id = $1 AND e.opportunity_status = 'Active' AND ep.status = 'Ongoing'
+  `;
+    const params = [user_id];
+    if (search) {
+      query += " AND e.title ILIKE $2"; // Add search condition
+      params.push(`%${search}%`); // Add search term to params
+    }
+
+    const result = await pool.query(query, params);
+
+    if (result.rows.length === 0) {
+      return res.status(200).json({ opportunities: [] });
+    }
+
+    res.status(200).json({ opportunities: result.rows });
+  } catch (error) {
+    console.error("Error fetching registered opportunities by user ID:", error);
+    res
+      .status(500)
+      .json({ error: "Failed to fetch registered opportunities." });
+  }
+};
+
+const getPastOpportunitiesByUserId = async (req, res) => {
+  const { user_id } = req.params;
+  const { search } = req.query;
+
+  try {
+    let query = `
+      SELECT 
+        e.id, e.co_id, e.title, e.fees, e.location, 
+        e.opportunity_date, e.opportunity_time, e.notes, 
+        e.terms_and_conditions, 
+        CASE
+          WHEN e.photo IS NOT NULL
+          THEN CONCAT('data:image/png;base64,', ENCODE(e.photo, 'base64'))
+          ELSE NULL
+        END AS photo, 
+        e.registration_due, e.created_at, 
+        e.capacity, e.opportunity_status
+      FROM opportunity_participants ep
+      JOIN co_available_opportunities e ON ep.opportunity_id = e.id
+      WHERE ep.user_id = $1 AND ep.status = 'Past'
+    `;
+
+    const params = [user_id];
+    if (search) {
+      query += " AND e.title ILIKE $2"; // Add search condition
+      params.push(`%${search}%`); // Add search term to params
+    }
+
+    const result = await pool.query(query, params);
+
+    if (result.rows.length === 0) {
+      return res.status(200).json({ opportunities: [] });
+    }
+
+    res.status(200).json({ opportunities: result.rows });
+  } catch (error) {
+    console.error("Error fetching past opportunities by user ID:", error);
+    res.status(500).json({ error: "Failed to fetch past opportunities." });
+  }
+};
+const archiveOpportunity = async (req, res) => {
+  const { opportunity_id, user_id } = req.params;
+
+  try {
+    const query = `
+      UPDATE opportunity_participants
+      SET status = 'Past'
+      WHERE opportunity_id = $1 AND user_id = $2
+    `;
+    const result = await pool.query(query, [opportunity_id, user_id]);
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: "Opportunity not found." });
+    }
+
+    res.status(200).json({ message: "Opportunity archived successfully!" });
+  } catch (error) {
+    console.error("Error archiving opportunity:", error);
+    res.status(500).json({ error: "Failed to archive opportunity." });
+  }
+};
+
+const unarchiveOpportunity = async (req, res) => {
+  const { opportunity_id, user_id } = req.params;
+
+  try {
+    const query = `
+      UPDATE opportunity_participants
+      SET status = 'Ongoing'
+      WHERE opportunity_id = $1 AND user_id = $2
+    `;
+    const result = await pool.query(query, [opportunity_id, user_id]);
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: "Opportunity not found." });
+    }
+
+    res.status(200).json({ message: "Opportunity archived successfully!" });
+  } catch (error) {
+    console.error("Error archiving opportunity:", error);
+    res.status(500).json({ error: "Failed to archive opportunity." });
+  }
+};
+
+const checkOpportunityRegistration = async (req, res) => {
+  const { user_id, opportunity_id } = req.params; // Extract user ID and opportunity ID from the route params
+
+  try {
+    const query = `
+      SELECT * FROM opportunity_participants 
+      WHERE user_id = $1 AND opportunity_id = $2
+    `;
+    const result = await pool.query(query, [user_id, opportunity_id]);
+
+    if (result.rows.length > 0) {
+      return res.status(200).json({ registered: true });
+    } else {
+      return res.status(200).json({ registered: false });
+    }
+  } catch (error) {
+    console.error("Error checking opportunity registration:", error);
+    res.status(500).json({ error: "Failed to check registration." });
+  }
+};
+
+const deleteParticipant = async (req, res) => {
+  const { opportunity_id, user_id } = req.params; // Extract the participant ID from the route params
+
+  try {
+    const query = `
+      DELETE FROM opportunity_participants 
+      WHERE opportunity_id = $1 AND user_id = $2
+      RETURNING *;  -- Return the deleted row for confirmation
+    `;
+    const result = await pool.query(query, [opportunity_id, user_id]);
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: "Participant not found." });
+    }
+
+    res.status(200).json({
+      message: "Participant deleted successfully!",
+      participant: result.rows[0],
+    });
+  } catch (error) {
+    console.error("Error deleting participant:", error);
+    res.status(500).json({ error: "Failed to delete participant." });
+  }
+};
+
 module.exports = {
   createOpportunity,
   upload,
@@ -352,4 +584,11 @@ module.exports = {
   addParticipantToOpportunity,
   getOpportunityParticipants,
   getParticipantCount,
+  getOpportunitiesElderlySite,
+  getRegisteredOpportunitiesByUserId,
+  archiveOpportunity,
+  getPastOpportunitiesByUserId,
+  unarchiveOpportunity,
+  checkOpportunityRegistration,
+  deleteParticipant,
 };
