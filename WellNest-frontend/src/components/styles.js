@@ -788,7 +788,9 @@ export default StyleSheet.create({
     fontWeight: "bold",
   },
   signOutButton: {
-    backgroundColor: "#f5a623",
+    // backgroundColor: "#f5a623",
+
+    backgroundColor: "#ff8b49",
     paddingVertical: 12,
     alignItems: "center",
     borderRadius: 8,
@@ -2555,5 +2557,143 @@ export default StyleSheet.create({
   oEventsScrollView: {
     flexGrow: 1,
     marginBottom: 75,
+  },
+  //CoAssessmentManagement.js
+  addAssessmentButton: {
+    backgroundColor: "#FF9800",
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    alignItems: "center",
+    marginVertical: 10,
+  },
+  addAssessmentButtonText: {
+    color: "#fff",
+    fontSize: 20,
+    fontWeight: "bold",
+  },
+  sectionHeader: {
+    fontSize: 25,
+    fontWeight: "bold",
+    marginTop: 20,
+    marginBottom: 10,
+  },
+  assessmentButtonGroup: {
+    flexDirection: "row",
+    marginBottom: 15,
+  },
+  choiceButton: {
+    flex: 1,
+    padding: 10,
+    marginHorizontal: 5,
+    borderRadius: 5,
+    backgroundColor: "#147eff",
+    alignItems: "center",
+  },
+  selectedButton: {
+    backgroundColor: "#0c4ea0",
+  },
+  assessmentButtonText: {
+    color: "white",
+  },
+
+  assessmentCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#fff",
+    padding: 10,
+    borderRadius: 10,
+    marginBottom: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  assessmentImage: {
+    width: 60,
+    height: 60,
+    borderRadius: 8,
+    marginRight: 10,
+  },
+  assessmentDetails: {
+    flex: 1,
+  },
+  assessmentTitle: {
+    fontSize: 16,
+    fontWeight: "bold",
+    marginBottom: 5,
+  },
+  editButton: {
+    alignSelf: "flex-end",
+    backgroundColor: "#FF7043",
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    borderRadius: 5,
+  },
+  editButtonText: {
+    color: "#fff",
+    fontSize: 14,
+    fontWeight: "bold",
+  },
+
+  //CoCreateAssessmentQuestionScreen,js
+  assessmentQuestionContainer: {
+    marginBottom: 20,
+    padding: 10,
+    backgroundColor: "#fff",
+    borderRadius: 5,
+    elevation: 2,
+  },
+  assessmentAnswerContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 10,
+  },
+  assessmentAddAnswerButton: {
+    marginTop: 10,
+    padding: 10,
+    backgroundColor: "#007BFF",
+    borderRadius: 5,
+    alignItems: "center",
+  },
+  assessmentAddAnswerText: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
+  assessmentAddQuestionButton: {
+    marginTop: 20,
+    padding: 15,
+    backgroundColor: "#28A745",
+    borderRadius: 5,
+    alignItems: "center",
+  },
+  assessmentAddQuestionText: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
+  assessmentSubmitButton: {
+    marginTop: 20,
+    padding: 15,
+    backgroundColor: "#FFC107",
+    borderRadius: 5,
+    alignItems: "center",
+  },
+  assessmentSubmitButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
+  assessmentInput: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 5,
+    padding: 10,
+    marginTop: 5,
+    width: "75%",
+  },
+  assessmentRemoveQuestionText: {
+    color: "red",
+    fontWeight: "bold",
   },
 });

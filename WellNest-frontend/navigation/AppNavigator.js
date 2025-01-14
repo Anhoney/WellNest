@@ -76,6 +76,9 @@ import CoVolunteerOpportunitiesManagement from "../src/screens/CommunityOrganize
 import CoCreateNEditOpportunity from "../src/screens/CommunityOrganizers/CoCreateNEditOpportunity";
 import CoOpportunityDetails from "../src/screens/CommunityOrganizers/CoOpportunityDetails";
 import CoOpportunityParticipants from "../src/screens/CommunityOrganizers/CoOpportunityParticipants";
+import CoElderlyCareAssessmentManagement from "../src/screens/CommunityOrganizers/CoElderlyCareAssessmentManagement";
+import CoAddAssessmentScreen from "../src/screens/CommunityOrganizers/CoAddAssessmentScreen";
+import CoCreateAssessmentQuestionScreen from "../src/screens/CommunityOrganizers/CoCreateAssessmentQuestionScreen";
 
 const Stack = createStackNavigator();
 
@@ -319,6 +322,18 @@ const AppNavigator = () => (
       <Stack.Screen
         name="VolunteerOpportunityDetails"
         component={VolunteerOpportunityDetails}
+      />
+      <Stack.Screen
+        name="CoElderlyCareAssessmentManagement"
+        component={CoElderlyCareAssessmentManagement}
+      />
+      <Stack.Screen
+        name="AddAssessmentScreen"
+        component={CoAddAssessmentScreen}
+      />
+      <Stack.Screen
+        name="CreateAssessmentQuestionScreen"
+        component={CoCreateAssessmentQuestionScreen}
       />
     </Stack.Navigator>
   </NavigationContainer>

@@ -426,7 +426,7 @@ const VolunteerOpportunitiesScreen = () => {
               {activeTab === "upcoming" && (
                 <>
                   <Text style={styles.sectionTitle}>
-                    Upcoming Opportunities
+                    Upcoming Registered Opportunities
                   </Text>
                   <View style={styles.displayUnderline}></View>
                   <FlatList

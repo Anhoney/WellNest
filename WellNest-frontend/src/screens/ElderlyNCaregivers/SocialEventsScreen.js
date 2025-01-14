@@ -356,7 +356,9 @@ const SocialEventsScreen = () => {
 
               {activeTab === "ongoing" && (
                 <>
-                  <Text style={styles.sectionTitle}>Ongoing Events</Text>
+                  <Text style={styles.sectionTitle}>
+                    Ongoing Registered Events
+                  </Text>
                   <View style={styles.displayUnderline}></View>
                   <FlatList
                     data={events

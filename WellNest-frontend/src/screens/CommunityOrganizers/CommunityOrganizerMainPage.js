@@ -114,7 +114,7 @@ const CommunityOrganizerMainPage = ({}) => {
 
               <TouchableOpacity
                 onPress={() =>
-                  navigation.navigate("ElderlyAssessmentManagementPage")
+                  navigation.navigate("CoElderlyCareAssessmentManagement")
                 }
               >
                 <Image

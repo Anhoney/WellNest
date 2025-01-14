@@ -16,6 +16,7 @@ const notificationRoutes = require("./routes/notificationRoutes");
 const medicationRoutes = require("./routes/medicationRoutes");
 const eventsRoutes = require("./routes/eventsRoutes");
 const opportunitiesRoutes = require("./routes/opportunitiesRoutes");
+const assessmentRoutes = require("./routes/assessmentRoutes");
 // const chatRoutes = require("./routes/chatRoutes"); // Added chat routes
 const scheduler = require("./scheduler"); // Import the scheduler
 
@@ -24,7 +25,9 @@ require("./reminderJobs"); // Import the scheduled tasks
 
 const app = express();
 app.use(cors());
-app.use(bodyParser.json());
+// app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: "50mb" })); // Increase limit to handle image data
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
 
 // Basic home route for testing
@@ -46,6 +49,7 @@ app.use("/api", notificationRoutes);
 app.use("/api", medicationRoutes);
 app.use("/api", eventsRoutes);
 app.use("/api", opportunitiesRoutes);
+app.use("/api", assessmentRoutes);
 
 // Serve static files from the "uploads" directory
 app.use("/uploads", express.static(path.join(__dirname, "uploads"))); // Adjust the path as necessary
