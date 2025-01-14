@@ -44,7 +44,7 @@ const upload = multer({
 // Create a new assessment
 const createAssessment = async (req, res) => {
   const { co_id } = req.params;
-  const { title, questions } = req.body;
+  const { title, questions, scores } = req.body;
   //   console.log(co_id, title, photo, questions);
   // For binary data storage
   const photo = req.file ? req.file.path : null;
@@ -96,6 +96,20 @@ const createAssessment = async (req, res) => {
       }
     }
 
+    // Insert overall scores and results
+    for (const score of scores) {
+      // Validate score range and result
+      if (!score.range.trim() || !score.result.trim()) {
+        console.warn(`Skipping score: ${JSON.stringify(score)}`);
+        continue; // Skip this score if it's empty
+      }
+
+      await pool.query(
+        "INSERT INTO assessment_results (assessment_id, score_range, result_text) VALUES ($1, $2, $3)",
+        [assessmentId, score.range, score.result]
+      );
+    }
+
     res.status(201).json({ message: "Assessment created successfully." });
   } catch (error) {
     console.error("Error creating assessment:", error);
@@ -110,12 +124,12 @@ const getAssessmentsByCoId = async (req, res) => {
   const { co_id } = req.params;
   try {
     const assessmentsResult = await pool.query(
-      `SELECT assessment_id, title, 
+      `SELECT assessment_id, title, created_at,
        CASE 
             WHEN photo IS NOT NULL 
             THEN CONCAT('data:image/png;base64,', ENCODE(photo, 'base64')) 
             ELSE NULL 
-        END AS photo FROM co_assessments WHERE co_id = $1`,
+        END AS photo FROM co_assessments WHERE co_id = $1 ORDER BY created_at DESC`,
       [co_id]
     );
 
@@ -185,10 +199,180 @@ const getAssessmentById = async (req, res) => {
   }
 };
 
+// Update an existing assessment
+const updateAssessment = async (req, res) => {
+  const { assessmentId } = req.params; // Get assessment ID from route params
+  const { title, photo, questions } = req.body; // Get data from request body
+
+  try {
+    // Update the assessment
+    const assessmentResult = await pool.query(
+      "UPDATE co_assessments SET title = $1, photo = $2 WHERE assessment_id = $3 RETURNING assessment_id",
+      [title, photo ? Buffer.from(photo, "base64") : null, assessmentId]
+    );
+
+    if (assessmentResult.rowCount === 0) {
+      return res.status(404).json({ message: "Assessment not found." });
+    }
+
+    // Clear existing questions and answers
+    await pool.query(
+      "DELETE FROM co_assessment_questions WHERE assessment_id = $1",
+      [assessmentId]
+    );
+    await pool.query(
+      "DELETE FROM co_assessment_answers WHERE question_id IN (SELECT question_id FROM co_assessment_questions WHERE assessment_id = $1)",
+      [assessmentId]
+    );
+
+    // Insert updated questions and answers
+    for (const question of questions) {
+      const questionResult = await pool.query(
+        "INSERT INTO co_assessment_questions (assessment_id, question_text) VALUES ($1, $2) RETURNING question_id",
+        [assessmentId, question.question]
+      );
+      const questionId = questionResult.rows[0].question_id;
+
+      for (const answer of question.answers) {
+        await pool.query(
+          "INSERT INTO co_assessment_answers (question_id, answer_text, mark) VALUES ($1, $2, $3)",
+          [questionId, answer.text, parseInt(answer.mark, 10)]
+        );
+      }
+    }
+
+    res.status(200).json({ message: "Assessment updated successfully." });
+  } catch (error) {
+    console.error("Error updating assessment:", error);
+    res
+      .status(500)
+      .json({ error: "An error occurred while updating the assessment." });
+  }
+};
+
+const deleteAssessment = async (req, res) => {
+  const { assessmentId } = req.params; // Extract assessmentId from request params
+
+  try {
+    // Delete answers associated with the questions of this assessment
+    await pool.query(
+      `DELETE FROM co_assessment_answers WHERE question_id IN 
+        (SELECT question_id FROM co_assessment_questions WHERE assessment_id = $1)`,
+      [assessmentId]
+    );
+
+    // Delete questions associated with this assessment
+    await pool.query(
+      "DELETE FROM co_assessment_questions WHERE assessment_id = $1",
+      [assessmentId]
+    );
+
+    // Delete the assessment itself
+    const result = await pool.query(
+      "DELETE FROM co_assessments WHERE assessment_id = $1 RETURNING *",
+      [assessmentId]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: "Assessment not found." });
+    }
+
+    res.status(200).json({ message: "Assessment deleted successfully." });
+  } catch (error) {
+    console.error("Error deleting assessment:", error);
+    res
+      .status(500)
+      .json({ error: "An error occurred while deleting the assessment." });
+  }
+};
+
+// Create overall scores and results for an assessment
+const createAssessmentResults = async (req, res) => {
+  const { assessmentId } = req.params; // Get assessment ID from route params
+  const { scores } = req.body; // Get scores from request body
+
+  try {
+    for (const score of scores) {
+      await pool.query(
+        "INSERT INTO assessment_results (assessment_id, score_range, result_text) VALUES ($1, $2, $3)",
+        [assessmentId, score.range, score.result]
+      );
+    }
+
+    res
+      .status(201)
+      .json({ message: "Assessment results created successfully." });
+  } catch (error) {
+    console.error("Error creating assessment results:", error);
+    res.status(500).json({
+      error: "An error occurred while creating the assessment results.",
+    });
+  }
+};
+
+// Fetch assessment results by assessment ID
+const getAssessmentResultsById = async (req, res) => {
+  const { assessmentId } = req.params;
+  try {
+    const resultsResult = await pool.query(
+      "SELECT score_range, result_text FROM assessment_results WHERE assessment_id = $1",
+      [assessmentId]
+    );
+
+    const results = resultsResult.rows.map((result) => ({
+      range: result.score_range,
+      result: result.result_text,
+    }));
+
+    res.status(200).json(results);
+  } catch (error) {
+    console.error("Error fetching assessment results:", error);
+    res
+      .status(500)
+      .json({ error: "An error occurred while fetching results." });
+  }
+};
+
+// Update assessment results
+const updateAssessmentResults = async (req, res) => {
+  const { assessmentId } = req.params; // Get assessment ID from route params
+  const { scores } = req.body; // Get scores from request body
+
+  try {
+    // Clear existing results
+    await pool.query(
+      "DELETE FROM assessment_results WHERE assessment_id = $1",
+      [assessmentId]
+    );
+
+    // Insert updated scores
+    for (const score of scores) {
+      await pool.query(
+        "INSERT INTO assessment_results (assessment_id, score_range, result_text) VALUES ($1, $2, $3)",
+        [assessmentId, score.range, score.result]
+      );
+    }
+
+    res
+      .status(200)
+      .json({ message: "Assessment results updated successfully." });
+  } catch (error) {
+    console.error("Error updating assessment results:", error);
+    res
+      .status(500)
+      .json({ error: "An error occurred while updating the results." });
+  }
+};
+
 // Correctly export the function
 module.exports = {
   createAssessment,
   upload,
   getAssessmentsByCoId,
   getAssessmentById,
+  updateAssessment,
+  deleteAssessment,
+  createAssessmentResults,
+  getAssessmentResultsById,
+  updateAssessmentResults,
 };

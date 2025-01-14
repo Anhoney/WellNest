@@ -62,7 +62,6 @@ const CoElderlyCareAssessmentManagement = () => {
       );
       if (response.data) {
         setAssessments(response.data);
-        console.log("Fetched assessments:", response.data.photo);
       } else {
         setAssessments([]);
       }
@@ -74,17 +73,18 @@ const CoElderlyCareAssessmentManagement = () => {
     }
   };
 
-  useEffect(() => {
-    if (userId) {
-      fetchAssessments();
-    }
-  }, [userId]);
+  useFocusEffect(
+    React.useCallback(() => {
+      if (userId) {
+        fetchAssessments();
+      }
+    }, [userId])
+  );
 
   const renderAssessments = () => {
-    console.log("Assessments photo:", assessments.photo);
     return assessments.map((assessment, index) => (
       <View key={index} style={styles.assessmentCard}>
-        <Image
+        {/* <Image
           source={
             assessment.photo
               ? {
@@ -95,7 +95,16 @@ const CoElderlyCareAssessmentManagement = () => {
               : require("../../../assets/DefaultAssessment.png")
           }
           style={styles.assessmentImage}
+        /> */}
+        <Image
+          source={
+            assessment.photo
+              ? { uri: assessment.photo } // Use the photo directly
+              : require("../../../assets/DefaultAssessment.png")
+          }
+          style={styles.assessmentImage}
         />
+
         <View style={styles.assessmentDetails}>
           <Text style={styles.assessmentTitle}>{assessment.title}</Text>
           <TouchableOpacity
@@ -156,7 +165,7 @@ const CoElderlyCareAssessmentManagement = () => {
         </TouchableOpacity>
 
         {/* My Assessments Section */}
-        <Text style={styles.sectionHeader}>My Assessments</Text>
+        <Text style={styles.sectionHeader}>My Created Assessments</Text>
         <View style={styles.displayUnderline}></View>
         {loading ? ( // Show ActivityIndicator while loading
           <ActivityIndicator size="large" color="#0000ff" />

@@ -44,6 +44,7 @@ const CoAddAssessmentScreen = () => {
   const [questions, setQuestions] = useState([
     { question: "", answers: [{ text: "", mark: "" }] },
   ]); // State for the questions
+  const [scores, setScores] = useState([{ range: "", result: "" }]);
 
   useEffect(() => {
     getUserIdFromToken().then((userId) => {
@@ -81,6 +82,18 @@ const CoAddAssessmentScreen = () => {
         );
         setQuestions(response.data.questions);
         // setSelectedFile(response.data.photo.uri.split("/").pop());
+
+        // Fetch results
+        const resultsResponse = await axios.get(
+          `${API_BASE_URL}/assessments/${assessmentId}/results`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
+        if (resultsResponse.data) {
+          setScores(resultsResponse.data); // Set the scores state with fetched results
+        }
       }
     } catch (error) {
       console.error("Error fetching assessment data:", error);
@@ -154,6 +167,21 @@ const CoAddAssessmentScreen = () => {
     setQuestions(newQuestions);
   };
 
+  const handleAddScore = () => {
+    setScores([...scores, { range: "", result: "" }]); // Add a new score entry
+  };
+
+  const handleScoreChange = (text, index, field) => {
+    const newScores = [...scores];
+    newScores[index][field] = text; // Update the score or result text
+    setScores(newScores);
+  };
+
+  const handleRemoveScore = (index) => {
+    const newScores = scores.filter((_, i) => i !== index); // Remove the score entry
+    setScores(newScores);
+  };
+
   //   const handleSubmit = () => {
   //     // Validate and submit the questions
   //     if (
@@ -205,8 +233,24 @@ const CoAddAssessmentScreen = () => {
       return;
     }
 
+    // Filter out blank scores
+    const validScores = scores.filter(
+      (score) => score.range.trim() !== "" && score.result.trim() !== ""
+    );
+
+    // Check if there are at least two valid scores
+    if (validScores.length < 2) {
+      Alert.alert("Error", "Please provide at least two valid score entries.");
+      return;
+    }
+    // Check if there are at least two scores
+    // if (scores.length < 2) {
+    //   Alert.alert("Error", "Please provide at least two score entries.");
+    //   return;
+    // }
+
     try {
-      console.log("UserId opp:", userId);
+      console.log("UserId Assessment:", userId);
       const token = await AsyncStorage.getItem("token");
 
       if (!token) {
@@ -218,16 +262,49 @@ const CoAddAssessmentScreen = () => {
         title,
         photo: photo ? await toBase64(photo) : null, // Convert image to base64 string if available
         questions,
+        scores,
       };
 
-      const response = await axios.post(
-        `${API_BASE_URL}/assessments/${userId}`,
-        payload,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      Alert.alert("Success", response.data.message);
+      if (route.params && route.params.assessmentId) {
+        await axios.put(
+          `${API_BASE_URL}/edit/assessments/${route.params.assessmentId}`,
+          payload,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        // Alert.alert("Success", "Assessment updated successfully!");
+        // Update scores
+        await axios.put(
+          `${API_BASE_URL}/assessments/${route.params.assessmentId}/results`,
+          { scores },
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        Alert.alert("Success", "Assessment results updated successfully!");
+      } else {
+        payload.co_id = userId;
+        const response = await axios.post(
+          `${API_BASE_URL}/assessments/${userId}`,
+          payload,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        Alert.alert("Success", response.data.message);
+      }
+
+      // Submit scores
+      //   if (route.params && route.params.assessmentId) {
+      //     await axios.post(
+      //       `${API_BASE_URL}/assessments/${route.params.assessmentId}/results`,
+      //       { scores },
+      //       {
+      //         headers: { Authorization: `Bearer ${token}` },
+      //       }
+      //     );
+      //   }
       navigation.goBack();
     } catch (error) {
       console.error("Error submitting assessment:", error);
@@ -236,6 +313,46 @@ const CoAddAssessmentScreen = () => {
         "An error occurred while submitting the assessment."
       );
     }
+  };
+
+  const handleDelete = async () => {
+    Alert.alert(
+      "Confirm Delete",
+      "Are you sure you want to delete this assessment? This action cannot be undone.",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              const token = await AsyncStorage.getItem("token");
+              if (!token) {
+                alert("No token found. Please log in.");
+                return;
+              }
+              await axios.delete(
+                `${API_BASE_URL}/delete/assessment/${route.params.assessmentId}`,
+                {
+                  headers: { Authorization: `Bearer ${token}` },
+                }
+              );
+              Alert.alert("Success", "Assessment deleted successfully!");
+              navigation.goBack();
+            } catch (error) {
+              console.error("Error deleting assessment:", error);
+              Alert.alert(
+                "Error",
+                "An error occurred while deleting the assessment."
+              );
+            }
+          },
+        },
+      ]
+    );
   };
 
   // Utility function to convert image to base64
@@ -375,12 +492,73 @@ const CoAddAssessmentScreen = () => {
             <Text style={styles.assessmentAddQuestionText}>Add Question</Text>
           </TouchableOpacity>
 
+          <Text style={styles.label}>Overall Scores and Results</Text>
+          <View style={styles.assessmentScoreContainer}>
+            <Text style={[styles.label]}> Scores Range</Text>
+            <Text style={[styles.label, { marginLeft: 110 }]}>Results</Text>
+          </View>
+          <View style={styles.assessmentScoreContainer}>
+            <Text style={[styles.label, { marginTop: -10 }]}>
+              {"  "}
+              (e.g., 0-24)
+            </Text>
+            <Text style={[styles.label, { marginLeft: 40, marginTop: -10 }]}>
+              (e.g., Severely Dependent)
+            </Text>
+          </View>
+          {scores.map((score, index) => (
+            <View key={index} style={styles.assessmentScoreQuestionContainer}>
+              <View style={styles.assessmentAnswerContainer}>
+                <TextInput
+                  style={styles.scoreInput}
+                  placeholder="Score Range (e.g., 0-24)"
+                  value={score.range}
+                  onChangeText={(text) =>
+                    handleScoreChange(text, index, "range")
+                  }
+                />
+                <TextInput
+                  style={styles.hpInput}
+                  placeholder="Result (e.g., Severely Dependent)"
+                  value={score.result}
+                  onChangeText={(text) =>
+                    handleScoreChange(text, index, "result")
+                  }
+                />
+              </View>
+              <TouchableOpacity
+                style={styles.assessmentRemoveQuestionButton}
+                onPress={() => handleRemoveScore(index)}
+              >
+                <Text style={styles.assessmentRemoveQuestionText}>
+                  Remove Score
+                </Text>
+              </TouchableOpacity>
+            </View>
+          ))}
+          <TouchableOpacity
+            style={styles.assessmentAddQuestionButton}
+            onPress={handleAddScore}
+          >
+            <Text style={styles.assessmentAddQuestionText}>Add Score</Text>
+          </TouchableOpacity>
+
           <TouchableOpacity
             style={styles.assessmentSubmitButton}
             onPress={handleSubmit}
           >
             <Text style={styles.assessmentSubmitButtonText}>Submit</Text>
           </TouchableOpacity>
+          <View style={[{ marginTop: -20 }]}></View>
+          {/* Render form content */}
+          {route.params && route.params.assessmentId && (
+            <TouchableOpacity
+              style={styles.deleteButton}
+              onPress={handleDelete}
+            >
+              <Text style={styles.deleteButtonText}>Delete Assessment</Text>
+            </TouchableOpacity>
+          )}
         </View>
       </ScrollView>
       <CoNavigationBar navigation={navigation} />

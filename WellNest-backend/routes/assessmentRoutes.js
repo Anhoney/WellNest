@@ -5,6 +5,11 @@ const {
   upload,
   getAssessmentsByCoId,
   getAssessmentById,
+  updateAssessment,
+  deleteAssessment,
+  createAssessmentResults,
+  getAssessmentResultsById,
+  updateAssessmentResults,
 } = require("../controllers/assessmentController"); // Ensure this is a direct import
 const authenticateToken = require("../middleware/authMiddleware");
 
@@ -23,6 +28,39 @@ router.get(
   "/single/assessment/:assessmentId",
   authenticateToken,
   getAssessmentById
+);
+
+// Route to update an existing assessment
+router.put(
+  "/edit/assessments/:assessmentId",
+  authenticateToken,
+  updateAssessment
+);
+router.delete(
+  "/delete/assessment/:assessmentId",
+  authenticateToken,
+  deleteAssessment
+);
+
+// Route to create overall scores and results for an assessment
+router.post(
+  "/assessments/:assessmentId/results",
+  authenticateToken,
+  createAssessmentResults
+);
+
+// Route to fetch assessment results
+router.get(
+  "/assessments/:assessmentId/results",
+  authenticateToken,
+  getAssessmentResultsById
+);
+
+// Route to update assessment results
+router.put(
+  "/assessments/:assessmentId/results",
+  authenticateToken,
+  updateAssessmentResults
 );
 
 module.exports = router;
