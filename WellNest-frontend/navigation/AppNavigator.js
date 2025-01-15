@@ -44,6 +44,9 @@ import VolunteerOpportunitiesScreen from "../src/screens/ElderlyNCaregivers/Volu
 import CollaborationScreen from "../src/screens/ElderlyNCaregivers/CollaborationScreen";
 import SocialEventsDetails from "../src/screens/ElderlyNCaregivers/SocialEventsDetails";
 import VolunteerOpportunityDetails from "../src/screens/ElderlyNCaregivers/VolunteerOpportunityDetails";
+import TestAssessment from "../src/screens/ElderlyNCaregivers/TestAssessment";
+import CarePlanScreen from "../src/screens/ElderlyNCaregivers/CarePlanScreen";
+import EditCarePlanScreen from "../src/screens/ElderlyNCaregivers/EditCarePlanScreen";
 
 // Healthcare Provider screens
 import HealthcareProviderMainPage from "../src/screens/HealthcareProvider/HealthcareProviderMainPage";
@@ -335,6 +338,9 @@ const AppNavigator = () => (
         name="CreateAssessmentQuestionScreen"
         component={CoCreateAssessmentQuestionScreen}
       />
+      <Stack.Screen name="TestAssessment" component={TestAssessment} />
+      <Stack.Screen name="CarePlanScreen" component={CarePlanScreen} />
+      <Stack.Screen name="EditCarePlan" component={EditCarePlanScreen} />
     </Stack.Navigator>
   </NavigationContainer>
 );

@@ -461,7 +461,12 @@ const CoAddAssessmentScreen = () => {
                     style={styles.hpInput}
                     placeholder="Marks"
                     keyboardType="numeric"
-                    value={answer.mark ? answer.mark.toString() : ""}
+                    // value={answer.mark ? answer.mark.toString() : ""}
+                    value={
+                      answer.mark !== null && answer.mark !== undefined
+                        ? answer.mark.toString()
+                        : ""
+                    }
                     // value={answer.mark}
                     onChangeText={(text) =>
                       handleMarkChange(text, questionIndex, answerIndex)

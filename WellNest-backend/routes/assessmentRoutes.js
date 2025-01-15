@@ -10,6 +10,11 @@ const {
   createAssessmentResults,
   getAssessmentResultsById,
   updateAssessmentResults,
+  getAllAssessments,
+  getAssessmentQuestionsAndAnswers,
+  calculateTotalMarksAndFetchResult,
+  saveAssessmentResults,
+  getAssessmentHistory,
 } = require("../controllers/assessmentController"); // Ensure this is a direct import
 const authenticateToken = require("../middleware/authMiddleware");
 
@@ -61,6 +66,36 @@ router.put(
   "/assessments/:assessmentId/results",
   authenticateToken,
   updateAssessmentResults
+);
+
+router.get("/user/allAssessments", authenticateToken, getAllAssessments);
+
+// Route to fetch questions and answers for a specific assessment
+router.get(
+  "/assessments/:assessmentId/questions",
+  authenticateToken,
+  getAssessmentQuestionsAndAnswers
+);
+
+// Route to calculate total marks and fetch result
+router.post(
+  "/assessments/:assessmentId/submit",
+  authenticateToken,
+  calculateTotalMarksAndFetchResult
+);
+
+// Route to save assessment results
+router.post(
+  "/assessments/:assessmentId/results/save",
+  authenticateToken,
+  saveAssessmentResults
+);
+
+// Route to get assessment history for a user
+router.get(
+  "/assessments/history/:userId",
+  authenticateToken,
+  getAssessmentHistory
 );
 
 module.exports = router;

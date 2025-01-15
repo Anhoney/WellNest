@@ -203,7 +203,12 @@ const ProfilePage = () => {
             />
             <Text style={styles.statusText}>Elderly Assessment</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.optionCard}>
+          <TouchableOpacity
+            style={styles.optionCard}
+            onPress={() => {
+              navigation.navigate("CarePlanScreen");
+            }}
+          >
             <Image
               source={require("../../../assets/CarePlanDevelopment.png")}
               style={styles.optionIcon}

@@ -44,25 +44,25 @@ const upload = multer({
 // Create a new assessment
 const createAssessment = async (req, res) => {
   const { co_id } = req.params;
-  const { title, questions, scores } = req.body;
+  const { title, questions, photo, scores } = req.body;
   //   console.log(co_id, title, photo, questions);
   // For binary data storage
-  const photo = req.file ? req.file.path : null;
-  console.log(photo);
-  let photoData = null;
-  if (photo) {
-    try {
-      // Read the image file as binary data
-      photoData = fs.readFileSync(photo);
-    } catch (error) {
-      console.error("Error reading profile image:", error);
-      return res.status(500).json({ error: "Failed to read profile image" });
-    }
-  }
+  // const photo = req.file ? req.file.path : null;
+  // console.log(photo);
+  // let photoData = null;
+  // if (photo) {
+  //   try {
+  //     // Read the image file as binary data
+  //     photoData = fs.readFileSync(photo);
+  //   } catch (error) {
+  //     console.error("Error reading profile image:", error);
+  //     return res.status(500).json({ error: "Failed to read profile image" });
+  //   }
+  // }
   try {
     const assessmentResult = await pool.query(
       "INSERT INTO co_assessments (co_id, title, photo) VALUES ($1, $2, $3) RETURNING assessment_id",
-      [co_id, title, photoData || null]
+      [co_id, title, photo ? Buffer.from(photo, "base64") : null]
     );
     const assessmentId = assessmentResult.rows[0].assessment_id;
 
@@ -138,7 +138,7 @@ const getAssessmentsByCoId = async (req, res) => {
       title: assessment.title,
       photo: assessment.photo ? assessment.photo.toString("base64") : null,
     }));
-    console.log(assessments);
+    // console.log(assessments);
     res.status(200).json(assessments);
   } catch (error) {
     console.error("Error fetching assessments:", error);
@@ -364,6 +364,180 @@ const updateAssessmentResults = async (req, res) => {
   }
 };
 
+//Elderly
+const getAllAssessments = async (req, res) => {
+  // const { co_id } = req.params;
+  try {
+    const assessmentsResult = await pool.query(
+      `SELECT assessment_id, title, created_at,
+       CASE 
+            WHEN photo IS NOT NULL 
+            THEN CONCAT('data:image/png;base64,', ENCODE(photo, 'base64')) 
+            ELSE NULL 
+        END AS photo FROM co_assessments ORDER BY created_at DESC`
+    );
+
+    const assessments = assessmentsResult.rows.map((assessment) => ({
+      assessment_id: assessment.assessment_id,
+      title: assessment.title,
+      photo: assessment.photo ? assessment.photo.toString("base64") : null,
+    }));
+    // console.log(assessments);
+    res.status(200).json(assessments);
+  } catch (error) {
+    console.error("Error fetching assessments:", error);
+    res
+      .status(500)
+      .json({ error: "An error occurred while fetching assessments." });
+  }
+};
+
+// Fetch questions and answers for a specific assessment
+const getAssessmentQuestionsAndAnswers = async (req, res) => {
+  const { assessmentId } = req.params; // Get assessment ID from route params
+
+  try {
+    // Fetch questions for the assessment
+    const questionsResult = await pool.query(
+      "SELECT question_id, question_text FROM co_assessment_questions WHERE assessment_id = $1",
+      [assessmentId]
+    );
+
+    // Fetch answers for each question
+    const questions = await Promise.all(
+      questionsResult.rows.map(async (question) => {
+        const answersResult = await pool.query(
+          "SELECT answer_id, answer_text, mark FROM co_assessment_answers WHERE question_id = $1",
+          [question.question_id]
+        );
+        return {
+          question_id: question.question_id,
+          question_text: question.question_text,
+          answers: answersResult.rows.map((answer) => ({
+            answer_id: answer.answer_id,
+            answer_text: answer.answer_text,
+            mark: answer.mark,
+          })),
+        };
+      })
+    );
+
+    res.status(200).json(questions);
+  } catch (error) {
+    console.error("Error fetching assessment questions and answers:", error);
+    res
+      .status(500)
+      .json({ error: "An error occurred while fetching questions." });
+  }
+};
+
+// Calculate total marks and fetch result based on selected answers
+const calculateTotalMarksAndFetchResult = async (req, res) => {
+  const { assessmentId } = req.params; // Get assessment ID from route params
+  const { answers } = req.body; // Get selected answers from request body
+
+  try {
+    let totalMarks = 0;
+
+    // Calculate total marks based on selected answers
+    for (const questionId in answers) {
+      const answerId = answers[questionId];
+      const answerResult = await pool.query(
+        "SELECT mark FROM co_assessment_answers WHERE answer_id = $1",
+        [answerId]
+      );
+
+      if (answerResult.rows.length > 0) {
+        totalMarks += answerResult.rows[0].mark; // Add the mark of the selected answer
+      }
+    }
+
+    // Fetch the result based on total marks
+    const resultResult = await pool.query(
+      "SELECT result_text, score_range FROM assessment_results WHERE assessment_id = $1",
+      [assessmentId]
+    );
+
+    // Check the total marks against the score ranges
+    let resultText = "No result found for the given marks.";
+    for (const row of resultResult.rows) {
+      const [min, max] = row.score_range.split("-").map(Number); // Split the range and convert to numbers
+      if (totalMarks >= min && totalMarks <= max) {
+        resultText = row.result_text; // Set the result text if total marks fall within the range
+        break; // Exit the loop once we find a matching range
+      }
+    }
+
+    res.status(200).json({ totalMarks, resultText });
+  } catch (error) {
+    console.error("Error calculating total marks and fetching result:", error);
+    res
+      .status(500)
+      .json({ error: "An error occurred while processing the request." });
+  }
+};
+
+// Save assessment results
+const saveAssessmentResults = async (req, res) => {
+  const { assessmentId } = req.params; // Get assessment ID from route params
+  const { userId, totalMarks, overallResult } = req.body; // Get userId, selected answers, and total marks from request body
+
+  try {
+    // Insert the results into the results table
+    const resultInsert = await pool.query(
+      "INSERT INTO assessment_history (user_id, assessment_id, total_marks, overall_result, assessment_date) VALUES ($1, $2, $3, $4, NOW()) RETURNING assessment_history_id",
+      [userId, assessmentId, totalMarks, overallResult]
+    );
+
+    const resultId = resultInsert.rows[0].id;
+
+    res.status(201).json({ message: "Assessment results saved successfully." });
+  } catch (error) {
+    console.error("Error saving assessment results:", error);
+    res
+      .status(500)
+      .json({ error: "An error occurred while saving the results." });
+  }
+};
+
+// Fetch assessment history for a user
+const getAssessmentHistory = async (req, res) => {
+  const { userId } = req.params; // Get user ID from route params
+
+  try {
+    const historyResult = await pool.query(
+      `SELECT ah.assessment_history_id, ah.total_marks, ah.assessment_date, ah.overall_result,
+              ca.title, 
+              CASE 
+                WHEN ca.photo IS NOT NULL 
+                THEN CONCAT('data:image/png;base64,', ENCODE(ca.photo, 'base64')) 
+                ELSE NULL 
+              END AS photo 
+       FROM assessment_history ah
+       JOIN co_assessments ca ON ah.assessment_id = ca.assessment_id
+       WHERE ah.user_id = $1
+       ORDER BY ah.assessment_date DESC`,
+      [userId]
+    );
+
+    const history = historyResult.rows.map((item) => ({
+      assessment_history_id: item.assessment_history_id,
+      total_marks: item.total_marks,
+      overall_result: item.overall_result,
+      assessment_date: item.assessment_date,
+      title: item.title,
+      photo: item.photo,
+    }));
+
+    res.status(200).json(history);
+  } catch (error) {
+    console.error("Error fetching assessment history:", error);
+    res
+      .status(500)
+      .json({ error: "An error occurred while fetching the history." });
+  }
+};
+
 // Correctly export the function
 module.exports = {
   createAssessment,
@@ -375,4 +549,9 @@ module.exports = {
   createAssessmentResults,
   getAssessmentResultsById,
   updateAssessmentResults,
+  getAllAssessments,
+  getAssessmentQuestionsAndAnswers,
+  calculateTotalMarksAndFetchResult,
+  saveAssessmentResults,
+  getAssessmentHistory,
 };

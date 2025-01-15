@@ -84,18 +84,6 @@ const CoElderlyCareAssessmentManagement = () => {
   const renderAssessments = () => {
     return assessments.map((assessment, index) => (
       <View key={index} style={styles.assessmentCard}>
-        {/* <Image
-          source={
-            assessment.photo
-              ? {
-                  uri: `data:image/png;base64,${Buffer.from(
-                    assessment.photo
-                  ).toString("base64")}`,
-                }
-              : require("../../../assets/DefaultAssessment.png")
-          }
-          style={styles.assessmentImage}
-        /> */}
         <Image
           source={
             assessment.photo
@@ -125,7 +113,7 @@ const CoElderlyCareAssessmentManagement = () => {
     <View style={styles.coEmptyContainer}>
       <Image
         source={require("../../../assets/SleepingCat.png")}
-        style={styles.emptyImage}
+        style={styles.largeEmptyImage}
       />
       <Text style={styles.emptyText}>No Assessment Yet.</Text>
     </View>

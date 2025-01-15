@@ -1,105 +1,3 @@
-// import React, { useState } from "react";
-// import {
-//   View,
-//   Text,
-//   TextInput,
-//   TouchableOpacity,
-//   ImageBackground,
-//   FlatList,
-//   StyleSheet,
-//   Alert,
-// } from "react-native";
-// import { Ionicons } from "@expo/vector-icons";
-// import styles from "../../components/styles"; // Import shared styles
-// import CoNavigationBar from "../../components/CoNavigationBar"; // Import your custom navigation bar component
-
-// const CoCreateAssessmentQuestionScreen = ({ route, navigation }) => {
-//   const { title, photo, pattern, choices } = route.params; // Get data from previous screen
-//   const [question, setQuestion] = useState("");
-//   const [answers, setAnswers] = useState([""]); // Initialize with one empty answer
-
-//   const handleAddAnswer = () => {
-//     setAnswers([...answers, ""]); // Add a new empty answer field
-//   };
-
-//   const handleAnswerChange = (text, index) => {
-//     const newAnswers = [...answers];
-//     newAnswers[index] = text; // Update the specific answer
-//     setAnswers(newAnswers);
-//   };
-
-//   const handleSubmit = () => {
-//     if (!question || answers.some((answer) => answer.trim() === "")) {
-//       Alert.alert(
-//         "Error",
-//         "Please fill in the question and all answer fields."
-//       );
-//       return;
-//     }
-
-//     // Here you can handle the submission of the question and answers
-//     console.log("Question:", question);
-//     console.log("Answers:", answers);
-//     // You can navigate to the next screen or send data to the backend here
-//     Alert.alert("Success", "Question and answers submitted successfully!");
-//     navigation.goBack(); // Navigate back to the previous screen
-//   };
-
-//   return (
-//     <ImageBackground
-//       source={require("../../../assets/PlainGrey.png")}
-//       style={styles.background}
-//     >
-//       <View style={styles.smallHeaderContainer}>
-//         <TouchableOpacity
-//           onPress={() => navigation.goBack()}
-//           style={styles.backButton}
-//         >
-//           <Ionicons name="chevron-back" size={24} color="#000" />
-//         </TouchableOpacity>
-//         <Text style={styles.hpTitle}>Create Assessment Question</Text>
-//       </View>
-
-//       <View style={styles.hpContainer}>
-//         <Text style={styles.sectionTitle}>Question Details</Text>
-//         <TextInput
-//           style={styles.hpInput}
-//           placeholder="Enter your question here..."
-//           value={question}
-//           onChangeText={setQuestion}
-//         />
-
-//         <Text style={styles.sectionTitle}>Answers</Text>
-//         <FlatList
-//           data={answers}
-//           renderItem={({ item, index }) => (
-//             <TextInput
-//               style={styles.hpInput}
-//               placeholder={`Answer ${index + 1}`}
-//               value={item}
-//               onChangeText={(text) => handleAnswerChange(text, index)}
-//             />
-//           )}
-//           keyExtractor={(item, index) => index.toString()}
-//         />
-
-//         <TouchableOpacity style={styles.addButton} onPress={handleAddAnswer}>
-//           <Text style={styles.addButtonText}>Add Another Answer</Text>
-//         </TouchableOpacity>
-
-//         <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-//           <Text style={styles.submitButtonText}>Submit Question</Text>
-//         </TouchableOpacity>
-//       </View>
-
-//       <CoNavigationBar navigation={navigation} />
-//     </ImageBackground>
-//   );
-// };
-
-// export default CoCreateAssessmentQuestionScreen;
-
-//Second Version
 // CreateAssessmentQuestionScreen.js
 import React, { useState } from "react";
 import {
@@ -118,7 +16,10 @@ import CoNavigationBar from "../../components/CoNavigationBar"; // Import your c
 
 const CoCreateAssessmentQuestionScreen = ({ route, navigation }) => {
   const { title, pattern, choices } = route.params; // Get title, pattern, and choices from previous screen
-  const [questions, setQuestions] = useState([{ question: "", answers: [""] }]); // Initialize with one question
+  // const [questions, setQuestions] = useState([{ question: "", answers: [""] }]); // Initialize with one question
+  const [questions, setQuestions] = useState([
+    { question: "", answers: [{ text: "", mark: 0 }] },
+  ]);
 
   const handleAddQuestion = () => {
     setQuestions([...questions, { question: "", answers: [""] }]); // Add a new question

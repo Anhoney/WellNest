@@ -2281,10 +2281,9 @@ export default StyleSheet.create({
   userInfo: {
     marginLeft: 30,
     marginTop: 10,
-    flexDirection: "column", // Stack items vertically
+    flexDirection: "row", // Stack items vertically
     alignItems: "flex-start", // Align items to the left
     padding: 16, // Add some padding for better spacing
-
     shadowOffset: {
       width: 0,
       height: 2,
@@ -2293,7 +2292,18 @@ export default StyleSheet.create({
     shadowRadius: 4,
     elevation: 2, // For Android shadow
   },
-  userName: { fontSize: 22, fontWeight: "bold", marginBottom: 10 },
+  userName: {
+    fontSize: 22,
+    fontWeight: "bold",
+    marginBottom: 10,
+    marginLeft: -18,
+  },
+  userAgeNGender: {
+    fontSize: 18,
+    marginBottom: 5,
+    marginLeft: 42,
+    marginTop: 3,
+  },
   tabs: { flexDirection: "row", justifyContent: "center", marginVertical: 10 },
   tab: { padding: 10, borderBottomWidth: 2, borderBottomColor: "transparent" },
   activeTab: { borderBottomColor: "#000" },
@@ -2750,5 +2760,141 @@ export default StyleSheet.create({
     backgroundColor: "#fff",
     borderRadius: 5,
     elevation: 2,
+  },
+  //TestAssessment
+  eQuestionContainer: {
+    marginBottom: 20,
+  },
+  eQuestionText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  eAnswerButton: {
+    padding: 10,
+    backgroundColor: "#f0f0f0",
+    borderRadius: 5,
+    marginBottom: 10,
+  },
+  eSelectedAnswer: {
+    backgroundColor: "#d0e0ff",
+  },
+  eAnswerText: {
+    fontSize: 16,
+  },
+  eSubmitButton: {
+    padding: 15,
+    backgroundColor: "#007bff",
+    borderRadius: 5,
+    alignItems: "center",
+  },
+  eSubmitButtonText: {
+    color: "#fff",
+    fontSize: 18,
+  },
+  eResultContainer: {
+    marginTop: 20,
+    padding: 10,
+    backgroundColor: "#e0f7fa",
+    borderRadius: 5,
+  },
+  eResultText: {
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  historyCard: {
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    padding: 15,
+    marginBottom: 15,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  historyImage: {
+    width: 50,
+    height: 50,
+    marginRight: 15,
+  },
+  historyDetails: {
+    flex: 1,
+  },
+  historyTitle: {
+    fontSize: 16,
+    fontWeight: "bold",
+    marginBottom: 5,
+  },
+  historyMarks: {
+    fontSize: 14,
+    color: "#555",
+  },
+  historyDate: {
+    fontSize: 12,
+    color: "#888",
+  },
+  //CarePlanScreen
+  cpContainer: { flex: 1, padding: 20, marginTop: -20 },
+  cpCard: {
+    backgroundColor: "#f9f9f9",
+    padding: 15,
+    marginBottom: 10,
+    borderRadius: 8,
+  },
+  cpTitle: { fontSize: 24, fontWeight: "bold" },
+  cpText: { fontSize: 22 },
+  cpEdit: {
+    fontSize: 20,
+    textDecorationLine: "underline",
+    color: "orange",
+    marginTop: 20,
+    fontWeight: "bold",
+  },
+  cpAddButton: {
+    backgroundColor: "#FFA500",
+    position: "absolute",
+    right: 20,
+    bottom: 20,
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  cpAddButtonText: { fontSize: 30, color: "white" },
+  ecpContainer: { flex: 1, padding: 20 },
+  ecpInput: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    padding: 10,
+    marginBottom: 10,
+    borderRadius: 5,
+    backgroundColor: "#fff",
+  },
+  ecpCancelButton: {
+    backgroundColor: "white",
+    paddingVertical: 12,
+    alignItems: "center",
+    borderRadius: 8,
+    margin: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.8,
+    shadowRadius: 2,
+    elevation: 5, // Add hover effect on Android
+    marginTop: -6,
+  },
+  ecpCancelButtonText: {
+    color: "#333",
+    fontSize: 18, // Larger button text
+    fontWeight: "bold",
+  },
+  largeEmptyImage: {
+    width: 250,
+    height: 200,
+    marginBottom: 20,
+  },
+  trashIcon: {
+    position: "absolute",
+    top: 20,
+    right: 8,
   },
 });
