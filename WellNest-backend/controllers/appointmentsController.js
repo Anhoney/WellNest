@@ -480,7 +480,7 @@ const getUpcomingVirtualAppointments = async (req, res) => {
       TO_CHAR(hv.hpva_date, 'YYYY-MM-DD') AS hpva_date,
       TO_CHAR(hv.hpva_time, 'HH12:MI AM') AS hpva_time,
       hv.status, hv.symptoms, hv.service, hv.fee, hv.payment_status, 
-      hv.receipt_url, 
+      hv.receipt_url, hv.meeting_link,
       hv.who_will_see, hv.patient_seen_before, hv.notes, 
       hv.created_at, hv.updated_at , 
       CASE 
@@ -498,11 +498,11 @@ const getUpcomingVirtualAppointments = async (req, res) => {
   `;
     const result = await pool.query(query, [hpId]);
 
-    if (result.rows.length === 0) {
-      return res
-        .status(404)
-        .json({ message: "No upcoming appointments found." });
-    }
+    // if (result.rows.length === 0) {
+    //   return res
+    //     .status(404)
+    //     .json({ message: "No upcoming appointments found." });
+    // }
     // console.log("Database query result:", result.rows);
 
     res.status(200).json(result.rows);
@@ -591,15 +591,24 @@ const updateVirtualAppointmentStatus = async (req, res) => {
 
     // Prepare the notification message based on the new status
     let message;
+    // if (status === "approved") {
+    //   message = `Your virtual consultation at ${formattedTime} on ${formattedDate} has been approved.`;
+    // } else if (status === "canceled") {
+    //   message = `Your virtual consultation has been canceled.`;
+    // }
+    let notificationType;
+
     if (status === "approved") {
       message = `Your virtual consultation at ${formattedTime} on ${formattedDate} has been approved.`;
+      notificationType = "appointment_approved"; // Set notification type for approved status
     } else if (status === "canceled") {
       message = `Your virtual consultation has been canceled.`;
+      notificationType = "appointment_status_update"; // Set notification type for canceled status
     }
 
     // Send the notification to the user
     if (message) {
-      await notifyUser(appointment.u_id, message, "appointment_status_update");
+      await notifyUser(appointment.u_id, message, notificationType);
     }
 
     res.status(200).json({
@@ -716,17 +725,38 @@ const getPastVirtualAppointments = async (req, res) => {
   }
 };
 
-// const sendCalendarEventNotification = (userId, appDate, appTime) => {
-//   // Logic to send a push notification or event message to user’s app
-//   // Implement based on your push notification service or messaging queue (e.g., Firebase, OneSignal)
-//   const notificationData = {
-//     title: "Appointment Reminder",
-//     body: `You have an appointment on ${appDate} at ${appTime}.`,
-//     data: { appDate, appTime },
-//   };
+const updateVirtualAppointmentMeetingLink = async (req, res) => {
+  const { hpva_id } = req.params;
+  const { meetingLink } = req.body; // Added meetingLink to request body
 
-//   sendPushNotificationToUser(userId, notificationData); // Use your notification service
-// };
+  console.log("VAppStatusReceived appointmentId:", hpva_id);
+  console.log("Received meetingLink:", meetingLink); // Log the received meeting link
+
+  try {
+    const query = `
+      UPDATE hp_virtual_appointment
+      SET meeting_link = $1
+      WHERE hpva_id = $2
+      RETURNING *;
+    `;
+    const result = await pool.query(query, [meetingLink, hpva_id]);
+
+    if (result.rows.length === 0) {
+      return res.status(400).json({ message: "Appointment not found." });
+    }
+
+    const appointment = result.rows[0];
+    console.log("Appointment details:", appointment);
+
+    res.status(200).json({
+      message: "Meeting link updated successfully.",
+      appointment: appointment,
+    });
+  } catch (error) {
+    console.error("Error updating meeting link:", error);
+    res.status(500).json({ error: "Failed to update meeting link" });
+  }
+};
 
 module.exports = {
   createAppointment,
@@ -748,4 +778,5 @@ module.exports = {
   getVirtualAppointmentDetailsByHpAppId,
   deleteVirtualSingleAppointment,
   getPastVirtualAppointments,
+  updateVirtualAppointmentMeetingLink,
 };

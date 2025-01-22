@@ -23,6 +23,7 @@ const {
   getVirtualAppointmentDetailsByHpAppId,
   deleteVirtualSingleAppointment,
   getPastVirtualAppointments,
+  updateVirtualAppointmentMeetingLink,
 } = require("../controllers/appointmentsController");
 const authenticateToken = require("../middleware/authMiddleware");
 
@@ -103,5 +104,9 @@ router.delete(
   deleteVirtualSingleAppointment
 );
 router.get("/virtual/getPastAppointments/:hpId", getPastVirtualAppointments);
+router.put(
+  "/virtual/appointments/updateMeetingLink/:hpva_id",
+  updateVirtualAppointmentMeetingLink
+);
 
 module.exports = router;

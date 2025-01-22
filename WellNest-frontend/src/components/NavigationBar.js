@@ -33,7 +33,7 @@ const NavigationBar = ({ activePage }) => {
   const tabs = [
     { name: "MainPage", label: "Home", icon: "home-outline" },
     { name: "AppointmentHistory", label: "Schedule", icon: "calendar-outline" },
-    { name: "Chat", label: "Chat", icon: "chatbubble-ellipses-outline" },
+    { name: "GroupChat", label: "Chat", icon: "chatbubble-ellipses-outline" },
     {
       name: "Notifications",
       label: "Notification",

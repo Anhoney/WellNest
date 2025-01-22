@@ -289,109 +289,30 @@ const CoSocialEventsManagement = () => {
 
               {activeTab === "chat" && (
                 <>
-                  <View style={styles.filterButtonContainer}>
-                    <TouchableOpacity
-                      style={[
-                        styles.filterButton,
-                        selectedFilter === "publicChat"
-                          ? styles.activeFilter
-                          : styles.inactiveFilter,
-                      ]}
-                      onPress={() => setSelectedFilter("publicChat")}
-                    >
-                      <Text
-                        style={[
-                          styles.filterButtonText,
-                          selectedFilter === "publicChat"
-                            ? styles.activeFilterText
-                            : styles.inactiveFilterText,
-                        ]}
-                      >
-                        My Created{"\n"}Chat Rooms
-                      </Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                      style={[
-                        styles.filterButton,
-                        selectedFilter === "myChat"
-                          ? styles.activeFilter
-                          : styles.inactiveFilter,
-                      ]}
-                      onPress={() => setSelectedFilter("myChat")}
-                    >
-                      <Text
-                        style={[
-                          styles.filterButtonText,
-                          selectedFilter === "myChat"
-                            ? styles.activeFilterText
-                            : styles.inactiveFilterText,
-                        ]}
-                      >
-                        Private / Events{"\n"} {"  "}Chats Room
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-
-                  <View style={styles.singleUnderline}></View>
-
-                  {selectedFilter === "myChat" ? (
-                    <>
-                      <Text style={styles.sectionTitle}>
-                        Private / Events Chats Room
-                      </Text>
-                      <View style={styles.displayUnderline}></View>
-                      <FlatList
-                        data={coChatRooms}
-                        keyExtractor={(room) => room.id.toString()}
-                        contentContainerStyle={styles.listContainer}
-                        renderItem={({ item: room }) => (
-                          <ChatRoomCard
-                            key={room.id}
-                            group_id={room.id}
-                            title={room.group_name}
-                            group_photo={room.group_photo}
-                            fetchChatRoom={fetchMyChatRoom}
-                            // onJoin={() => alert(`Joining ${room.group_name}`)}
-                            onJoin={() =>
-                              navigation.navigate("chatRoom", {
-                                group_id: room.id,
-                                group_name: room.group_name,
-                              })
-                            }
-                          />
-                        )}
+                  <Text style={styles.sectionTitle}>My Created Chat Rooms</Text>
+                  <View style={styles.displayUnderline}></View>
+                  <FlatList
+                    data={coChatRooms}
+                    keyExtractor={(room) => room.id.toString()}
+                    contentContainerStyle={styles.listContainer}
+                    renderItem={({ item: room }) => (
+                      <ChatRoomCard
+                        key={room.id}
+                        group_id={room.id}
+                        title={room.group_name}
+                        group_photo={room.group_photo}
+                        fetchChatRoom={fetchMyChatRoom}
+                        // onJoin={() => alert(`Joining ${room.group_name}`)}
+                        onJoin={() =>
+                          navigation.navigate("chatRoom", {
+                            group_id: room.id,
+                            group_name: room.group_name,
+                          })
+                        }
                       />
-                    </>
-                  ) : (
-                    <>
-                      <Text style={styles.sectionTitle}>
-                        My Created Chat Rooms
-                      </Text>
-                      <View style={styles.displayUnderline}></View>
-                      <FlatList
-                        data={coChatRooms}
-                        keyExtractor={(room) => room.id.toString()}
-                        contentContainerStyle={styles.listContainer}
-                        renderItem={({ item: room }) => (
-                          <ChatRoomCard
-                            key={room.id}
-                            group_id={room.id}
-                            title={room.group_name}
-                            group_photo={room.group_photo}
-                            fetchChatRoom={fetchMyChatRoom}
-                            // onJoin={() => alert(`Joining ${room.group_name}`)}
-                            onJoin={() =>
-                              navigation.navigate("chatRoom", {
-                                group_id: room.id,
-                                group_name: room.group_name,
-                              })
-                            }
-                          />
-                        )}
-                      />
-                    </>
-                  )}
+                    )}
+                  />
+
                   <TouchableOpacity
                     style={styles.addEventButton}
                     onPress={() =>

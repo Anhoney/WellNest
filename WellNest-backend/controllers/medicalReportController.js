@@ -587,7 +587,11 @@ const getUserMedicalReports = async (req, res) => {
         rm.medicine_id,
         rm.name AS medicine_name,
         rm.dosage,
-        rm.duration
+        rm.duration,
+        ha.app_date,
+        ha.app_time,
+        hva.hpva_date,
+        hva.hpva_time
       FROM public.medical_reports mr
       LEFT JOIN public.report_medicines rm ON mr.report_id = rm.report_id
       LEFT JOIN public.hp_appointments ha ON ha.hp_app_id = mr.appointment_id
@@ -613,7 +617,24 @@ const getUserMedicalReports = async (req, res) => {
         medicine_name,
         dosage,
         duration,
+        app_date,
+        app_time,
+        hpva_date,
+        hpva_time,
       } = row;
+
+      const formattedAppDate = app_date
+        ? format(new Date(app_date), "dd-MM-yyyy")
+        : null;
+      const formattedAppTime = app_time
+        ? format(new Date(`1970-01-01T${app_time}Z`), "hh:mm a")
+        : null;
+      const formattedHpvaDate = hpva_date
+        ? format(new Date(hpva_date), "dd-MM-yyyy")
+        : null;
+      const formattedHpvaTime = hpva_time
+        ? format(new Date(`1970-01-01T${hpva_time}Z`), "hh:mm a")
+        : null;
 
       if (!reports[report_id]) {
         reports[report_id] = {
@@ -636,6 +657,10 @@ const getUserMedicalReports = async (req, res) => {
               appointment_type.slice(1) // Capitalize the first letter
             : "", // Handle null or empty case
           medicines: [],
+          app_date: formattedAppDate,
+          app_time: formattedAppTime,
+          hpva_date: formattedHpvaDate,
+          hpva_time: formattedHpvaTime,
         };
       }
 

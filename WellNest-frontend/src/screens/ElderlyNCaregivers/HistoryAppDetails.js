@@ -265,6 +265,16 @@ const HistoryAppDetails = ({ route, navigation }) => {
                   </View>
                 </>
               )}
+              {isVirtual && appointmentDetails.meeting_link && (
+                <>
+                  <View style={styles.tableRow}>
+                    <Text style={styles.tableCell}>Meeting Link</Text>
+                    <Text style={styles.tableCell}>
+                      {appointmentDetails.meeting_link}
+                    </Text>
+                  </View>
+                </>
+              )}
               <View style={styles.tableRow}>
                 <Text style={styles.tableCell}>
                   {isVirtual ? "Symptoms" : "Reason"}:

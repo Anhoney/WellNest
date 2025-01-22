@@ -52,6 +52,7 @@ const CoCreateNEditOpportunity = () => {
   const [selectedFile, setSelectedFile] = useState(null); // Add logic for the image if editing
   const route = useRoute(); // Get route params
   const { opportunityId } = route.params || {};
+  const [existingPhoto, setExistingPhoto] = useState(null);
 
   useEffect(() => {
     getUserIdFromToken().then((userId) => {
@@ -88,6 +89,7 @@ const CoCreateNEditOpportunity = () => {
       setOpportunityStatus(opportunity.opportunity_status);
       setRegistrationDue(new Date(opportunity.registration_due));
       setPhoto(opportunity.photo);
+      setExistingPhoto(opportunity.photo);
     } catch (error) {
       console.error("Failed to fetch opportunity data:", error);
     }
@@ -223,6 +225,10 @@ const CoCreateNEditOpportunity = () => {
         // console.log("Appending image to FormData:", file);
         formData.append("photo", file);
       } else {
+        // If no new photo is selected, append the existing photo data
+        if (existingPhoto) {
+          formData.append("photo", existingPhoto); // Send existing photo data
+        }
         console.log("No photo to upload.");
       }
       // if (photo)

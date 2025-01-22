@@ -7,10 +7,10 @@ import styles from "./styles"; // Assuming you have your styles.js setup
 const NavigationBar = ({ navigation, activePage }) => {
   const tabs = [
     { name: "CommunityOrganizerMainPage", label: "Home", icon: "home-outline" },
-    { name: "Schedule", label: "Schedule", icon: "calendar-outline" },
-    { name: "Chat", label: "Chat", icon: "chatbubble-ellipses-outline" },
+    // { name: "Schedule", label: "Schedule", icon: "calendar-outline" },
+    { name: "CoGroupChat", label: "Chat", icon: "chatbubble-ellipses-outline" },
     {
-      name: "Notification",
+      name: "Notifications",
       label: "Notification",
       icon: "notifications-outline",
     },

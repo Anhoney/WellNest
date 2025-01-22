@@ -160,7 +160,11 @@ const MainPage = ({ medicineReminder }) => {
               </TouchableOpacity>
 
               <TouchableOpacity
-                onPress={() => navigation.navigate("MedicationReminderPage")}
+                onPress={() =>
+                  navigation.navigate("MedicationReminderPage", {
+                    userId: userId,
+                  })
+                }
               >
                 <Image
                   source={require("../../../assets/MedicationReminder.png")}

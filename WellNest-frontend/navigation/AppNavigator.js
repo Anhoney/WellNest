@@ -52,6 +52,7 @@ import FamilyCollabScreen from "../src/screens/ElderlyNCaregivers/FamilyCollabSc
 import CaregiverInformation from "../src/screens/ElderlyNCaregivers/CaregiverInformation";
 import ChatRoomElderly from "../src/screens/ElderlyNCaregivers/ChatRoomElderly";
 import ManageChatRoomElderly from "../src/screens/ElderlyNCaregivers/ManageChatRoomElderly";
+import GroupChat from "../src/screens/ElderlyNCaregivers/GroupChat";
 
 // Healthcare Provider screens
 import HealthcareProviderMainPage from "../src/screens/HealthcareProvider/HealthcareProviderMainPage";
@@ -87,10 +88,10 @@ import CoOpportunityParticipants from "../src/screens/CommunityOrganizers/CoOppo
 import CoElderlyCareAssessmentManagement from "../src/screens/CommunityOrganizers/CoElderlyCareAssessmentManagement";
 import CoAddAssessmentScreen from "../src/screens/CommunityOrganizers/CoAddAssessmentScreen";
 import CoCreateAssessmentQuestionScreen from "../src/screens/CommunityOrganizers/CoCreateAssessmentQuestionScreen";
-
 import CoCreateChatRoom from "../src/screens/CommunityOrganizers/CoCreateChatRoom";
 import ChatRoom from "../src/screens/CommunityOrganizers/ChatRoom";
 import CoManageChatRoom from "../src/screens/CommunityOrganizers/CoManageChatRoom";
+import CoGroupChat from "../src/screens/CommunityOrganizers/CoGroupChat";
 
 const Stack = createStackNavigator();
 
@@ -367,6 +368,8 @@ const AppNavigator = () => (
         name="ManageChatRoomElderly"
         component={ManageChatRoomElderly}
       />
+      <Stack.Screen name="GroupChat" component={GroupChat} />
+      <Stack.Screen name="CoGroupChat" component={CoGroupChat} />
     </Stack.Navigator>
   </NavigationContainer>
 );

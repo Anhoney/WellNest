@@ -404,7 +404,7 @@ const AppointmentPage = () => {
         >
           <Ionicons name="chevron-back" size={24} color="#000" />
         </TouchableOpacity>
-        <Text style={styles.title}>Booking Appointment</Text>
+        <Text style={styles.title}>Appointment Booking</Text>
       </View>
 
       <View style={styles.appointmentContainer}>

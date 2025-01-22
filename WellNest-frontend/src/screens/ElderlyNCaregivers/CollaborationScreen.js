@@ -334,8 +334,18 @@ const FamilyCaregiverCollaboration = ({}) => {
               <Text style={styles.pendingRequestText}>
                 You have sent the following collaboration requests:
               </Text>
-              {pendingRequests.map((request) => (
+              {/* {pendingRequests.map((request) => (
                 <Text key={request.id} style={styles.pendingRequestText}>
+                  {` - ${
+                    request.collaborator_username || request.full_name
+                  } (Relationship: ${request.relationship}) `}
+                </Text>
+              ))} */}
+              {pendingRequests.map((request, index) => (
+                <Text
+                  key={request.id || `pending-${index}`}
+                  style={styles.pendingRequestText}
+                >
                   {` - ${
                     request.collaborator_username || request.full_name
                   } (Relationship: ${request.relationship}) `}
@@ -353,10 +363,13 @@ const FamilyCaregiverCollaboration = ({}) => {
           // keyExtractor={(item) => item.collab_id}
           // .toString()
           // keyExtractor={(item) => item.collab_id.toString()}
-          keyExtractor={(item) =>
-            item.collab_id
-              ? item.collab_id.toString()
-              : item.id || Math.random().toString()
+          // keyExtractor={(item) =>
+          //   item.collab_id
+          //     ? item.collab_id.toString()
+          //     : item.id || Math.random().toString()
+          // }
+          keyExtractor={(item, index) =>
+            item.collab_id ? item.collab_id.toString() : `collab-${index}`
           }
           ListEmptyComponent={renderEmptyComponent}
         />

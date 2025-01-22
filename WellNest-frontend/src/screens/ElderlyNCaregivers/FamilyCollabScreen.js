@@ -44,6 +44,9 @@ const FamilyCollabScreen = () => {
         caregiverId: userToCollabId,
       });
     } else if (feature === "Medication Reminder") {
+      navigation.navigate("MedicationReminderPage", {
+        userId: userToCollabId,
+      });
     } else if (feature === "Care Plan Development") {
       navigation.navigate("CarePlanScreen", {
         userId: userToCollabId,

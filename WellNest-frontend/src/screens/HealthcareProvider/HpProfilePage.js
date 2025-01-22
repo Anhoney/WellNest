@@ -32,27 +32,6 @@ const HpProfilePage = () => {
   const { handleClearInterval } = useNotification();
 
   const fetchUserId = async () => {
-    // try {
-    //   const token = await AsyncStorage.getItem("token");
-    //   console.log("token:", token);
-    //   if (!token) {
-    //     alert("No token found. Please log in.");
-    //     return;
-    //   }
-
-    //   const decodedToken = jwt_decode(token);
-    //   const decodedUserId = decodedToken.id;
-    //   // console.log("decodeuserid:", decodedUserId);
-    //   if (decodedUserId) {
-    //     setUserId(decodedUserId);
-    //     fetchProfileData(decodedUserId);
-    //   } else {
-    //     alert("Failed to retrieve user ID from token.");
-    //   }
-    // } catch (error) {
-    //   console.error("Error decoding token:", error);
-    //   Alert.alert("Error", "Failed to decode token");
-    // }
     const userId = await getUserIdFromToken();
     console.log("userId:", userId);
     if (userId) {
@@ -119,70 +98,213 @@ const HpProfilePage = () => {
   // }, []);
 
   // Confirm and handle Delete Account
-  const handleDeleteAccount = () => {
-    Alert.alert(
-      "Confirm Delete Account",
-      "Are you sure you want to delete your account? This action cannot be undone.",
-      [
+  const handleDeleteAccount = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      if (!token || !userId) {
+        Alert.alert("Error", "Unable to authenticate. Please log in.");
+        return;
+      }
+
+      // Fetch upcoming virtual appointments before deleting the account
+      const virtualAppointmentResponse = await axios.get(
+        `${API_BASE_URL}/virtual/getUpcomingAppointment/${userId}`,
         {
-          text: "Cancel", // User cancels
-          style: "cancel",
-        },
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      // Fetch upcoming physical appointments before deleting the account
+      const physicalAppointmentResponse = await axios.get(
+        `${API_BASE_URL}/getUpcomingAppointment/${userId}`,
         {
-          text: "Yes", // User confirms
-          onPress: async () => {
-            try {
-              const token = await AsyncStorage.getItem("token");
-              if (!token || !userId) {
-                Alert.alert("Error", "Unable to authenticate. Please log in.");
-                return;
-              }
-              const response = await axios.delete(
-                `${API_BASE_URL}/deleteAccount/${userId}`,
-                {
-                  headers: { Authorization: `Bearer ${token}` },
-                }
-              );
-              if (response.status === 200) {
-                Alert.alert(
-                  "Success",
-                  "Your account has been deleted successfully."
-                );
-                await logout(); // Log out and clear token
-                handleClearInterval();
-                navigation.reset({
-                  index: 0,
-                  routes: [{ name: "LoginPage" }],
-                });
-              }
-            } catch (error) {
-              console.error("Error deleting account:", error);
-              Alert.alert(
-                "Error",
-                "Failed to delete account. Please try again."
-              );
-            }
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      if (
+        (virtualAppointmentResponse.data &&
+          virtualAppointmentResponse.data.length > 0) ||
+        (physicalAppointmentResponse.data &&
+          physicalAppointmentResponse.data.length > 0)
+      ) {
+        Alert.alert(
+          "Cannot Delete Account",
+          "You have upcoming appointments. Please complete or cancel them before deleting your account."
+        );
+        return;
+      }
+
+      Alert.alert(
+        "Confirm Delete Account",
+        "Are you sure you want to delete your account? This action cannot be undone.",
+        [
+          {
+            text: "Cancel", // User cancels
+            style: "cancel",
           },
-        },
-      ],
-      { cancelable: false } // Prevent closing the alert by tapping outside
-    );
+          {
+            text: "Yes", // User confirms
+            onPress: async () => {
+              try {
+                const response = await axios.delete(
+                  `${API_BASE_URL}/deleteAccount/${userId}`,
+                  {
+                    headers: { Authorization: `Bearer ${token}` },
+                  }
+                );
+                if (response.status === 200) {
+                  Alert.alert(
+                    "Success",
+                    "Your account has been deleted successfully."
+                  );
+                  await logout(); // Log out and clear token
+                  handleClearInterval();
+                  navigation.reset({
+                    index: 0,
+                    routes: [{ name: "LoginPage" }],
+                  });
+                }
+              } catch (error) {
+                console.error("Error deleting account:", error);
+                Alert.alert(
+                  "Error",
+                  "Failed to delete account. Please try again."
+                );
+              }
+            },
+          },
+        ],
+        { cancelable: false } // Prevent closing the alert by tapping outside
+      );
+    } catch (error) {
+      console.error("Error fetching appointments or deleting account:", error);
+      Alert.alert("Error", "Failed to check appointments. Please try again.");
+    }
   };
 
-  // // Sign Out Function
-  // const handleSignOut = async () => {
+  // const handleDeleteAccount = async () => {
   //   try {
-  //     // Remove token from AsyncStorage
-  //     await AsyncStorage.removeItem("authToken");
-  //     // Navigate back to the login page
-  //     navigation.reset({
-  //       index: 0,
-  //       routes: [{ name: "LoginPage" }],
-  //     });
+  //     const token = await AsyncStorage.getItem("token");
+  //     if (!token || !userId) {
+  //       Alert.alert("Error", "Unable to authenticate. Please log in.");
+  //       return;
+  //     }
+
+  //     // Fetch upcoming appointments before deleting the account
+  //     const appointmentResponse = await axios.get(
+  //       `${API_BASE_URL}/virtual/getUpcomingAppointment/${userId}`,
+  //       {
+  //         headers: { Authorization: `Bearer ${token}` },
+  //       }
+  //     );
+
+  //     if (appointmentResponse.data && appointmentResponse.data.length > 0) {
+  //       Alert.alert(
+  //         "Cannot Delete Account",
+  //         "You have upcoming appointments. Please complete or cancel them before deleting your account."
+  //       );
+  //       return;
+  //     }
+
+  //     Alert.alert(
+  //       "Confirm Delete Account",
+  //       "Are you sure you want to delete your account? This action cannot be undone.",
+  //       [
+  //         {
+  //           text: "Cancel", // User cancels
+  //           style: "cancel",
+  //         },
+  //         {
+  //           text: "Yes", // User confirms
+  //           onPress: async () => {
+  //             try {
+  //               const response = await axios.delete(
+  //                 `${API_BASE_URL}/deleteAccount/${userId}`,
+  //                 {
+  //                   headers: { Authorization: `Bearer ${token}` },
+  //                 }
+  //               );
+  //               if (response.status === 200) {
+  //                 Alert.alert(
+  //                   "Success",
+  //                   "Your account has been deleted successfully."
+  //                 );
+  //                 await logout(); // Log out and clear token
+  //                 handleClearInterval();
+  //                 navigation.reset({
+  //                   index: 0,
+  //                   routes: [{ name: "LoginPage" }],
+  //                 });
+  //               }
+  //             } catch (error) {
+  //               console.error("Error deleting account:", error);
+  //               Alert.alert(
+  //                 "Error",
+  //                 "Failed to delete account. Please try again."
+  //               );
+  //             }
+  //           },
+  //         },
+  //       ],
+  //       { cancelable: false } // Prevent closing the alert by tapping outside
+  //     );
   //   } catch (error) {
-  //     console.error("Error signing out:", error);
+  //     console.error("Error fetching appointments or deleting account:", error);
+  //     Alert.alert("Error", "Failed to check appointments. Please try again.");
   //   }
   // };
+
+  // const handleDeleteAccount = () => {
+  //   Alert.alert(
+  //     "Confirm Delete Account",
+  //     "Are you sure you want to delete your account? This action cannot be undone.",
+  //     [
+  //       {
+  //         text: "Cancel", // User cancels
+  //         style: "cancel",
+  //       },
+  //       {
+  //         text: "Yes", // User confirms
+  //         onPress: async () => {
+  //           try {
+  //             const token = await AsyncStorage.getItem("token");
+  //             if (!token || !userId) {
+  //               Alert.alert("Error", "Unable to authenticate. Please log in.");
+  //               return;
+  //             }
+  //             const response = await axios.delete(
+  //               `${API_BASE_URL}/deleteAccount/${userId}`,
+  //               {
+  //                 headers: { Authorization: `Bearer ${token}` },
+  //               }
+  //             );
+  //             if (response.status === 200) {
+  //               Alert.alert(
+  //                 "Success",
+  //                 "Your account has been deleted successfully."
+  //               );
+  //               await logout(); // Log out and clear token
+  //               handleClearInterval();
+  //               navigation.reset({
+  //                 index: 0,
+  //                 routes: [{ name: "LoginPage" }],
+  //               });
+  //             }
+  //           } catch (error) {
+  //             console.error("Error deleting account:", error);
+  //             Alert.alert(
+  //               "Error",
+  //               "Failed to delete account. Please try again."
+  //             );
+  //           }
+  //         },
+  //       },
+  //     ],
+  //     { cancelable: false } // Prevent closing the alert by tapping outside
+  //   );
+  // };
+
   // Confirm and handle Sign Out
   const handleSignOut = () => {
     Alert.alert(
@@ -199,7 +321,11 @@ const HpProfilePage = () => {
             try {
               await logout(); // Log out function from AuthContext
               handleClearInterval();
-              navigation.navigate("LoginPage");
+              navigation.reset({
+                index: 0,
+                routes: [{ name: "LoginPage" }],
+              });
+              // navigation.navigate("LoginPage");
             } catch (error) {
               console.error("Error signing out:", error);
             }

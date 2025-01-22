@@ -1421,6 +1421,15 @@ export default StyleSheet.create({
   past: { borderColor: "#888", borderWidth: 2 },
   doctorName: { fontSize: 18, fontWeight: "bold" },
   doctorDetails: { fontSize: 16, color: "#555" },
+  appointmentType: {
+    fontSize: 18, // Larger font size
+    fontWeight: "bold", // Bold text for emphasis
+    color: "#333333", // Darker color for better contrast
+    letterSpacing: 0.5, // Slight spacing between letters
+    // textShadowColor: "#AAAAAA", // Optional: subtle shadow effect
+    // textShadowOffset: { width: 1, height: 1 },
+    // textShadowRadius: 1,
+  },
   date: {
     fontSize: 16,
     color: "#008000",
@@ -1573,13 +1582,21 @@ export default StyleSheet.create({
     marginRight: 10,
   },
   mrCancelButton: {
+    marginBottom: -6,
     backgroundColor: "#FFFFFF", // Set the background color to white
-    padding: 10,
-    borderRadius: 5,
-    flex: 1,
+    paddingVertical: 12,
+    alignItems: "center",
+    borderRadius: 8,
+    margin: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.8,
+    shadowRadius: 2,
+    elevation: 5,
     borderColor: "#007BFF", // Change the border color to blue
     borderWidth: 2, // Add border width to make the border visible
   },
+
   mrButtonText: {
     color: "#fff",
     textAlign: "center",
@@ -1708,6 +1725,32 @@ export default StyleSheet.create({
     alignItems: "center",
   },
   //HpVUpcomingAppointment
+  HpVconfirmButton: {
+    backgroundColor: "#4CAF50", // Green background for the button
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 10,
+  },
+
+  HpVconfirmButtonText: {
+    color: "#FFFFFF", // White text color
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+
+  HpVmeetingLinkInput: {
+    borderColor: "#B0BEC5", // Light grey border color
+    borderWidth: 1,
+    borderRadius: 5,
+    padding: 10,
+    fontSize: 16,
+    marginBottom: 10,
+    backgroundColor: "#F5F5F5", // Light background for input
+    color: "#000000", // Black text color
+  },
   HpVmodalContainer: {
     flex: 1,
     justifyContent: "center",
@@ -1918,21 +1961,30 @@ export default StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     marginBottom: 5,
+    color: "#FF5733",
   },
   details: {
-    fontSize: 14,
+    fontSize: 16,
     marginBottom: 5,
   },
   medicineHeader: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: "bold",
-    marginTop: 10,
+    // marginTop: 10,
   },
   medicineContainer: {
     marginVertical: 5,
   },
+  largeMedicineContainer: {
+    padding: 10,
+    borderRadius: 8,
+    backgroundColor: "#bce4f7", // Light background for distinction
+    borderWidth: 1,
+    borderColor: "#ddd", // Subtle border
+    marginTop: 10,
+  },
   medicineText: {
-    fontSize: 14,
+    fontSize: 16,
     fontStyle: "italic",
   },
   noMedicines: {
@@ -2939,5 +2991,12 @@ export default StyleSheet.create({
     marginBottom: 8,
     lineHeight: 22, // Increase line height for better readability
     textAlign: "left", // Align text to the left
+  },
+  //GroupChat.js
+  groupChatContainer: {
+    flex: 1,
+    // padding: 20,
+    marginTop: 25,
+    padding: 10,
   },
 });

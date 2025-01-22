@@ -106,6 +106,7 @@ const CoEventParticipants = () => {
   const renderParticipant = ({ item }) => (
     <View style={styles.participantContainer}>
       <Text style={styles.participantUsername}>{item.username}</Text>
+      <Text style={styles.participantEmail}>{item.phone_no}</Text>
       <Text style={styles.participantEmail}>{item.email}</Text>
     </View>
   );

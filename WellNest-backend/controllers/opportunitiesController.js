@@ -192,7 +192,7 @@ const updateOpportunity = async (req, res) => {
         UPDATE co_available_opportunities
         SET 
           title = $1, fees = $2, location = $3, opportunity_date = $4, opportunity_time = $5, 
-          notes = $6, terms_and_conditions = $7, photo = $8, registration_due = $9,
+          notes = $6, terms_and_conditions = $7, photo = COALESCE($8, photo), registration_due = $9,
           capacity = $10, opportunity_status = $11
         WHERE id = $12
       `;
@@ -314,7 +314,8 @@ const getOpportunityParticipants = async (req, res) => {
         op.id AS participant_id,
         u.id AS user_id,
         pro.username,
-        u.email
+        u.email,
+        u.phone_no
       FROM opportunity_participants op
       JOIN users u ON op.user_id = u.id
       LEFT JOIN profile pro ON op.user_id = pro.user_id

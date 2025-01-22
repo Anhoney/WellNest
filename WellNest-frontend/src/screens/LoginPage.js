@@ -162,15 +162,15 @@ const LoginPage = () => {
           </TouchableOpacity>
         </View>
 
-        <View style={{ alignItems: "flex-start", width: "90%" }}>
-          {/* Forgot Password */}
-          <TouchableOpacity
+        {/* <View style={{ alignItems: "flex-start", width: "90%" }}> */}
+        {/* Forgot Password */}
+        {/* <TouchableOpacity
             onPress={() => navigation.navigate("ForgotPassword")}
           >
             <Text style={styles.forgotPassword}>Forgot password?</Text>
           </TouchableOpacity>
-        </View>
-
+        </View> */}
+        <View style={[{ marginBottom: 50 }]}></View>
         {/* Login Button */}
         <TouchableOpacity
           onPress={handleLogin}

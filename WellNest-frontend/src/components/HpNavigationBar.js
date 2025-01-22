@@ -10,8 +10,8 @@ const HpNavigationBar = ({ navigation, activePage }) => {
 
   const tabs = [
     { name: "HealthcareProviderMainPage", label: "Home", icon: "home-outline" },
-    { name: "Schedule", label: "Schedule", icon: "calendar-outline" },
-    { name: "Chat", label: "Chat", icon: "chatbubble-ellipses-outline" },
+    // { name: "Schedule", label: "Schedule", icon: "calendar-outline" },
+    // { name: "Chat", label: "Chat", icon: "chatbubble-ellipses-outline" },
     {
       name: "HpNotification",
       label: "Notification",

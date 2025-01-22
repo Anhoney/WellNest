@@ -21,43 +21,13 @@ const ChangePassword = () => {
   const [isNewPasswordVisible, setIsNewPasswordVisible] = useState(false); // State for new password visibility
   const navigation = useNavigation();
 
-  //   const handleChangePassword = async () => {
-
-  //     const userId = await AsyncStorage.getItem("userId");
-  //     console.log("changePassword:", userId);
-  //     if (!oldPassword || !newPassword) {
-  //       Alert.alert("Error", "Please fill in all fields");
-  //       return;
-  //     }
-
-  //     try {
-  //       const response = await fetch(
-  //         `${API_BASE_URL}/auth/changePassword/${userId}`,
-  //         {
-  //           method: "POST",
-  //           headers: {
-  //             "Content-Type": "application/json",
-  //           },
-  //           body: JSON.stringify({ oldPassword, newPassword }),
-  //         }
-  //       );
-
-  //       const data = await response.json();
-  //       if (response.ok) {
-  //         Alert.alert("Success", data.message, [
-  //           { text: "OK", onPress: () => navigation.goBack() },
-  //         ]);
-  //       } else {
-  //         Alert.alert("Error", data.error);
-  //       }
-  //     } catch (error) {
-  //       console.error("Change password error:", error);
-  //       Alert.alert(
-  //         "Error",
-  //         "Failed to change password. Please try again later."
-  //       );
-  //     }
-  //   };
+  const validatePassword = (password) => {
+    // Ensure password is at least 8 characters and contains both numbers and letters
+    const isValidLength = password.length >= 8; // Changed to >= 8 for clarity
+    const hasLetters = /[A-Za-z]/.test(password);
+    const hasNumbers = /[0-9]/.test(password);
+    return isValidLength && hasLetters && hasNumbers;
+  };
 
   const handleChangePassword = async () => {
     try {
@@ -70,6 +40,15 @@ const ChangePassword = () => {
 
       if (!oldPassword || !newPassword) {
         Alert.alert("Error", "Please fill in all fields");
+        return;
+      }
+
+      // Validate the new password
+      if (!validatePassword(newPassword)) {
+        Alert.alert(
+          "Validation Error",
+          "New password must be at least 8 characters long and contain both letters and numbers."
+        );
         return;
       }
 

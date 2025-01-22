@@ -61,11 +61,12 @@ const MedicalReport = () => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      console.log(userId);
+
       if (!response.ok) {
         throw new Error("Failed to fetch medical reports");
       }
       const data = await response.json();
+      console.log(data);
       setReports(data);
     } catch (error) {
       console.error("Error fetching medical reports:", error);
@@ -102,7 +103,15 @@ const MedicalReport = () => {
   const renderReport = ({ item }) => (
     <View style={styles.mrCard}>
       <Text style={styles.reportTitle}>
-        Appointment ID: {item.appointment_id}
+        Appointment Date | Time:{"\n"}
+        {item.appointment_type.toLowerCase() === "virtual"
+          ? item.hpva_date
+          : item.app_date}
+        {" | "}
+        {/* Appointment Time:{" "} */}
+        {item.appointment_type.toLowerCase() === "virtual"
+          ? item.hpva_time
+          : item.app_time}
       </Text>
       <Text style={styles.details}>Summary: {item.encounter_summary}</Text>
       <Text style={styles.details}>
@@ -116,12 +125,21 @@ const MedicalReport = () => {
         Appointment Type: {item.appointment_type} Appointment
       </Text>
 
-      <Text style={styles.medicineHeader}>Medicines:</Text>
+      {/* <Text style={styles.medicineHeader}>Medicines:</Text>
       {item.medicines && item.medicines.length > 0 ? (
         renderMedicineList(item.medicines)
       ) : (
         <Text style={styles.noMedicines}>No medicines prescribed</Text>
-      )}
+      )} */}
+
+      <View style={styles.largeMedicineContainer}>
+        <Text style={styles.medicineHeader}>Medicines:</Text>
+        {item.medicines && item.medicines.length > 0 ? (
+          renderMedicineList(item.medicines)
+        ) : (
+          <Text style={styles.noMedicines}>No medicines prescribed</Text>
+        )}
+      </View>
     </View>
   );
 

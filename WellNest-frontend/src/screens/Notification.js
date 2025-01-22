@@ -184,21 +184,99 @@ const Notifications = () => {
     }
   };
 
+  // const handleNotificationPress = async (item) => {
+  //   await markAsRead([item.notification_id]); // Mark notification as read
+  //   if (
+  //     item.notification_type === "appointment_approved" &&
+  //     item.eventDateTime
+  //   ) {
+  //     const title = "Appointment Reminder"; // Customize as needed
+  //     console.log("Adding to calendar:", title, "at", item.eventDateTime);
+  //     // Ensure eventDateTime is a valid date
+  //     const eventDateTime = new Date(item.eventDateTime);
+  //     if (isNaN(eventDateTime.getTime())) {
+  //       Alert.alert("Error", "Invalid event date and time.");
+  //       return;
+  //     }
+  //     addToCalendar(title, item.eventDateTime); // Create calendar event
+  //   } else {
+  //     Alert.alert("Notification", item.message);
+  //   }
+  // };
+
   const handleNotificationPress = async (item) => {
     await markAsRead([item.notification_id]); // Mark notification as read
-    if (
-      item.notification_type === "appointment_approved" &&
-      item.eventDateTime
-    ) {
-      const title = "Appointment Reminder"; // Customize as needed
-      console.log("Adding to calendar:", title, "at", item.eventDateTime);
-      // Ensure eventDateTime is a valid date
-      const eventDateTime = new Date(item.eventDateTime);
-      if (isNaN(eventDateTime.getTime())) {
-        Alert.alert("Error", "Invalid event date and time.");
-        return;
+
+    if (item.notification_type === "appointment_approved") {
+      const title = "WellNest Appointment Scheduled"; // Customize as needed
+      console.log("Adding to calendar:", title, "with message:", item.message);
+
+      // Extract date and time from the message
+      const dateTimeRegex =
+        /at (\d{1,2}:\d{2} [APM]{2}) on (\d{1,2} [A-Z][a-z]+ \d{4})/;
+      const match = item.message.match(dateTimeRegex);
+
+      if (match) {
+        // const timeString = match[1]; // Extracted time, e.g., "9:00 AM"
+        // const dateString = match[2]; // Extracted date, e.g., "22 Dec 2024"
+        const [_, timeString, dateString] = match; // Destructure the matched groups
+        // Combine dateString and timeString to form a full date-time string
+        // const dateTimeString = ⁠`${dateString} ${timeString}`;
+        const dateTimeString = `${dateString} ${timeString}`;
+
+        console.log("DateTime String:", dateTimeString);
+
+        // Parse the date-time string to a Date object
+        const [day, month, year, time, period] = dateTimeString
+          .match(/(\d{1,2}) ([A-Za-z]+) (\d{4}) (\d{1,2}:\d{2}) (AM|PM)/)
+          .slice(1);
+        const months = {
+          Jan: 0,
+          Feb: 1,
+          Mar: 2,
+          Apr: 3,
+          May: 4,
+          Jun: 5,
+          Jul: 6,
+          Aug: 7,
+          Sep: 8,
+          Oct: 9,
+          Nov: 10,
+          Dec: 11,
+        };
+        const hours = parseInt(time.split(":")[0]);
+        const minutes = parseInt(time.split(":")[1]);
+        const adjustedHours =
+          period === "PM" && hours !== 12
+            ? hours + 12
+            : period === "AM" && hours === 12
+            ? 0
+            : hours;
+
+        const eventDateTime = new Date(
+          year,
+          months[month],
+          day,
+          adjustedHours,
+          minutes
+        );
+        console.log("Event DateTime:", eventDateTime);
+
+        if (isNaN(eventDateTime.getTime())) {
+          Alert.alert("Error", "Invalid event date and time.");
+          return;
+        }
+
+        const isoDateTime = eventDateTime.toISOString();
+        console.log("ISO Event DateTime:", isoDateTime);
+
+        addToCalendar(title, isoDateTime); // Create calendar event
+      } else {
+        Alert.alert(
+          "Error",
+          "Failed to extract date and time from the message."
+        );
       }
-      addToCalendar(title, item.eventDateTime); // Create calendar event
     } else {
       Alert.alert("Notification", item.message);
     }

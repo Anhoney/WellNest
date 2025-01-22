@@ -52,6 +52,7 @@ const CoCreateNEditEvents = () => {
   const [selectedFile, setSelectedFile] = useState(null); // Add logic for the image if editing
   const route = useRoute(); // Get route params
   const { eventId } = route.params || {};
+  const [existingPhoto, setExistingPhoto] = useState(null);
 
   useEffect(() => {
     getUserIdFromToken().then((userId) => {
@@ -66,43 +67,6 @@ const CoCreateNEditEvents = () => {
       }
     }, [eventId])
   );
-
-  // useEffect(() => {
-  //   // Load event data if editing an existing event
-  //   const loadEventData = async () => {
-
-  //     // Assuming eventId is passed from navigation
-  //     if (eventId) {
-  //       try {
-  //         console.log("Create Event ID:", eventId);
-  //         const token = await AsyncStorage.getItem("token");
-  //         const response = await axios.get(
-  //           `${API_BASE_URL}/single/event/${eventId}`,
-  //           {
-  //             headers: { Authorization: `Bearer ${token}` },
-  //           }
-  //         );
-  //         console.log("Event Data:", response.data);
-  //         const event = response.data;
-  //         setId(event.id);
-  //         setTitle(event.title);
-  //         setFee(event.fees);
-  //         setLocation(event.location);
-  //         setDate(event.event_date);
-  //         setTime(event.event_time);
-  //         setNote(event.notes);
-  //         setTnC(event.terms_and_conditions);
-  //         setCapacity(event.capacity);
-  //         setEventStatus(event.event_status);
-  //         setRegistrationDue(new Date(event.registration_due));
-  //         // Assuming photo handling is binary, adjust as needed
-  //       } catch (error) {
-  //         console.error("Failed to fetch event data:", error);
-  //       }
-  //     }
-  //   };
-  //   loadEventData();
-  // }, []);
 
   const loadEventData = async () => {
     try {
@@ -125,6 +89,7 @@ const CoCreateNEditEvents = () => {
       setEventStatus(event.event_status);
       setRegistrationDue(new Date(event.registration_due));
       setPhoto(event.photo);
+      setExistingPhoto(event.photo);
     } catch (error) {
       console.error("Failed to fetch event data:", error);
     }
@@ -163,12 +128,6 @@ const CoCreateNEditEvents = () => {
     } catch (error) {
       console.error("Error picking image:", error);
     }
-    // if (result.canceled) {
-    //   console.log("User canceled the image picker.");
-    //   return;
-    // }
-
-    // setSelectedFile(result);
   };
   const validateForm = () => {
     if (!title.trim()) {
@@ -240,13 +199,21 @@ const CoCreateNEditEvents = () => {
         }
         return uri;
       };
+      console.log(photo);
+      // Preserve or update photo
+      // if (selectedFile && selectedFile.assets) {
+      //   const file = selectedFile.assets[0];
+      //   formData.append("photo", {
+      //     uri: file.uri,
+      //     name: file.fileName || file.uri.split("/").pop(),
+      //     type: file.type || "image/jpeg",
+      //   });
+      // } else if (photo) {
+      //   // Send the existing photo as a base64-encoded string if no new file
+      //   formData.append("photo", photo);
+      // }
 
       if (photo) {
-        // const uri = profile_image;
-        // const uri = profile_image.startsWith("file://")
-        //   ? profile_image
-        //   : `file://${profile_image}`; // Ensure correct URI format
-        // const localUri = uri;
         const uri = normalizeFilePath(photo);
         const filename = uri.split("/").pop();
         const type = `image/${filename.split(".").pop()}`;
@@ -256,11 +223,36 @@ const CoCreateNEditEvents = () => {
           name: filename,
           type: type,
         };
-        // console.log("Appending image to FormData:", file);
         formData.append("photo", file);
       } else {
-        console.log("No photo to upload.");
+        // If no new photo is selected, append the existing photo data
+        if (existingPhoto) {
+          formData.append("photo", existingPhoto); // Send existing photo data
+        }
       }
+
+      // if (photo) {
+      //   // const uri = profile_image;
+      //   // const uri = profile_image.startsWith("file://")
+      //   //   ? profile_image
+      //   //   : `file://${profile_image}`; // Ensure correct URI format
+      //   // const localUri = uri;
+      //   const uri = normalizeFilePath(photo);
+      //   const filename = uri.split("/").pop();
+      //   const type = `image/${filename.split(".").pop()}`;
+
+      //   const file = {
+      //     uri: photo,
+      //     name: filename,
+      //     type: type,
+      //   };
+      //   // console.log("Appending image to FormData:", file);
+      //   formData.append("photo", file);
+      // } else {
+      //   // If no new photo is selected, append the existing photo URL
+      //   formData.append("photo", existingPhoto);
+      //   // console.log("No photo to upload.");
+      // }
       // if (photo)
       //   formData.append("photo", {
       //     uri: uri,

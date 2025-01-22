@@ -12,7 +12,11 @@ import {
 import Ionicons from "react-native-vector-icons/Ionicons";
 import NavigationBar from "../../components/NavigationBar";
 import styles from "../../components/styles";
-import { useNavigation, useFocusEffect } from "@react-navigation/native";
+import {
+  useNavigation,
+  useFocusEffect,
+  useRoute,
+} from "@react-navigation/native";
 import axios from "axios";
 import { getUserIdFromToken } from "../../../services/authService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -21,7 +25,9 @@ import API_BASE_URL from "../../../config/config";
 const MedicationReminderPage = () => {
   const [medicationList, setMedicationList] = useState([]);
   const navigation = useNavigation();
-  const [userId, setUserId] = useState(null);
+  const route = useRoute();
+  const { userId } = route.params;
+  // const [userId, setUserId] = useState(null);
 
   // Fetch medications from the backend
   const fetchMedications = useCallback(async (id) => {
@@ -44,10 +50,10 @@ const MedicationReminderPage = () => {
   useFocusEffect(
     useCallback(() => {
       const fetchUserIdAndMedications = async () => {
-        const id = await getUserIdFromToken();
-        if (id) {
-          setUserId(id);
-          fetchMedications(id);
+        // const id = await getUserIdFromToken();
+        if (userId) {
+          // setUserId(userId);
+          fetchMedications(userId);
         }
       };
 

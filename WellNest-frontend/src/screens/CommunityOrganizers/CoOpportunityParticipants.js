@@ -107,6 +107,7 @@ const CoOpportunityParticipants = () => {
   const renderParticipant = ({ item }) => (
     <View style={styles.participantContainer}>
       <Text style={styles.participantUsername}>{item.username}</Text>
+      <Text style={styles.participantEmail}>{item.phone_no}</Text>
       <Text style={styles.participantEmail}>{item.email}</Text>
     </View>
   );
@@ -141,7 +142,7 @@ const CoOpportunityParticipants = () => {
         >
           <Ionicons name="chevron-back" size={24} color="#000" />
         </TouchableOpacity>
-        <Text style={styles.title}>Events Participants</Text>
+        <Text style={styles.title}>Opportunity Participants</Text>
       </View>
       <View style={styles.assessmentContainer}>
         <Text style={styles.participantCountText}>

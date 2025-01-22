@@ -159,7 +159,7 @@ const VirtualConsultationPage = () => {
       <TouchableOpacity
         onPress={() => {
           // Navigate to AppointmentDoctorDetails with the selected doctor and date
-          navigation.navigate("DoctorDetails", {
+          navigation.navigate("VirtualDoctorDetails", {
             doctorId: item.virtual_availability_id, // Assuming item.id is the doctor's ID
             // selectedDate: date.toISOString().split("T")[0], // Pass the selected date
           });

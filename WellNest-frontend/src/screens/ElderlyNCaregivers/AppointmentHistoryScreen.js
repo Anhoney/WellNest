@@ -248,7 +248,19 @@ const AppointmentHistoryScreen = () => {
               <Text style={styles.doctorDetails}>
                 {item.category || item.doctor_specialization} | {item.location}
               </Text>
-              <Text style={styles.doctorDetails}>
+              {/* <Text style={styles.appointmentType}> */}
+              <Text
+                style={[
+                  styles.appointmentType,
+                  {
+                    color:
+                      item.appointment_type === "physical"
+                        ? "#1E90FF"
+                        : "#fd1dfd", // Blue for physical, green for virtual
+                    fontWeight: "bold", // Optional: emphasize text for both types
+                  },
+                ]}
+              >
                 {item.appointment_type === "physical"
                   ? "Physical Appointment"
                   : "Virtual Appointment"}{" "}

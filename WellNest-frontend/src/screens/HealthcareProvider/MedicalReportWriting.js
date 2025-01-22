@@ -474,8 +474,8 @@ const MedicalReportWriting = ({ route }) => {
               <Text style={styles.addButtonText}>+ Add Medicine</Text>
             </TouchableOpacity>
 
-            <View style={styles.mrButtonContainer}>
-              <TouchableOpacity
+            {/* <View style={styles.mrButtonContainer}> */}
+            {/* <TouchableOpacity
                 style={styles.mrDeleteButton}
                 // onPress={handleDeleteReport}
                 onPress={() => setModalVisible(true)} // Show modal
@@ -484,51 +484,49 @@ const MedicalReportWriting = ({ route }) => {
                   <Ionicons name="trash-bin" size={20} color="#FFF" />
                   <Text style={styles.mrButtonText}> Delete Report </Text>
                 </View>
-              </TouchableOpacity>
+              </TouchableOpacity> */}
 
-              <Modal
-                animationType="slide"
-                transparent={true}
-                visible={modalVisible}
-                onRequestClose={() => setModalVisible(false)}
-              >
-                <View style={styles.modalContainer}>
-                  <View style={styles.modalView}>
-                    <Text style={styles.modalTitle}>Confirm Deletion</Text>
-                    <Image
-                      source={require("../../../assets/DeleteCat.png")}
-                      style={styles.successImage} // Add this style in styles.js
-                    />
-                    <Text style={styles.modalMessage}>
-                      Are you sure you want to delete this medical report?
-                    </Text>
-                    <View style={styles.modalButtons}>
-                      <TouchableOpacity
-                        style={styles.modalConfirmButton}
-                        onPress={confirmDeleteReport} // Confirm action
-                      >
-                        <Text style={styles.modalConfirmButtonText}>
-                          Confirm
-                        </Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        style={styles.modalCancelButton}
-                        onPress={() => setModalVisible(false)} // Cancel action
-                      >
-                        <Text style={styles.modalCancelButtonText}>Cancel</Text>
-                      </TouchableOpacity>
-                    </View>
+            <Modal
+              animationType="slide"
+              transparent={true}
+              visible={modalVisible}
+              onRequestClose={() => setModalVisible(false)}
+            >
+              <View style={styles.modalContainer}>
+                <View style={styles.modalView}>
+                  <Text style={styles.modalTitle}>Confirm Deletion</Text>
+                  <Image
+                    source={require("../../../assets/DeleteCat.png")}
+                    style={styles.successImage} // Add this style in styles.js
+                  />
+                  <Text style={styles.modalMessage}>
+                    Are you sure you want to delete this medical report?
+                  </Text>
+                  <View style={styles.modalButtons}>
+                    <TouchableOpacity
+                      style={styles.modalConfirmButton}
+                      onPress={confirmDeleteReport} // Confirm action
+                    >
+                      <Text style={styles.modalConfirmButtonText}>Confirm</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.modalCancelButton}
+                      onPress={() => setModalVisible(false)} // Cancel action
+                    >
+                      <Text style={styles.modalCancelButtonText}>Cancel</Text>
+                    </TouchableOpacity>
                   </View>
                 </View>
-              </Modal>
+              </View>
+            </Modal>
 
-              <TouchableOpacity
-                style={styles.mrCancelButton}
-                onPress={() => navigation.goBack()}
-              >
-                <Text style={styles.blueMrButtonText}>Cancel</Text>
-              </TouchableOpacity>
-            </View>
+            <TouchableOpacity
+              style={styles.mrCancelButton}
+              onPress={() => navigation.goBack()}
+            >
+              <Text style={styles.blueMrButtonText}>Cancel</Text>
+            </TouchableOpacity>
+            {/* </View> */}
             <TouchableOpacity
               style={styles.signOutButton}
               onPress={handleSubmit}

@@ -171,6 +171,7 @@ const updateEvent = async (req, res) => {
     registration_due,
     capacity,
     event_status,
+    // photo,// Base64 or binary data if sent
   } = req.body;
   console.log("Update request Body:", req.body);
   // For binary data storage
@@ -192,7 +193,7 @@ const updateEvent = async (req, res) => {
         UPDATE co_available_events
         SET 
           title = $1, fees = $2, location = $3, event_date = $4, event_time = $5, 
-          notes = $6, terms_and_conditions = $7, photo = $8, registration_due = $9,
+          notes = $6, terms_and_conditions = $7, photo = COALESCE($8, photo), registration_due = $9,
           capacity = $10, event_status = $11
         WHERE id = $12
       `;
@@ -206,6 +207,7 @@ const updateEvent = async (req, res) => {
       terms_and_conditions,
       // photo,
       photoData || null,
+      // ..(photoData ? [photoData] : []),
       registration_due || null,
       capacity || null,
       event_status || null,
@@ -314,7 +316,8 @@ const getEventParticipants = async (req, res) => {
         ep.id AS participant_id,
         u.id AS user_id,
         pro.username,
-        u.email
+        u.email,
+        u.phone_no
       FROM event_participants ep
       JOIN users u ON ep.user_id = u.id
       LEFT JOIN profile pro ON ep.user_id = pro.user_id
