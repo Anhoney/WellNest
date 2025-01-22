@@ -12,7 +12,11 @@ import {
   ImageBackground,
 } from "react-native";
 import axios from "axios";
-import { useNavigation, useFocusEffect } from "@react-navigation/native";
+import {
+  useNavigation,
+  useRoute,
+  useFocusEffect,
+} from "@react-navigation/native";
 import API_BASE_URL from "../../../config/config";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getUserIdFromToken } from "../../../services/authService";
@@ -23,17 +27,19 @@ import NavigationBar from "../../components/NavigationBar";
 const CarePlanScreen = () => {
   const [carePlans, setCarePlans] = useState([]);
   const navigation = useNavigation();
-  const [userId, setUserId] = useState(null);
+  const route = useRoute();
+  const { userId } = route.params;
+  const [writerId, setWriterId] = useState(null);
   const [userData, setUserData] = useState({ name: "", gender: "", age: "" });
 
   useFocusEffect(
     React.useCallback(() => {
-      const fetchUserId = async () => {
+      const fetchWriterId = async () => {
         const id = await getUserIdFromToken();
-        setUserId(id);
+        setWriterId(id);
       };
 
-      fetchUserId();
+      fetchWriterId();
     }, [])
   );
 
@@ -92,7 +98,7 @@ const CarePlanScreen = () => {
     }
 
     try {
-      console.log(userId);
+      console.log("fetchCarePlan", userId);
       const response = await axios.get(
         `${API_BASE_URL}/careplan/${userId}`,
 
@@ -106,12 +112,27 @@ const CarePlanScreen = () => {
     }
   };
 
+  /*************  ✨ Codeium Command ⭐  *************/
+  /**
+   * Renders a care plan card with title and plan details.
+   * Provides an option to navigate to the edit screen for the given care plan item.
+   *
+   * @param {Object} item - The care plan item to render.
+   * @param {string} item.title - The title of the care plan.
+   * @param {string} item.plan - The details of the care plan.
+   */
+
+  /******  c472b9a7-9bc9-41cc-b3fd-da5a94f31e8b  *******/
   const renderCarePlan = ({ item }) => (
     <View style={styles.cpCard}>
       <Text style={styles.cpTitle}>{item.title}</Text>
       <Text style={styles.cpText}>{item.plan}</Text>
       <TouchableOpacity
-        onPress={() => navigation.navigate("EditCarePlan", { carePlan: item })}
+        onPress={() =>
+          navigation.navigate("EditCarePlan", {
+            carePlan: item,
+          })
+        }
       >
         <Text style={styles.cpEdit}>Edit</Text>
       </TouchableOpacity>
@@ -145,10 +166,12 @@ const CarePlanScreen = () => {
       </View>
 
       <View style={[{ marginTop: 15 }]}></View>
-      <View style={styles.userInfo}>
-        <Text style={styles.userName}>{userData.name || "User"}</Text>
+      <View style={[{ marginLeft: -10 }, styles.userInfo]}>
+        <Text style={[{ marginLeft: -35 }, styles.userName]}>
+          {userData.name || "User"}
+        </Text>
         {/* <Text style={[styles.userAgeNGender, { marginTop: -15 }]}> */}
-        <Text style={[styles.userAgeNGender]}>
+        <Text style={[{ marginBottom: -100 }, styles.userAgeNGender]}>
           Gender: {userData.gender || "N/A"}
         </Text>
         <Text style={[styles.userAgeNGender]}>
@@ -171,7 +194,9 @@ const CarePlanScreen = () => {
         />
         <TouchableOpacity
           style={styles.cpAddButton}
-          onPress={() => navigation.navigate("EditCarePlan")}
+          onPress={() =>
+            navigation.navigate("EditCarePlan", { currentPlanUserId: userId })
+          }
         >
           <Text style={styles.cpAddButtonText}>+</Text>
         </TouchableOpacity>

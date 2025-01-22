@@ -1,12 +1,34 @@
 //NavigationBar.js
-import React from "react";
+// import React from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import styles from "./styles";
 import { useNotification } from "../../context/NotificationProvider";
+import { getUserIdFromToken } from "../../services/authService";
+import {
+  useNavigation,
+  useRoute,
+  useFocusEffect,
+} from "@react-navigation/native";
 
-const NavigationBar = ({ navigation, activePage }) => {
+const NavigationBar = ({ activePage }) => {
+  const route = useRoute();
+  const navigation = useNavigation();
   const { unreadCount } = useNotification();
+  const [userId, setUserId] = useState(null);
+
+  useEffect(() => {
+    const fetchUserId = async () => {
+      const userId = await getUserIdFromToken();
+      // console.log("userId:", userId);
+      if (userId) {
+        setUserId(userId);
+        // fetchProfile(userId);
+      }
+    };
+    fetchUserId();
+  }, []);
 
   const tabs = [
     { name: "MainPage", label: "Home", icon: "home-outline" },
@@ -23,9 +45,21 @@ const NavigationBar = ({ navigation, activePage }) => {
   return (
     <View style={styles.navigationBar}>
       {tabs.map((tab, index) => (
+        // <TouchableOpacity
+        //   key={index}
+        //   onPress={() => navigation.navigate(tab.name)}
+        //   style={styles.tabButton}
+        // >
+
         <TouchableOpacity
           key={index}
-          onPress={() => navigation.navigate(tab.name)}
+          onPress={() => {
+            if (tab.name === "AppointmentHistory") {
+              navigation.navigate(tab.name, { userId }); // Pass userId as a route param
+            } else {
+              navigation.navigate(tab.name);
+            }
+          }}
           style={styles.tabButton}
         >
           <View style={{ position: "relative" }}>

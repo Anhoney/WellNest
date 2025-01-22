@@ -333,7 +333,9 @@ const HpAppointmentCreationPage = () => {
         >
           <Ionicons name="chevron-back" size={24} color="#000" />
         </TouchableOpacity>
-        <Text style={styles.hpTitle}>Appointment {"\n"} Creation</Text>
+        <Text style={styles.hpTitle}>
+          {existingAppointment ? "Appointment Edit" : "Appointment Creation"}
+        </Text>
       </View>
 
       <ScrollView contentContainerStyle={styles.hpContainer}>

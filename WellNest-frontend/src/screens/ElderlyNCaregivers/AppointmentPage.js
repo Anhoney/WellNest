@@ -393,7 +393,7 @@ const AppointmentPage = () => {
 
   return (
     <ImageBackground
-      source={require("../../../assets/AppointmentPage.png")}
+      source={require("../../../assets/DoctorDetails.png")}
       style={styles.background}
     >
       {/* Title Section with Back chevron-back */}

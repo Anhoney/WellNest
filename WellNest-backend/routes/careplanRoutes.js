@@ -12,10 +12,10 @@ const authenticateToken = require("../middleware/authMiddleware");
 router.get("/careplan/:user_id", authenticateToken, getAllCarePlans);
 
 // Create a new care plan
-router.post("/careplan/:user_id", authenticateToken, createCarePlan);
+router.post("/create/careplan/:user_id", authenticateToken, createCarePlan);
 
 // Update a care plan
-router.put("/careplan/:id", authenticateToken, updateCarePlan);
+router.put("/update/careplan/:id", authenticateToken, updateCarePlan);
 
 // Delete a care plan
 router.delete("/careplan/:id", authenticateToken, deleteCarePlan);

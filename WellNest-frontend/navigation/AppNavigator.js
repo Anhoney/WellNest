@@ -41,12 +41,17 @@ import MedicalReport from "../src/screens/ElderlyNCaregivers/MedicalReport";
 import AddReminder from "../src/screens/ElderlyNCaregivers/AddReminder";
 import SocialEventsScreen from "../src/screens/ElderlyNCaregivers/SocialEventsScreen";
 import VolunteerOpportunitiesScreen from "../src/screens/ElderlyNCaregivers/VolunteerOpportunitiesScreen";
-import CollaborationScreen from "../src/screens/ElderlyNCaregivers/CollaborationScreen";
+import FamilyCaregiverCollaboration from "../src/screens/ElderlyNCaregivers/CollaborationScreen";
 import SocialEventsDetails from "../src/screens/ElderlyNCaregivers/SocialEventsDetails";
 import VolunteerOpportunityDetails from "../src/screens/ElderlyNCaregivers/VolunteerOpportunityDetails";
 import TestAssessment from "../src/screens/ElderlyNCaregivers/TestAssessment";
 import CarePlanScreen from "../src/screens/ElderlyNCaregivers/CarePlanScreen";
 import EditCarePlanScreen from "../src/screens/ElderlyNCaregivers/EditCarePlanScreen";
+import AccessCollaborators from "../src/screens/ElderlyNCaregivers/AccessCollaborators";
+import FamilyCollabScreen from "../src/screens/ElderlyNCaregivers/FamilyCollabScreen";
+import CaregiverInformation from "../src/screens/ElderlyNCaregivers/CaregiverInformation";
+import ChatRoomElderly from "../src/screens/ElderlyNCaregivers/ChatRoomElderly";
+import ManageChatRoomElderly from "../src/screens/ElderlyNCaregivers/ManageChatRoomElderly";
 
 // Healthcare Provider screens
 import HealthcareProviderMainPage from "../src/screens/HealthcareProvider/HealthcareProviderMainPage";
@@ -82,6 +87,10 @@ import CoOpportunityParticipants from "../src/screens/CommunityOrganizers/CoOppo
 import CoElderlyCareAssessmentManagement from "../src/screens/CommunityOrganizers/CoElderlyCareAssessmentManagement";
 import CoAddAssessmentScreen from "../src/screens/CommunityOrganizers/CoAddAssessmentScreen";
 import CoCreateAssessmentQuestionScreen from "../src/screens/CommunityOrganizers/CoCreateAssessmentQuestionScreen";
+
+import CoCreateChatRoom from "../src/screens/CommunityOrganizers/CoCreateChatRoom";
+import ChatRoom from "../src/screens/CommunityOrganizers/ChatRoom";
+import CoManageChatRoom from "../src/screens/CommunityOrganizers/CoManageChatRoom";
 
 const Stack = createStackNavigator();
 
@@ -284,7 +293,7 @@ const AppNavigator = () => (
       />
       <Stack.Screen
         name="CollaborationScreen"
-        component={CollaborationScreen}
+        component={FamilyCaregiverCollaboration}
       />
       <Stack.Screen
         name="SocialEventsManagementScreen"
@@ -341,6 +350,23 @@ const AppNavigator = () => (
       <Stack.Screen name="TestAssessment" component={TestAssessment} />
       <Stack.Screen name="CarePlanScreen" component={CarePlanScreen} />
       <Stack.Screen name="EditCarePlan" component={EditCarePlanScreen} />
+      <Stack.Screen
+        name="AccessCollaborators"
+        component={AccessCollaborators}
+      />
+      <Stack.Screen name="FamilyCollabScreen" component={FamilyCollabScreen} />
+      <Stack.Screen
+        name="CaregiverInformation"
+        component={CaregiverInformation}
+      />
+      <Stack.Screen name="AddChatRoom" component={CoCreateChatRoom} />
+      <Stack.Screen name="chatRoom" component={ChatRoom} />
+      <Stack.Screen name="CoManageChatRoom" component={CoManageChatRoom} />
+      <Stack.Screen name="ChatRoomElderly" component={ChatRoomElderly} />
+      <Stack.Screen
+        name="ManageChatRoomElderly"
+        component={ManageChatRoomElderly}
+      />
     </Stack.Navigator>
   </NavigationContainer>
 );

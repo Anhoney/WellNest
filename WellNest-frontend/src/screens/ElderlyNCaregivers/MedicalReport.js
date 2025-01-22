@@ -24,21 +24,23 @@ import {
 const MedicalReport = () => {
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [userId, setUserId] = useState(null);
+  // const [userId, setUserId] = useState(null);
   const navigation = useNavigation();
+  const route = useRoute();
+  const { userId } = route.params;
   // console.log(reports);
 
   useEffect(() => {
-    const fetchUserId = async () => {
-      const userId = await getUserIdFromToken();
-      // console.log("userId:", userId);
-      if (userId) {
-        // setUserId(userId);
-        // fetchProfile(userId);
-        fetchMedicalReports(userId);
-      }
-    };
-    fetchUserId();
+    // const fetchUserId = async () => {
+    // const userId = await getUserIdFromToken();
+    // console.log("userId:", userId);
+    if (userId) {
+      // setUserId(userId);
+      // fetchProfile(userId);
+      fetchMedicalReports(userId);
+    }
+    // };
+    // fetchUserId();
   }, []);
 
   // useEffect(() => {
@@ -163,7 +165,7 @@ const MedicalReport = () => {
 
   return (
     <ImageBackground
-      source={require("../../../assets/DoctorDetails.png")}
+      source={require("../../../assets/PlainGrey.png")}
       style={[styles.background, { flex: 1 }]}
     >
       {/* Title Section with Back chevron-back */}

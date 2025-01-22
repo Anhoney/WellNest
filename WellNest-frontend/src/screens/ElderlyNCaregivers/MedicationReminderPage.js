@@ -65,6 +65,15 @@ const MedicationReminderPage = () => {
       console.error("Error updating status:", error.message);
     }
   };
+  const EmptyReminder = () => (
+    <View style={styles.emptyFavoritesContainer}>
+      <Image
+        source={require("../../../assets/NothingCat.png")}
+        style={styles.emptyFavoritesImage}
+      />
+      <Text style={styles.noDataText}>No reminder yet.</Text>
+    </View>
+  );
 
   // const handleMarkAsDone = (id) => {
   //   const updatedList = medicationList.map((med) =>
@@ -132,12 +141,12 @@ const MedicationReminderPage = () => {
           >
             <Text style={styles.doneButtonText}>Done</Text>
           </TouchableOpacity>
-          <TouchableOpacity
+          {/* <TouchableOpacity
             style={styles.remindButton}
             onPress={() => handleRemindMeLater(item.id)}
           >
             <Text style={styles.remindButtonText}>Remind Me Later</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
       )}
       {/* <Text
@@ -217,6 +226,10 @@ const MedicationReminderPage = () => {
           renderItem={renderMedicationItem}
           keyExtractor={(item) => item.id.toString()}
           showsVerticalScrollIndicator={false}
+          ListEmptyComponent={
+            <EmptyReminder />
+            // <Text style={styles.noDataText}>No favorites yet</Text>
+          }
         />
       </View>
 

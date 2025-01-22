@@ -18,6 +18,11 @@ const eventsRoutes = require("./routes/eventsRoutes");
 const opportunitiesRoutes = require("./routes/opportunitiesRoutes");
 const assessmentRoutes = require("./routes/assessmentRoutes");
 const careplanRoutes = require("./routes/careplanRoutes");
+const collaboratorsRoutes = require("./routes/collaboratorsRoutes");
+const supportGroupRoutes = require("./routes/supportGroupRoutes");
+const supportGroupUserRoutes = require("./routes/supportGroupUserRoutes");
+const supportGroupMessageRoutes = require("./routes/supportGroupMessageRoutes");
+const usersRoutes = require("./routes/usersRoute");
 // const chatRoutes = require("./routes/chatRoutes"); // Added chat routes
 const scheduler = require("./scheduler"); // Import the scheduler
 
@@ -52,6 +57,11 @@ app.use("/api", eventsRoutes);
 app.use("/api", opportunitiesRoutes);
 app.use("/api", assessmentRoutes);
 app.use("/api", careplanRoutes);
+app.use("/api", collaboratorsRoutes);
+app.use("/api", supportGroupRoutes);
+app.use("/api", supportGroupUserRoutes);
+app.use("/api", supportGroupMessageRoutes);
+app.use("/api", usersRoutes);
 
 // Serve static files from the "uploads" directory
 app.use("/uploads", express.static(path.join(__dirname, "uploads"))); // Adjust the path as necessary

@@ -131,6 +131,7 @@ const ProfilePage = () => {
           />
         </TouchableOpacity>
         <Text style={styles.userName}>{username}</Text>
+        <Text style={styles.profileId}>ID: {userId}</Text>
         <TouchableOpacity
           style={styles.editProfileButton}
           onPress={() => navigation.navigate("ProfileEditPage")}
@@ -139,9 +140,11 @@ const ProfilePage = () => {
         </TouchableOpacity>
       </View>
 
-      <ScrollView contentContainerStyle={styles.pageContainer}>
+      <ScrollView
+        contentContainerStyle={[{ marginLeft: -30 }, styles.pageContainer]}
+      >
         {/* Health Booking Status */}
-        <View style={styles.sectionContainer}>
+        {/* <View style={styles.sectionContainer}>
           <Text style={styles.sectionTitle}>My Health Booking Status</Text>
           <View style={styles.statusOptions}>
             <TouchableOpacity style={styles.statusCard}>
@@ -166,12 +169,14 @@ const ProfilePage = () => {
               <Text style={styles.statusText}>Rating</Text>
             </TouchableOpacity>
           </View>
-        </View>
+        </View> */}
 
         {/* Other Options */}
-        <View style={styles.otherOptions}>
-          <TouchableOpacity style={styles.optionCard}>
-            <Image
+        {/* <View style={styles.otherOptions}> */}
+        {/* <Text style={styles.sectionTitle}>Care and Planning</Text> */}
+        {/* <View style={styles.statusOptions}> */}
+        {/* <TouchableOpacity style={styles.optionCard}>
+             <Image
               source={require("../../../assets/Favourite.png")}
               style={styles.optionIcon}
             />
@@ -189,7 +194,12 @@ const ProfilePage = () => {
             />
             <Text style={styles.statusText}>Medical History</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.optionCard}>
+          <TouchableOpacity
+            style={styles.optionCard}
+            onPress={() => {
+              navigation.navigate("CaregiverCollabScreen");
+            }}
+          >
             <Image
               source={require("../../../assets/PrescriptionBottle.png")}
               style={styles.optionIcon}
@@ -202,27 +212,34 @@ const ProfilePage = () => {
               style={styles.optionIcon}
             />
             <Text style={styles.statusText}>Elderly Assessment</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.optionCard}
-            onPress={() => {
-              navigation.navigate("CarePlanScreen");
-            }}
-          >
-            <Image
-              source={require("../../../assets/CarePlanDevelopment.png")}
-              style={styles.optionIcon}
-            />
-            <Text style={styles.statusText}>Care Plan</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.optionCard}>
-            <Image
-              source={require("../../../assets/CaregiverInformation.png")}
-              style={styles.optionIcon}
-            />
-            <Text style={styles.statusText}>Caregiver Information</Text>
-          </TouchableOpacity>
-        </View>
+          </TouchableOpacity> */}
+
+        <TouchableOpacity
+          style={[{ marginLeft: 80 }, styles.optionCard]}
+          onPress={() => {
+            navigation.navigate("CarePlanScreen", {
+              userId: userId,
+            });
+          }}
+        >
+          <Image
+            source={require("../../../assets/CarePlanDevelopment.png")}
+            style={styles.optionIcon}
+          />
+          <Text style={styles.statusText}>Care Plan</Text>
+        </TouchableOpacity>
+        {/* <TouchableOpacity
+              style={styles.optionCard}
+              onPress={() => {
+                navigation.navigate("CaregiverInformation");
+              }}
+            >
+              <Image
+                source={require("../../../assets/CaregiverInformation.png")}
+                style={styles.optionIcon}
+              />
+              <Text style={styles.statusText}>Caregiver Information</Text>
+            </TouchableOpacity> */}
       </ScrollView>
 
       {/* Account Settings */}
@@ -238,112 +255,5 @@ const ProfilePage = () => {
     </ImageBackground>
   );
 };
-
-// const styles = StyleSheet.create({
-//   // Add the styles here
-//   background: {
-//     flex: 1,
-//     backgroundColor: '#f2f2f2',
-//   },
-//   smallHeaderContainer: {
-//     flexDirection: 'row',
-//     alignItems: 'center',
-//     padding: 15,
-//   },
-//   backButton: {
-//     marginRight: 10,
-//   },
-//   title: {
-//     fontSize: 20,
-//     fontWeight: 'bold',
-//   },
-//   profileContainer: {
-//     alignItems: 'center',
-//     paddingVertical: 20,
-//   },
-//   profileImage: {
-//     width: 100,
-//     height: 100,
-//     borderRadius: 50,
-//     borderWidth: 2,
-//     borderColor: '#fff',
-//   },
-//   userName: {
-//     fontSize: 22,
-//     fontWeight: 'bold',
-//     marginTop: 10,
-//   },
-//   editProfileButton: {
-//     backgroundColor: '#333',
-//     paddingHorizontal: 15,
-//     paddingVertical: 5,
-//     borderRadius: 5,
-//     marginTop: 10,
-//   },
-//   editProfileText: {
-//     color: '#fff',
-//     fontSize: 14,
-//   },
-//   contentContainer: {
-//     paddingHorizontal: 15,
-//   },
-//   healthBookingStatus: {
-//     marginBottom: 20,
-//   },
-//   sectionTitle: {
-//     fontSize: 18,
-//     fontWeight: 'bold',
-//     marginBottom: 10,
-//   },
-//   statusOptions: {
-//     flexDirection: 'row',
-//     justifyContent: 'space-between',
-//   },
-//   statusCard: {
-//     alignItems: 'center',
-//     width: '30%',
-//   },
-//   statusIcon: {
-//     width: 50,
-//     height: 50,
-//     marginBottom: 5,
-//   },
-//   statusText: {
-//     textAlign: 'center',
-//     fontSize: 12,
-//   },
-//   otherOptions: {
-//     flexDirection: 'row',
-//     flexWrap: 'wrap',
-//     justifyContent: 'space-between',
-//   },
-//   optionCard: {
-//     alignItems: 'center',
-//     width: '30%',
-//     marginBottom: 20,
-//   },
-//   optionIcon: {
-//     width: 50,
-//     height: 50,
-//     marginBottom: 5,
-//   },
-//   optionText: {
-//     textAlign: 'center',
-//     fontSize: 12,
-//   },
-//   accountSettings: {
-//     flexDirection: 'row',
-//     justifyContent: 'space-between',
-//     alignItems: 'center',
-//     paddingHorizontal: 15,
-//     paddingVertical: 20,
-//     backgroundColor: '#fff',
-//     borderTopWidth: 1,
-//     borderTopColor: '#ccc',
-//   },
-//   accountSettingsText: {
-//     fontSize: 16,
-//   },
-// });
 
 export default ProfilePage;

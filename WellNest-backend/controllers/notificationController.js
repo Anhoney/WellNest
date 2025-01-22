@@ -2,13 +2,23 @@
 const db = require("../config/db");
 const { format } = require("date-fns"); // Import date-fns for formatting
 // const io = require("../server"); // Import the io instance
+
+const parseAppointmentDateTime = (message) => {
+  const dateMatch = message.match(/on (\d{1,2} \w+ \d{4})/);
+  const timeMatch = message.match(/at (\d{1,2}:\d{2} (?:AM|PM))/);
+
+  if (dateMatch && timeMatch) {
+    const date = dateMatch[1];
+    const time = timeMatch[1];
+    const dateTimeString = `${date} ${time}`;
+    const dateTime = new Date(dateTimeString);
+    return dateTime;
+  }
+  return null;
+};
+
 // Notify User
-const notifyUser = async (
-  userId,
-  message,
-  notificationType,
-  notificationTime
-) => {
+const notifyUser = async (userId, message, notificationType) => {
   //   console.log("Notification Type:", notificationType);
   //   console.log("Message:", message);
   //   console.log("User ID:", userId);
@@ -26,28 +36,48 @@ const notifyUser = async (
     );
     const query = `
       INSERT INTO notifications (user_id, message, notification_type, is_read, created_at)
-      VALUES ($1, $2, $3, FALSE, NOW())
+      VALUES ($1, $2, $3, FALSE, NOW()) RETURNING *; 
     `;
-    await db.query(query, [userId, message, notificationType]);
-    console.log("Notification inserted successfully.");
-    // Include notification time in the response to the client
-    // If you're using WebSocket or similar, emit the data
-    const notificationData = {
-      userId,
-      message,
-      type: notificationType,
-      time: notificationTime, // Send this to the client
-    };
+    const result = await db.query(query, [userId, message, notificationType]);
+    const notification = result.rows[0];
 
-    // For example:
-    // io.to(userId).emit("new_notification", notificationData);
+    if (notificationType === "appointment_approved") {
+      const dateTime = parseAppointmentDateTime(message);
+      if (dateTime) {
+        notification.eventDateTime = dateTime;
+      }
+    }
 
-    console.log("Notification inserted and emitted successfully.");
+    // Send the notification to the client (if using real-time sockets, emit here)
+    console.log("Notification sent successfully.");
+    return notification;
   } catch (error) {
     console.error("Error inserting notification:", error);
     throw new Error("Failed to notify user.");
   }
 };
+//     await db.query(query, [userId, message, notificationType]);
+//     console.log("Notification inserted successfully.");
+
+//     // const notificationTime = result.rows[0]?.created_at; // Use the inserted timestamp
+//     // Include notification time in the response to the client
+//     // If you're using WebSocket or similar, emit the data
+//     const notificationData = {
+//       userId,
+//       message,
+//       type: notificationType,
+//       // time: notificationTime, // Actual created_at time from DB
+//     };
+
+//     // For example:
+//     // io.to(userId).emit("new_notification", notificationData);
+//     console.log("Notification inserted successfully:", notificationData);
+//     console.log("Notification inserted and emitted successfully.");
+//   } catch (error) {
+//     console.error("Error inserting notification:", error);
+//     throw new Error("Failed to notify user.");
+//   }
+// };
 
 // Get Notifications for a User
 const getNotifications = async (req, res) => {

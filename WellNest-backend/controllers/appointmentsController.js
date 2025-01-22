@@ -213,9 +213,13 @@ const approveAppointment = async (req, res) => {
     }
 
     const appointment = result.rows[0];
+    // const { u_id, app_date, app_time } = appointment;
     // Format the appointment date and time
     const formattedTime = formatTime(appointment.app_time); // e.g., "1:00 PM"
     const formattedDate = formatDate(appointment.app_date); // e.g., "16 Dec 2024"
+
+    // // Send notification to user for calendar event creation
+    // sendCalendarEventNotification(u_id, formattedDate, formattedTime);
 
     // Notify the user directly
     await notifyUser(
@@ -580,33 +584,7 @@ const updateVirtualAppointmentStatus = async (req, res) => {
 
     const appointment = result.rows[0];
     console.log("Appointment u_id:", appointment.u_id);
-    // Trigger notification based on the new status
-    // let actionType = null;
-    // if (status === "approved") {
-    //   actionType = "appointment_approved";
-    // } else if (status === "canceled") {
-    //   actionType = "appointment_canceled";
-    // }
 
-    // if (actionType) {
-    //   await triggerNotification({
-    //     userId: appointment.u_id, // Assuming `u_id` is the user ID column
-    //     actionType,
-    //   });
-    // }
-
-    // Prepare the notification message based on the new status
-    // let message;
-    // if (status === "approved") {
-    //   message = `Your virtual consultation has been approved.`;
-    // } else if (status === "canceled") {
-    //   message = `Your virtual consultation has been canceled.`;
-    // }
-
-    // // Send the notification to the user
-    // if (message) {
-    //   await notifyUser(appointment.u_id, message, "appointment_status_update");
-    // }
     // Format the appointment date and time
     const formattedTime = formatTime(appointment.hpva_time); // e.g., "1:00 PM"
     const formattedDate = formatDate(appointment.hpva_date); // e.g., "16 Dec 2024"
@@ -737,6 +715,18 @@ const getPastVirtualAppointments = async (req, res) => {
     res.status(500).json({ error: "Failed to fetch past appointments" });
   }
 };
+
+// const sendCalendarEventNotification = (userId, appDate, appTime) => {
+//   // Logic to send a push notification or event message to user’s app
+//   // Implement based on your push notification service or messaging queue (e.g., Firebase, OneSignal)
+//   const notificationData = {
+//     title: "Appointment Reminder",
+//     body: `You have an appointment on ${appDate} at ${appTime}.`,
+//     data: { appDate, appTime },
+//   };
+
+//   sendPushNotificationToUser(userId, notificationData); // Use your notification service
+// };
 
 module.exports = {
   createAppointment,

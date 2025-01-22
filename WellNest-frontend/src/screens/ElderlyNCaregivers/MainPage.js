@@ -15,10 +15,21 @@ import NavigationBar from "../../components/NavigationBar"; // Import here
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import API_BASE_URL from "../../../config/config";
 import axios from "axios";
+import { getUserIdFromToken } from "../../../services/authService";
 
 const MainPage = ({ medicineReminder }) => {
   const [userName, setUserName] = useState("");
   const navigation = useNavigation();
+  const [userId, setUserId] = useState(null);
+
+  useEffect(() => {
+    const fetchUserId = async () => {
+      const id = await getUserIdFromToken();
+      setUserId(id);
+    };
+
+    fetchUserId();
+  }, []);
 
   const fetchUserName = async () => {
     try {
@@ -110,7 +121,7 @@ const MainPage = ({ medicineReminder }) => {
             />
           )}
         </View>
-
+        <View style={[{ marginTop: 20 }]} />
         <ScrollView>
           {/* Healthcare Section */}
           <View style={styles.sectionContainer}>
@@ -137,7 +148,9 @@ const MainPage = ({ medicineReminder }) => {
               </TouchableOpacity>
 
               <TouchableOpacity
-                onPress={() => navigation.navigate("MedicalReport")}
+                onPress={() =>
+                  navigation.navigate("MedicalReport", { userId: userId })
+                }
               >
                 <Image
                   source={require("../../../assets/Prescription.png")}

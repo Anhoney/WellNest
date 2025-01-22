@@ -28,6 +28,7 @@
     "date-fns": "^4.1.0",
     "dotenv": "^16.4.5",
     "expo": "^52.0.18",
+    "expo-calendar": "~14.0.5",
     "expo-checkbox": "~4.0.0",
     "expo-document-picker": "~13.0.1",
     "expo-file-system": "~18.0.6",
@@ -50,6 +51,7 @@
     "react-native-datepicker": "^1.7.2",
     "react-native-document-picker": "^9.3.1",
     "react-native-dotenv": "^3.4.11",
+    "react-native-dropdown-select-list": "^2.0.5",
     "react-native-elements": "^3.4.3",
     "react-native-fast-image": "^8.6.3",
     "react-native-gesture-handler": "~2.20.2",
@@ -65,8 +67,7 @@
     "react-native-svg": "15.8.0",
     "react-native-vector-icons": "^10.2.0",
     "react-native-webview": "13.12.5",
-    "react-navigation": "^5.0.0",
-    "expo-calendar": "~14.0.5"
+    "react-navigation": "^5.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.24.0"

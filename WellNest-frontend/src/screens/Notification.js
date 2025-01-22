@@ -16,6 +16,7 @@ import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import API_BASE_URL from "../../config/config";
 import { getUserIdFromToken } from "../../services/authService";
 import NavigationBar from "../components/NavigationBar";
+import * as Calendar from "expo-calendar";
 
 const Notifications = () => {
   // Accept route prop to determine user type
@@ -30,6 +31,82 @@ const Notifications = () => {
       fetchUserId();
     }, [])
   );
+
+  useEffect(() => {
+    (async () => {
+      const { status } = await Calendar.requestCalendarPermissionsAsync();
+      if (status === "granted") {
+        const calendars = await Calendar.getCalendarsAsync(
+          Calendar.EntityTypes.EVENT
+        );
+        console.log("Here are all your calendars:");
+        console.log({ calendars });
+
+        const expoCalendarIds = calendars
+          .filter((calendar) => calendar.title === "Expo Calendar")
+          .map((calendar) => calendar.id);
+        console.log("Expo Calendar IDs:", expoCalendarIds);
+      }
+    })();
+  }, []);
+
+  async function getDefaultCalendarSource() {
+    const defaultCalendar = await Calendar.getDefaultCalendarAsync();
+    return defaultCalendar.source;
+  }
+
+  const createOrGetCalendar = async () => {
+    const calendars = await Calendar.getCalendarsAsync(
+      Calendar.EntityTypes.EVENT
+    );
+    const expoCalendar = calendars.find(
+      (calendar) => calendar.title === "Expo Calendar"
+    );
+
+    if (expoCalendar) {
+      return expoCalendar.id;
+    } else {
+      const defaultCalendarSource = await getDefaultCalendarSource();
+      const newCalendarId = await Calendar.createCalendarAsync({
+        title: "Expo Calendar",
+        color: "blue",
+        entityType: Calendar.EntityTypes.EVENT,
+        sourceId: defaultCalendarSource.id,
+        source: defaultCalendarSource,
+        name: "ExpoCalendar",
+        ownerAccount: "personal",
+        accessLevel: Calendar.CalendarAccessLevel.OWNER,
+      });
+      return newCalendarId;
+    }
+  };
+
+  const addToCalendar = async (title, dateTime) => {
+    try {
+      const { status } = await Calendar.requestCalendarPermissionsAsync();
+      if (status !== "granted") {
+        Alert.alert("Permission Denied", "Calendar permissions are required.");
+        return;
+      }
+
+      const calendarId = await createOrGetCalendar();
+      const startDate = new Date(dateTime);
+      const endDate = new Date(startDate.getTime() + 60 * 60 * 1000); // 1-hour event
+
+      await Calendar.createEventAsync(calendarId, {
+        title: title,
+        startDate: startDate,
+        endDate: endDate,
+        timeZone: "GMT",
+        alarms: [{ relativeOffset: -5 }], // 5 minutes before
+        notes: "Reminder for your appointment.",
+      });
+
+      Alert.alert("Success", "Event added to your calendar!");
+    } catch (error) {
+      console.error("Error adding to calendar:", error);
+    }
+  };
 
   const fetchUserId = async () => {
     const userId = await getUserIdFromToken();
@@ -62,6 +139,27 @@ const Notifications = () => {
     }
   };
 
+  // const addToCalendar = async (title, dateTime) => {
+  //   try {
+  //     const { status } = await Calendar.requestCalendarPermissionsAsync();
+  //     const { status: writeStatus } = await Calendar.requestRemindersPermissionsAsync();
+  //     if (status === "granted"&& writeStatus === "granted") {
+  //       const defaultCalendarSource =
+  //         await Calendar.getDefaultCalendarSourceAsync();
+  //       await Calendar.createEventAsync(defaultCalendarSource.id, {
+  //         title: title,
+  //         startDate: new Date(dateTime),
+  //         endDate: new Date(new Date(dateTime).getTime() + 60 * 60 * 1000), // 1-hour event
+  //         timeZone: "GMT", // Adjust to the local time zone
+  //         notes: "Reminder for your appointment.",
+  //       });
+  //       Alert.alert("Success", "Event added to your calendar!");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error adding to calendar:", error);
+  //   }
+  // };
+
   const markAsRead = async (notificationIds) => {
     try {
       await axios.put(`${API_BASE_URL}/notifications/mark-as-read`, {
@@ -86,6 +184,26 @@ const Notifications = () => {
     }
   };
 
+  const handleNotificationPress = async (item) => {
+    await markAsRead([item.notification_id]); // Mark notification as read
+    if (
+      item.notification_type === "appointment_approved" &&
+      item.eventDateTime
+    ) {
+      const title = "Appointment Reminder"; // Customize as needed
+      console.log("Adding to calendar:", title, "at", item.eventDateTime);
+      // Ensure eventDateTime is a valid date
+      const eventDateTime = new Date(item.eventDateTime);
+      if (isNaN(eventDateTime.getTime())) {
+        Alert.alert("Error", "Invalid event date and time.");
+        return;
+      }
+      addToCalendar(title, item.eventDateTime); // Create calendar event
+    } else {
+      Alert.alert("Notification", item.message);
+    }
+  };
+
   //   useEffect(() => {
   //     if (userId) {
   //       fetchNotifications();
@@ -100,68 +218,6 @@ const Notifications = () => {
     }, 30000); // Poll every 30 seconds
     return () => clearInterval(interval);
   }, [userId]);
-
-  //   useEffect(() => {
-  //     const ws = new WebSocket("ws://localhost:8080"); // Connect to WebSocket server
-
-  //     ws.onopen = () => {
-  //       console.log("Connected to WebSocket server");
-  //     };
-
-  //     ws.onmessage = (event) => {
-  //       const notification = JSON.parse(event.data);
-  //       if (notification.userId === userId) {
-  //         setNotifications((prevNotifications) => [
-  //           ...prevNotifications,
-  //           {
-  //             notification_id: notification.id, // Assuming the notification has an ID
-  //             message: notification.message,
-  //             is_read: false,
-  //             created_at: new Date(),
-  //           },
-  //         ]);
-  //         setUnreadCount((prevCount) => prevCount + 1);
-  //       }
-  //     };
-
-  //     ws.onclose = () => {
-  //       console.log("Disconnected from WebSocket server");
-  //     };
-
-  //     return () => {
-  //       ws.close(); // Clean up WebSocket connection on component unmount
-  //     };
-  //   }, [userId]);
-  //   useEffect(() => {
-  //     const ws = new WebSocket("ws://localhost:8080"); // Connect to WebSocket server
-
-  //     ws.onopen = () => {
-  //       console.log("Connected to WebSocket server");
-  //     };
-
-  //     ws.onmessage = (event) => {
-  //       const notification = JSON.parse(event.data);
-  //       if (notification.userId === userId) {
-  //         setNotifications((prevNotifications) => [
-  //           ...prevNotifications,
-  //           {
-  //             message: notification.message,
-  //             is_read: false,
-  //             created_at: new Date(),
-  //           },
-  //         ]);
-  //         setUnreadCount((prevCount) => prevCount + 1);
-  //       }
-  //     };
-
-  //     ws.onclose = () => {
-  //       console.log("Disconnected from WebSocket server");
-  //     };
-
-  //     return () => {
-  //       ws.close(); // Clean up WebSocket connection on component unmount
-  //     };
-  //   }, [userId]);
 
   return (
     <ImageBackground
@@ -183,8 +239,7 @@ const Notifications = () => {
           <Text style={styles.notificationIcon}>🔔</Text>
           {unreadCount > 0 && <View style={styles.redDot} />}
         </TouchableOpacity> */}
-
-        <FlatList
+        {/* <FlatList
           data={notifications}
           keyExtractor={(item) => item.notification_id.toString()}
           renderItem={({ item }) => (
@@ -194,6 +249,27 @@ const Notifications = () => {
                 !item.is_read && styles.unreadItem,
               ]}
               onPress={() => markAsRead([item.notification_id])}
+            >
+              <Text style={styles.message}>{item.message}</Text>
+              <Text style={styles.timestamp}>
+                {new Date(item.created_at).toLocaleString()}
+              </Text>
+            </TouchableOpacity>
+          )}
+          ListEmptyComponent={
+            <Text style={styles.noNotifications}>No notifications</Text>
+          }
+        /> */}
+        <FlatList
+          data={notifications}
+          keyExtractor={(item) => item.notification_id.toString()}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              style={[
+                styles.notificationItem,
+                !item.is_read && styles.unreadItem,
+              ]}
+              onPress={() => handleNotificationPress(item)}
             >
               <Text style={styles.message}>{item.message}</Text>
               <Text style={styles.timestamp}>

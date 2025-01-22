@@ -1,3 +1,4 @@
+//EditCarePlanScreen.js
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -21,62 +22,57 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getUserIdFromToken } from "../../../services/authService";
 
 const EditCarePlanScreen = ({ route, navigation }) => {
-  const { carePlan } = route.params || {};
+  const { carePlan, currentPlanUserId } = route.params || {};
   const [title, setTitle] = useState(carePlan ? carePlan.title : "");
   const [plan, setPlan] = useState(carePlan ? carePlan.plan : "");
-  const [userId, setUserId] = useState(null);
+  // const [writer_id, setWriter_Id] = useState(
+  //   carePlan ? carePlan.username : ""
+  // );
+  const [writerName, setWriterName] = useState(
+    carePlan && carePlan.username
+      ? carePlan.username
+      : carePlan
+      ? carePlan.full_name
+      : ""
+  );
+  const [userId, setUserId] = useState(carePlan ? carePlan.user_Id : "");
+  const [writerId, setWriterId] = useState(null);
   const [isDeleteModalVisible, setDeleteModalVisible] = useState(false);
 
   useEffect(() => {
-    getUserIdFromToken().then((userId) => {
-      setUserId(userId);
+    getUserIdFromToken().then((writerId) => {
+      setWriterId(writerId);
     });
   }, []);
 
-  //   useEffect(() => {
-  //     if (userId) {
-  //       fetchCarePlans(userId); // Pass userId to the function
-  //     }
-  //   }, [userId]); // Dependency array includes userId
-
-  //   const fetchCarePlans = async () => {
-  //     const token = await AsyncStorage.getItem("token");
-
-  //     if (!token) {
-  //       alert("No token found. Please log in.");
-  //       return;
-  //     }
-
-  //     try {
-  //       console.log(userId);
-  //       const response = await axios.get(
-  //         `${API_BASE_URL}/careplan/${userId}`,
-
-  //         {
-  //           headers: { Authorization: `Bearer ${token}` },
-  //         }
-  //       );
-  //       setCarePlans(response.data);
-  //     } catch (error) {
-  //       console.error("Error fetching care plans:", error);
-  //     }
-  //   };
-
   const handleSubmit = async () => {
+    // Validation: Check if title and plan are filled
+    if (!title.trim() || !plan.trim()) {
+      Alert.alert("Validation Error", "Please fill in all fields.");
+      return;
+    }
+    console.log("writerId", writerId);
+    console.log("userId", userId);
+    console.log("currentPlanUserId", currentPlanUserId);
     const token = await AsyncStorage.getItem("token");
 
     if (!token) {
       alert("No token found. Please log in.");
       return;
     }
+    console.log(
+      "Care Plan ID:",
+      carePlan ? carePlan.careplan_id : "New Care Plan"
+    );
     try {
       let response;
       if (carePlan) {
         response = await axios.put(
-          `${API_BASE_URL}/careplan/${carePlan.careplan_id}`,
+          `${API_BASE_URL}/update/careplan/${carePlan.careplan_id}`,
           {
             title,
             plan,
+            writerId,
           },
           {
             headers: { Authorization: `Bearer ${token}` }, // Ensure token is sent in headers
@@ -84,21 +80,18 @@ const EditCarePlanScreen = ({ route, navigation }) => {
         );
       } else {
         response = await axios.post(
-          `${API_BASE_URL}/careplan/${userId}`,
+          `${API_BASE_URL}/create/careplan/${currentPlanUserId}`,
           {
             title,
             plan,
+            writerId,
           },
           {
             headers: { Authorization: `Bearer ${token}` }, // Ensure token is sent in headers
           }
         );
       }
-
-      //   if (response.status === 200) {
-      //     alert(response.data.message); // Use the message from the backend
-      //     navigation.goBack();
-      //   }
+      console.log("Response:", response.data);
       // Check the response status
       if (response.status === 200 || response.status === 201) {
         alert(response.data.message); // Use the message from the backend
@@ -139,6 +132,18 @@ const EditCarePlanScreen = ({ route, navigation }) => {
     setDeleteModalVisible(false); // Close the modal
   };
 
+  const formatDate = (dateString) => {
+    const options = { day: "numeric", month: "long", year: "numeric" };
+    const date = new Date(dateString);
+
+    // Get the day, month, and year separately
+    const day = date.toLocaleString("en-US", { day: "numeric" });
+    const month = date.toLocaleString("en-US", { month: "long" });
+    const year = date.toLocaleString("en-US", { year: "numeric" });
+
+    // Return the formatted date in the desired format
+    return `${day} ${month} ${year}`;
+  };
   return (
     <ImageBackground
       source={require("../../../assets/PlainGrey.png")}
@@ -151,7 +156,9 @@ const EditCarePlanScreen = ({ route, navigation }) => {
         >
           <Ionicons name="chevron-back" size={24} color="#000" />
         </TouchableOpacity>
-        <Text style={styles.hpTitle}>Create Care Plan</Text>
+        <Text style={styles.hpTitle}>
+          {carePlan ? "Edit Care Plan" : "Add Care Plan"}
+        </Text>
       </View>
 
       <ScrollView contentContainerStyle={styles.hpContainer}>
@@ -188,6 +195,10 @@ const EditCarePlanScreen = ({ route, navigation }) => {
           value={plan}
           onChangeText={setPlan}
         />
+        <Text style={styles.label}>Plan By: {writerName || "You"}</Text>
+        <Text style={styles.label}>Updated By:</Text>
+        <Text>{formatDate(carePlan.updated_at)}</Text>
+
         <TouchableOpacity
           style={[styles.signOutButton, { marginTop: 100 }]}
           onPress={handleSubmit}
@@ -254,14 +265,3 @@ const EditCarePlanScreen = ({ route, navigation }) => {
 };
 
 export default EditCarePlanScreen;
-
-// const styles = StyleSheet.create({
-//   container: { flex: 1, padding: 20 },
-//   input: {
-//     borderWidth: 1,
-//     borderColor: "#ccc",
-//     padding: 10,
-//     marginBottom: 10,
-//     borderRadius: 5,
-//   },
-// });

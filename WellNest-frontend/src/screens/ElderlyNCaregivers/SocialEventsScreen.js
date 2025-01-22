@@ -25,6 +25,7 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
+
 const SocialEventsScreen = () => {
   const navigation = useNavigation();
   const [searchQuery, setSearchQuery] = useState("");
@@ -32,6 +33,9 @@ const SocialEventsScreen = () => {
   const [loading, setLoading] = useState(false);
   const [events, setEvents] = useState([]);
   const [userId, setUserId] = useState(null);
+  const [chatRooms, setChatRooms] = useState([]);
+  const [selectedFilter, setSelectedFilter] = useState("publicChat");
+  const [joinedChatRooms, setJoinedChatRooms] = useState([]);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -92,9 +96,106 @@ const SocialEventsScreen = () => {
     React.useCallback(() => {
       if (userId) {
         fetchEvents(); // Fetch events when userId is available
+        fetchChatRoom();
+        fetchJoinedChatRoom();
       }
     }, [userId, activeTab])
   );
+
+  const fetchChatRoom = async () => {
+    const userId = await getUserIdFromToken();
+    const token = await AsyncStorage.getItem("token");
+    if (!token) {
+      alert("No token found. Please log in.");
+      return;
+    }
+    console.log("userId", userId);
+    try {
+      const response = await axios.get(
+        `${API_BASE_URL}/getUnjoin/support_group/${userId}/`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Use your actual token
+          },
+        }
+      );
+      console.log("response.data", response.data);
+      if (response.status === 200) {
+        // Handle the response data
+        setChatRooms(response.data);
+        console.log("Available support groups:", response.data);
+      }
+    } catch (error) {
+      console.log("Error fetching chat room", error);
+    }
+  };
+
+  const fetchJoinedChatRoom = async () => {
+    const userId = await getUserIdFromToken();
+    const token = await AsyncStorage.getItem("token");
+    if (!token) {
+      alert("No token found. Please log in.");
+      return;
+    }
+
+    try {
+      const response = await axios.get(
+        `${API_BASE_URL}/get/support_group/${userId}/`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Use your actual token
+          },
+        }
+      );
+      console.log("response.data", response.data);
+
+      setJoinedChatRooms(response.data);
+    } catch (error) {
+      console.log("Error fetching joined chat room", error);
+    }
+  };
+
+  const handleJoinChatRoom = async (room) => {
+    const token = await AsyncStorage.getItem("token");
+    if (!token) {
+      alert("No token found. Please log in.");
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        `${API_BASE_URL}/support_group_user/`,
+        {
+          group_id: room.id,
+          user_id: userId,
+          date: new Date().toISOString(),
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        alert("Successfully joined the chat room!");
+        fetchChatRoom(); // Refresh chat rooms after joining
+        fetchJoinedChatRoom();
+        // Navigate to the chat room after joining
+        navigation.navigate("ChatRoomElderly", {
+          group_id: room.id,
+          group_name: room.group_name,
+        });
+      }
+    } catch (error) {
+      if (error.response && error.response.status === 400) {
+        alert(error.response.data.error); // Show the error message from the backend
+      } else {
+        console.error("Error joining chat room:", error);
+        alert("An error occurred while trying to join the chat room.");
+      }
+    }
+  };
 
   const archiveEvent = async (eventId) => {
     try {
@@ -171,17 +272,6 @@ const SocialEventsScreen = () => {
     // setSearchQuery(query);
     fetchEvents(searchQuery);
   };
-
-  const chatRooms = [
-    {
-      id: "1",
-      title: "Dementia Support!",
-    },
-    {
-      id: "2",
-      title: "Mental Talk",
-    },
-  ];
 
   const renderEmptyComponent = () => (
     <View style={styles.coEmptyContainer}>
@@ -342,15 +432,128 @@ const SocialEventsScreen = () => {
 
               {activeTab === "chat" && (
                 <>
-                  <Text style={styles.sectionTitle}>Let's Chat</Text>
-                  <View style={styles.displayUnderline}></View>
-                  {chatRooms.map((room) => (
-                    <ChatRoomCard
-                      key={room.id}
-                      title={room.title}
-                      onJoin={() => alert(`Joining ${room.title}`)}
-                    />
-                  ))}
+                  <View style={styles.filterButtonContainer}>
+                    <TouchableOpacity
+                      style={[
+                        styles.filterButton,
+                        selectedFilter === "publicChat"
+                          ? styles.activeFilter
+                          : styles.inactiveFilter,
+                      ]}
+                      onPress={() => setSelectedFilter("publicChat")}
+                    >
+                      <Text
+                        style={[
+                          styles.filterButtonText,
+                          selectedFilter === "publicChat"
+                            ? styles.activeFilterText
+                            : styles.inactiveFilterText,
+                        ]}
+                      >
+                        Available Chat Rooms
+                      </Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                      style={[
+                        styles.filterButton,
+                        selectedFilter === "myChat"
+                          ? styles.activeFilter
+                          : styles.inactiveFilter,
+                      ]}
+                      onPress={() => setSelectedFilter("myChat")}
+                    >
+                      <Text
+                        style={[
+                          styles.filterButtonText,
+                          selectedFilter === "myChat"
+                            ? styles.activeFilterText
+                            : styles.inactiveFilterText,
+                        ]}
+                      >
+                        My Joined Chats
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+
+                  <View style={styles.singleUnderline}></View>
+
+                  {selectedFilter === "myChat" ? (
+                    <>
+                      <Text style={styles.sectionTitle}>Joined Chat</Text>
+                      <View style={styles.displayUnderline}></View>
+                      <FlatList
+                        data={joinedChatRooms}
+                        keyExtractor={(room) => room.group_id.toString()}
+                        renderItem={({ item: room }) => (
+                          <ChatRoomCard
+                            key={room.id}
+                            group_id={room.id}
+                            title={room.group_name}
+                            group_photo={room.group_photo}
+                            fetchChatRoom={fetchJoinedChatRoom}
+                            contentContainerStyle={styles.flexListContainer}
+                            // onJoin={() => alert(`Joining ${room.group_name}`)}
+                            //     onJoin={() =>
+                            //       navigation.navigate("chatRoom", {
+                            //         group_id: room.id,
+                            //         group_name: room.group_name,
+                            //       })
+                            //     }
+                            //   />
+                            // )}
+                            onJoin={() =>
+                              navigation.navigate("ChatRoomElderly", {
+                                group_id: room.group_id,
+                                group_name: room.group_name,
+                              })
+                            }
+                            isJoined={true} // Pass true for joined rooms
+                          />
+                        )}
+                        ListEmptyComponent={() => (
+                          <Text style={styles.noChatRoomText}>
+                            You have not joined any chat rooms yet.
+                          </Text>
+                        )}
+                      />
+                    </>
+                  ) : (
+                    <>
+                      <Text style={styles.sectionTitle}>Public Chat</Text>
+                      <View style={styles.displayUnderline}></View>
+                      <FlatList
+                        data={chatRooms}
+                        keyExtractor={(room) => room.id.toString()}
+                        renderItem={({ item: room }) => (
+                          <ChatRoomCard
+                            key={room.id}
+                            group_id={room.id}
+                            title={room.group_name}
+                            group_photo={room.group_photo}
+                            fetchChatRoom={fetchChatRoom}
+                            contentContainerStyle={styles.flexListContainer}
+                            // onJoin={() => alert(`Joining ${room.group_name}`)}
+                            // onJoin={() =>
+                            //   navigation.navigate("chatRoom", {
+                            //     group_id: room.id,
+                            //     group_name: room.group_name,
+                            //   })
+                            // }
+                            //onJoin={() => joinSupportGroup(room.id, userId)}
+                            // onJoin={() => handleJoinChatRoom(room)}
+                            onJoin={() => handleJoinChatRoom(room)} // Action for joining public chat
+                            isJoined={false} // Pass false for public rooms
+                          />
+                        )}
+                        ListEmptyComponent={() => (
+                          <Text style={styles.noChatRoomText}>
+                            No available chat rooms to join.
+                          </Text>
+                        )}
+                      />
+                    </>
+                  )}
                 </>
               )}
 

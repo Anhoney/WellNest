@@ -400,7 +400,11 @@ const HpCreateOrEditVApp = () => {
         >
           <Ionicons name="chevron-back" size={24} color="#000" />
         </TouchableOpacity>
-        <Text style={styles.hpTitle}>Virtual Consultation</Text>
+        <Text style={styles.hpTitle}>
+          {existingAppointment
+            ? "Virtual Consultation Edit"
+            : "Virtual Consultation Creation"}
+        </Text>
       </View>
 
       <ScrollView contentContainerStyle={styles.hpContainer}>
@@ -416,71 +420,7 @@ const HpCreateOrEditVApp = () => {
           />
 
           <Text style={styles.label}>Services Provide</Text>
-          {/* <View style={styles.checkboxContainer}>
-            <CheckBox
-              value={servicesProvide.videoConsultation.selected}
-              onValueChange={(value) =>
-                handleServiceChange("videoConsultation", "selected", value)
-              }
-            />
-            <Text>Video Consultation</Text>
-          </View>
-          {servicesProvide.videoConsultation.selected && (
-            <TextInput
-              style={styles.input}
-              placeholder="Price for Video Consultation"
-              keyboardType="numeric"
-              value={servicesProvide.videoConsultation.price}
-              onChangeText={(text) =>
-                handleServiceChange("videoConsultation", "price", text)
-              }
-            />
-          )}
 
-          <View style={styles.checkboxContainer}>
-            <CheckBox
-              value={servicesProvide.textConsultation.selected}
-              onValueChange={(value) =>
-                handleServiceChange("textConsultation", "selected", value)
-              }
-            />
-            <Text>Text Consultation</Text>
-          </View>
-          {servicesProvide.textConsultation.selected && (
-            <TextInput
-              style={styles.input}
-              placeholder="Price for Text Consultation"
-              keyboardType="numeric"
-              value={servicesProvide.textConsultation.price}
-              onChangeText={(text) =>
-                handleServiceChange("textConsultation", "price", text)
-              }
-            />
-          )} */}
-          {/* {servicesProvide.map((service, index) => (
-            <View key={index} style={styles.checkboxContainer}>
-              <CheckBox
-                value={service.selected}
-                onValueChange={(value) =>
-                  handleServiceChange(index, "selected", value)
-                }
-              />
-              <Text>{service.service.replace(/([A-Z])/g, " $1").trim()}</Text>
-              {service.selected && (
-                <TextInput
-                  style={styles.input}
-                  placeholder={`Price for ${service.service
-                    .replace(/([A-Z])/g, " $1")
-                    .trim()}`}
-                  keyboardType="numeric"
-                  value={service.price}
-                  onChangeText={(text) =>
-                    handleServiceChange(index, "price", text)
-                  }
-                />
-              )}
-            </View>
-          ))} */}
           {servicesProvide.map((service, index) => (
             <View key={index} style={styles.checkboxContainer}>
               <CheckBox

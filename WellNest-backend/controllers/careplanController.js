@@ -2,10 +2,10 @@ const pool = require("../config/db");
 // Get all care plans
 const getAllCarePlans = async (req, res) => {
   const { user_id } = req.params;
-
+  console.log("getAllCarePlans", user_id);
   try {
     const result = await pool.query(
-      "SELECT * FROM care_plans WHERE user_id = $1 ORDER BY created_at DESC",
+      "SELECT cp.*, u.full_name, p.username FROM care_plans cp LEFT JOIN users u ON cp.writer_id = u.id LEFT JOIN profile p ON cp.writer_id = p.user_id WHERE cp.user_id = $1 ORDER BY created_at DESC",
       [user_id]
     );
     res.json(result.rows);
@@ -17,11 +17,12 @@ const getAllCarePlans = async (req, res) => {
 // Create a new care plan
 const createCarePlan = async (req, res) => {
   const { user_id } = req.params;
-  const { title, plan } = req.body;
+  const { title, plan, writerId } = req.body;
+  console.log("createCarePlan", user_id, title, plan, writerId);
   try {
     const result = await pool.query(
-      "INSERT INTO care_plans (title, plan, user_id) VALUES ($1, $2, $3) RETURNING *",
-      [title, plan, user_id]
+      "INSERT INTO care_plans (title, plan, user_id, writer_id) VALUES ($1, $2, $3, $4) RETURNING *",
+      [title, plan, user_id, writerId]
     );
     // Send a success message along with the created care plan
     res.status(201).json({
@@ -37,11 +38,11 @@ const createCarePlan = async (req, res) => {
 // Update a care plan
 const updateCarePlan = async (req, res) => {
   const { id } = req.params;
-  const { title, plan } = req.body;
+  const { title, plan, writerId } = req.body;
   try {
     const result = await pool.query(
-      "UPDATE care_plans SET title = $1, plan = $2 WHERE careplan_id = $3 RETURNING *",
-      [title, plan, id]
+      "UPDATE care_plans SET title = $1, plan = $2, writer_id = $3 WHERE careplan_id = $4 RETURNING *",
+      [title, plan, writerId, id]
     );
     if (result.rows.length > 0) {
       res.status(200).json({

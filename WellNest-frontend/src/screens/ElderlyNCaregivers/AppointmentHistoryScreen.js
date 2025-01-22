@@ -15,18 +15,23 @@ import { getUserIdFromToken } from "../../../services/authService";
 import NavigationBar from "../../components/NavigationBar";
 import styles from "../../components/styles"; // Import your custom styles
 import { Ionicons } from "@expo/vector-icons"; // Import icons from Expo
+import { useNavigation, useRoute } from "@react-navigation/native";
 
-const AppointmentHistoryScreen = ({ navigation }) => {
+const AppointmentHistoryScreen = () => {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [userId, setUserId] = useState(null);
+  const [loggedInUserId, setLoggedInUserId] = useState(null);
+  const navigation = useNavigation();
+  const route = useRoute();
+  const { userId } = route.params;
 
   useEffect(() => {
     const fetchUserId = async () => {
-      const userId = await getUserIdFromToken();
+      const id = await getUserIdFromToken();
       // console.log("userId:", userId);
-      if (userId) {
-        setUserId(userId);
+      if (id) {
+        setLoggedInUserId(id);
+        // setUserId(userId);
         // fetchProfile(userId);
       }
     };
@@ -283,7 +288,7 @@ const AppointmentHistoryScreen = ({ navigation }) => {
     <View style={styles.emptyContainer}>
       <Image
         source={require("../../../assets/NothingDog.png")}
-        style={styles.emptyImage}
+        style={[{ marginTop: 150 }, styles.emptyImage]}
       />
       <Text style={styles.emptyText}>No appointments found.</Text>
     </View>
@@ -329,7 +334,12 @@ const AppointmentHistoryScreen = ({ navigation }) => {
           <Text style={styles.signOutButtonText}>Back to Home</Text>
         </TouchableOpacity>
       </View>
-      <NavigationBar navigation={navigation} activePage="AppointmentHistory" />
+      <NavigationBar
+        navigation={navigation}
+        activePage={loggedInUserId === userId ? "AppointmentHistory" : ""} // Set activePage based on userId match
+        userId={loggedInUserId}
+      />
+      {/* <NavigationBar navigation={navigation} activePage="AppointmentHistory" /> */}
     </ImageBackground>
   );
 };

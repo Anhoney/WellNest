@@ -22,7 +22,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import API_BASE_URL from "../../../config/config";
 import { scheduleAlarmNotification } from "../../utils/notificationUtils"; // Custom utility for scheduling notifications
 import * as Calendar from "expo-calendar";
-// import notifee, { TriggerType } from "@notifee/react-native";
+import notifee, { TriggerType } from "@notifee/react-native";
 
 const AddReminder = ({ route, navigation }) => {
   const { edit, medicationData, medicationId } = route.params || {}; // Get data from route params
@@ -454,6 +454,8 @@ const AddReminder = ({ route, navigation }) => {
         },
       });
       Alert.alert("Success", "Medication reminder set successfully!");
+      await onCreateTriggerNotification();
+      // await setReminder();
       navigation.goBack();
     } catch (error) {
       console.error("Error saving medication:", error.message);
@@ -475,7 +477,7 @@ const AddReminder = ({ route, navigation }) => {
         },
       });
       // await setReminder();
-      await onCreateTriggerNotification();
+      // await onCreateTriggerNotification();
       Alert.alert("Success", "Medication reminder deleted successfully!");
       navigation.goBack();
     } catch (error) {
@@ -517,7 +519,7 @@ const AddReminder = ({ route, navigation }) => {
 
           <View style={styles.mrrow}>
             <Ionicons name="medkit" size={18} color="#000" />
-            <Text style={styles.mrlabel}>Pills Name</Text>
+            <Text style={styles.mrlabel}>Medication Name</Text>
           </View>
           <TextInput
             style={styles.mrinput}
@@ -528,7 +530,7 @@ const AddReminder = ({ route, navigation }) => {
 
           <View style={styles.mrrow}>
             <Ionicons name="apps" size={18} color="#000" />
-            <Text style={styles.mrlabel}>Amount</Text>
+            <Text style={styles.mrlabel}>Dosage</Text>
           </View>
           <TextInput
             style={styles.mrinput}
@@ -540,7 +542,7 @@ const AddReminder = ({ route, navigation }) => {
 
           <View style={styles.mrrow}>
             <Ionicons name="calendar" size={18} color="#000" />
-            <Text style={styles.mrlabel}>Duration (days)</Text>
+            <Text style={styles.mrlabel}>Duration (in days)</Text>
           </View>
           <TextInput
             style={styles.mrinput}
@@ -552,7 +554,7 @@ const AddReminder = ({ route, navigation }) => {
 
           <View style={styles.mrrow}>
             <Ionicons name="repeat" size={18} color="#000" />
-            <Text style={styles.mrlabel}>Notification Frequency</Text>
+            <Text style={styles.mrlabel}>Reminder Frequency</Text>
           </View>
           <View style={styles.mrfoodButtons}>
             {["One time per day", "Twice per day", "Three times per day"].map(
@@ -578,9 +580,7 @@ const AddReminder = ({ route, navigation }) => {
             <View key={index}>
               <View style={styles.mrrow}>
                 <Ionicons name="time" size={18} color="#000" />
-                <Text style={styles.mrlabel}>
-                  Notification Time {index + 1}
-                </Text>
+                <Text style={styles.mrlabel}>Reminder Time {index + 1}</Text>
               </View>
               <TouchableOpacity
                 style={styles.mrinput}
@@ -681,7 +681,7 @@ const AddReminder = ({ route, navigation }) => {
             onCancel={() => setTimePickerVisibility(false)}
           /> */}
 
-          <View style={styles.mrrow}>
+          {/* <View style={styles.mrrow}>
             <Ionicons name="repeat" size={18} color="#000" />
             <Text style={styles.mrlabel}>Repeat</Text>
           </View>
@@ -698,14 +698,14 @@ const AddReminder = ({ route, navigation }) => {
                 <Text>{option}</Text>
               </TouchableOpacity>
             ))}
-          </View>
+          </View> */}
 
           {/* Space between Repeat and Food & Pills */}
           <View style={{ marginVertical: 8 }} />
 
           <View style={styles.mrrow}>
             <Ionicons name="restaurant" size={18} color="#000" />
-            <Text style={styles.mrlabel}>Food & Pills</Text>
+            <Text style={styles.mrlabel}>Meal and Medication Timing</Text>
           </View>
           <View style={styles.mrfoodButtons}>
             {["beforeFood", "flexible", "afterFood"].map((relation) => (
@@ -719,10 +719,10 @@ const AddReminder = ({ route, navigation }) => {
               >
                 <Text>
                   {relation === "beforeFood"
-                    ? "Before Food"
+                    ? "Before Meals"
                     : relation === "flexible"
                     ? "When Needed"
-                    : "After Food"}
+                    : "After Meals"}
                 </Text>
               </TouchableOpacity>
             ))}

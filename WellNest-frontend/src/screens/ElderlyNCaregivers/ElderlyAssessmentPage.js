@@ -22,6 +22,16 @@ import styles from "../../components/styles";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getUserIdFromToken } from "../../../services/authService";
 
+const EmptyAssessment = () => (
+  <View style={[{ marginTop: 100 }, styles.emptyFavoritesContainer]}>
+    <Image
+      source={require("../../../assets/NothingDog.png")} // Replace with your empty state image
+      style={styles.emptyFavoritesImage}
+    />
+    <Text style={styles.noDataText}>No assessments available.</Text>
+  </View>
+);
+
 const ElderlyAssessmentPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [assessments, setAssessments] = useState([]);
@@ -136,6 +146,9 @@ const ElderlyAssessmentPage = () => {
   );
 
   const renderAssessments = () => {
+    if (assessments.length === 0) {
+      return <EmptyAssessment />;
+    }
     return assessments.map((assessment, index) => (
       <View key={index} style={styles.assessmentCard}>
         <Image
@@ -166,6 +179,9 @@ const ElderlyAssessmentPage = () => {
   };
 
   const renderHistory = () => {
+    if (history.length === 0) {
+      return <EmptyAssessment />;
+    }
     return history.map((item, index) => (
       <View key={index} style={styles.historyCard}>
         <Image
@@ -188,16 +204,6 @@ const ElderlyAssessmentPage = () => {
     ));
   };
 
-  const renderEmptyComponent = () => (
-    <View style={styles.coEmptyContainer}>
-      <Image
-        source={require("../../../assets/NothingDog.png")}
-        style={styles.emptyImage}
-      />
-      <Text style={styles.emptyText}>No Assessment.</Text>
-    </View>
-  );
-
   const handleSearch = () => {
     console.log("Search:", searchQuery);
     // Implement search functionality here
@@ -219,19 +225,31 @@ const ElderlyAssessmentPage = () => {
         <Text style={styles.title}>Assessment</Text>
       </View>
       <View style={[{ marginTop: 15 }]}></View>
-      <View style={styles.userInfo}>
-        {/* <View style={styles.assessmentScoreContainer}> */}
-        {/* <Text style={[styles.label]}> Scores Range</Text>
+      {/* <View style={styles.userInfo}> */}
+      {/* <View style={styles.assessmentScoreContainer}> */}
+      {/* <Text style={[styles.label]}> Scores Range</Text>
             <Text style={[styles.label, { marginLeft: 110 }]}>Results</Text> */}
-        <Text style={styles.userName}>{userData.name || "User"}</Text>
+      {/* <Text style={styles.userName}>{userData.name || "User"}</Text>
 
         <Text style={styles.userAgeNGender}>
           Gender: {userData.gender || "N/A"}
         </Text>
         <Text style={styles.userAgeNGender}>
           Age: {userData.age || "N/A"} Years
+        </Text> */}
+      {/* </View> */}
+      <View style={[{ marginLeft: -10 }, styles.userInfo]}>
+        <Text style={[{ marginLeft: -35 }, styles.userName]}>
+          {userData.name || "User"}
         </Text>
-        {/* </View> */}
+        {/* <Text style={[styles.userAgeNGender, { marginTop: -15 }]}> */}
+        <Text style={[{ marginBottom: -100 }, styles.userAgeNGender]}>
+          Gender: {userData.gender || "N/A"}
+        </Text>
+        <Text style={[styles.userAgeNGender]}>
+          {/* <Text style={[styles.userAgeNGender, { marginTop: -15 }]}> */}
+          Age: {userData.age || "N/A"} Years Old
+        </Text>
       </View>
 
       {/* <View style={styles.coSearchContainer}>
@@ -268,7 +286,7 @@ const ElderlyAssessmentPage = () => {
             <Text style={styles.tabText}>History Result</Text>
           </TouchableOpacity>
         </View>
-
+        <View style={[{ marginTop: 15 }]}></View>
         {loading ? (
           <ActivityIndicator size="large" color="#0000ff" />
         ) : selectedTab === "Test" ? (

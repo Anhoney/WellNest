@@ -377,8 +377,8 @@ export default StyleSheet.create({
     fontWeight: "bold",
   },
   defaultImage: {
-    width: 165,
-    height: 165,
+    width: 180,
+    height: 180,
     resizeMode: "contain",
   },
   sectionTitle: {
@@ -925,7 +925,7 @@ export default StyleSheet.create({
   // AppointmentCreationPage
   hpContainer: {
     flexGrow: 1,
-    backgroundColor: "#D3D3D3",
+    // backgroundColor: "#D3D3D3",
     padding: 20,
   },
   formContainer: {
@@ -985,13 +985,13 @@ export default StyleSheet.create({
     // borderRadius: 5,
     // marginTop: 10,
     // alignItems: "center",
-    paddingVertical: 15,
-    borderRadius: 10,
+    paddingVertical: 12,
+    borderRadius: 8,
     alignItems: "center",
-    marginVertical: 20,
+    // marginVertical: 20,
 
     // borderRadius: 8,
-    margin: 10,
+    margin: 20,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.8,
@@ -2230,11 +2230,15 @@ export default StyleSheet.create({
     marginBottom: 8,
   },
   collabCardTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: "bold",
+    // alignItems: "center",
+    textAlign: "center",
   },
   collabCardDetails: {
-    fontSize: 16,
+    fontSize: 18,
+    // alignItems: "center",
+    textAlign: "center",
   },
   connectButton: {
     marginTop: 16,
@@ -2292,12 +2296,12 @@ export default StyleSheet.create({
     shadowRadius: 4,
     elevation: 2, // For Android shadow
   },
-  userName: {
-    fontSize: 22,
-    fontWeight: "bold",
-    marginBottom: 10,
-    marginLeft: -18,
-  },
+  // userName: {
+  //   fontSize: 22,
+  //   fontWeight: "bold",
+  //   marginBottom: 10,
+  //   marginLeft: -18,
+  // },
   userAgeNGender: {
     fontSize: 18,
     marginBottom: 5,
@@ -2327,6 +2331,12 @@ export default StyleSheet.create({
   startButtonText: { color: "#fff", fontWeight: "bold" },
   historyContainer: { padding: 20 },
   //CoSocialEventsManagement.js
+  privateChatRoomTitle: {
+    marginTop: 20, // Add space between the two sections
+  },
+  flexListContainer: {
+    flex: 1, // Adjust this value if needed to push content above the navigation bar
+  },
   coSearchContainer: {
     marginTop: 25,
     marginBottom: 20,
@@ -2896,5 +2906,38 @@ export default StyleSheet.create({
     position: "absolute",
     top: 20,
     right: 8,
+  },
+  //CollaborationScreen
+  pendingRequestsContainer: {
+    backgroundColor: "#ffffff", // Light background for contrast
+    padding: 20,
+    borderRadius: 10,
+    marginVertical: 15,
+    marginHorizontal: 20,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2, // For Android shadow
+  },
+  pendingRequestsTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 12,
+    // color: "#333", // Darker text color for title
+    color: "#2c3e50", // Darker text color for title
+    textAlign: "center", // Center the title
+  },
+  pendingRequestText: {
+    fontSize: 16,
+    // color: "#555", // Slightly lighter text color for request details
+    // marginBottom: 5,
+    color: "#34495e", // Darker text color for request details
+    marginBottom: 8,
+    lineHeight: 22, // Increase line height for better readability
+    textAlign: "left", // Align text to the left
   },
 });
