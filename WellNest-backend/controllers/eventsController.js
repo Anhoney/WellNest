@@ -385,28 +385,11 @@ const getEventsElderlySite = async (req, res) => {
       params.push(`%${search}%`); // Add the search term to params
     }
 
-    query += " GROUP BY e.id"; // Ensure GROUP BY is always included
-
-    // const query = `
-    //   SELECT
-    //     e.id, e.co_id, e.title, e.fees, e.location,
-    //     e.event_date, e.event_time, e.notes,
-    //     e.terms_and_conditions, e.capacity, e.event_status,
-    //     CASE
-    //       WHEN e.photo IS NOT NULL
-    //       THEN CONCAT('data:image/png;base64,', ENCODE(e.photo, 'base64'))
-    //       ELSE NULL
-    //     END AS photo,
-    //     e.registration_due, e.created_at,
-    //     COUNT(ep.user_id) AS participant_count
-    //   FROM co_available_events e
-    //   LEFT JOIN event_participants ep ON e.id = ep.event_id
-    //   WHERE
-    //      e.registration_due >= CURRENT_DATE
-    //     AND e.event_status = 'Active'
-    //   GROUP BY e.id
-    //   ${search ? "AND e.title ILIKE $1" : ""}
-    // `;
+    // query += " GROUP BY e.id"; // Ensure GROUP BY is always included
+    query += `
+    GROUP BY e.id
+    HAVING COUNT(ep.user_id) < CAST(e.capacity AS INTEGER)
+  `;
 
     // const params = search ? [`%${search}%`] : []; // Prepare parameters for the query
     const result = await pool.query(query, params);

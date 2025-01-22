@@ -40,6 +40,7 @@ const RegisterPage = () => {
   const [communityOrganizerFile, setCommunityOrganizerFile] = useState(null);
   const [communityOrganizerFileName, setCommunityOrganizerFileName] =
     useState(""); // State for file name feedback
+  const [isConfirmPasswordVisible, setConfirmPasswordVisible] = useState(false); // Toggle for confirm password visibility
 
   // State for invalid fields
   const [invalidFields, setInvalidFields] = useState({
@@ -61,6 +62,33 @@ const RegisterPage = () => {
   };
 
   // Function to handle document picking
+  // const handleFileSelection = async (setFileState, setFileName) => {
+  //   try {
+  //     const result = await DocumentPicker.getDocumentAsync({
+  //       type: [
+  //         "image/*",
+  //         "application/pdf",
+  //         "application/msword",
+  //         "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  //       ],
+  //       copyToCacheDirectory: false,
+  //     });
+
+  //     if (result != null) {
+  //       // console.log();
+  //       setFileState(result);
+  //       setFileName(result.assets[0].name);
+  //       // console.log(result.type);
+  //       // console.log(healthcareLicenseFileName);
+  //     } else {
+  //       console.log("No file selected or result is null");
+  //       Alert.alert("File Selection", "File selection was canceled");
+  //     }
+  //   } catch (error) {
+  //     console.error("Document selection error:", error);
+  //     Alert.alert("Error", "Error selecting document");
+  //   }
+  // };
   const handleFileSelection = async (setFileState, setFileName) => {
     try {
       const result = await DocumentPicker.getDocumentAsync({
@@ -73,7 +101,9 @@ const RegisterPage = () => {
         copyToCacheDirectory: false,
       });
 
-      if (result != null) {
+      console.log(result);
+
+      if (result && result.assets != null) {
         // console.log();
         setFileState(result);
         setFileName(result.assets[0].name);
@@ -446,7 +476,8 @@ const RegisterPage = () => {
                 />
                 {/* Make sure TouchableOpacity wraps around the icon properly */}
                 <TouchableOpacity
-                  onPress={togglePasswordVisibility}
+                  onPress={() => setPasswordVisible(!isPasswordVisible)}
+                  // onPress={togglePasswordVisibility}
                   style={{ marginLeft: 10 }}
                 >
                   <Ionicons
@@ -472,15 +503,19 @@ const RegisterPage = () => {
                   placeholder="Confirm Password"
                   value={confirmPassword}
                   onChangeText={setConfirmPassword}
-                  secureTextEntry={!isPasswordVisible} // Toggle visibility
+                  secureTextEntry={!isConfirmPasswordVisible}
+                  // secureTextEntry={!isPasswordVisible} // Toggle visibility
                 />
                 {/* Make sure TouchableOpacity wraps around the icon properly */}
                 <TouchableOpacity
-                  onPress={togglePasswordVisibility}
+                  onPress={() =>
+                    setConfirmPasswordVisible(!isConfirmPasswordVisible)
+                  }
+                  // onPress={togglePasswordVisibility}
                   style={{ marginLeft: 10 }}
                 >
                   <Ionicons
-                    name={isPasswordVisible ? "eye-off" : "eye"}
+                    name={isConfirmPasswordVisible ? "eye-off" : "eye"}
                     size={24}
                     color="gray"
                   />

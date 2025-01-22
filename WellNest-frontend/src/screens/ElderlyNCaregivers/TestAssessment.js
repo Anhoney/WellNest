@@ -81,6 +81,16 @@ const TestAssessment = () => {
   };
 
   const handleSubmit = async () => {
+    // Check if all questions have been answered
+    const unansweredQuestions = questions.filter(
+      (question) => !selectedAnswers[question.question_id]
+    );
+
+    if (unansweredQuestions.length > 0) {
+      Alert.alert("Error", "Please answer all questions before submitting.");
+      return;
+    }
+
     // Here you can handle the submission of selected answers
     // For example, you can send the selected answers to the backend
     try {

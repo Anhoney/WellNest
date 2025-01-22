@@ -380,6 +380,15 @@ const AddReminder = ({ route, navigation }) => {
   };
 
   const handleSubmit = async () => {
+    // Check if at least one notification time is provided
+    const hasNotificationTime = notificationTimes.some(
+      (time) => time.trim() !== ""
+    );
+    if (!hasNotificationTime) {
+      Alert.alert("Error", "Please provide at least one notification time.");
+      return;
+    }
+
     if (!pillName || !amount || !duration || !time) {
       Alert.alert("Error", "Please fill in all fields!");
       return;
