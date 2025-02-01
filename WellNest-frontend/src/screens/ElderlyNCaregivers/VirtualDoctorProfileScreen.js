@@ -175,7 +175,7 @@ const VirtualDoctorProfileScreen = () => {
             <Text style={styles.boldSectionContent}>Qualifications:</Text>
             <Text style={styles.sectionContent}>{doctor.credentials}</Text>
             <Text style={styles.boldSectionContent}>
-              Medical Registration Number:
+              Malaysian Medical Council (MMC) Registration Number:
             </Text>
             <Text style={styles.sectionContent}>
               {doctor.healthcare_license}

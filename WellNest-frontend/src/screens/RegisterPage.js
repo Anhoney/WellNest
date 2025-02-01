@@ -61,34 +61,13 @@ const RegisterPage = () => {
     return isValidLength && hasLetters && hasNumbers;
   };
 
-  // Function to handle document picking
-  // const handleFileSelection = async (setFileState, setFileName) => {
-  //   try {
-  //     const result = await DocumentPicker.getDocumentAsync({
-  //       type: [
-  //         "image/*",
-  //         "application/pdf",
-  //         "application/msword",
-  //         "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-  //       ],
-  //       copyToCacheDirectory: false,
-  //     });
+  const validatePhoneNumber = (phone) => {
+    // Check if phone number starts with '0', has more than 10 digits, and is not a sequence of the same digit
+    const isValidFormat = /^0\d{9,}$/.test(phone); // Starts with 0 and has at least 10 digits
+    const isNotSequential = !/(.)\1{9}/.test(phone); // Not a sequence of the same digit
+    return isValidFormat && isNotSequential;
+  };
 
-  //     if (result != null) {
-  //       // console.log();
-  //       setFileState(result);
-  //       setFileName(result.assets[0].name);
-  //       // console.log(result.type);
-  //       // console.log(healthcareLicenseFileName);
-  //     } else {
-  //       console.log("No file selected or result is null");
-  //       Alert.alert("File Selection", "File selection was canceled");
-  //     }
-  //   } catch (error) {
-  //     console.error("Document selection error:", error);
-  //     Alert.alert("Error", "Error selecting document");
-  //   }
-  // };
   const handleFileSelection = async (setFileState, setFileName) => {
     try {
       const result = await DocumentPicker.getDocumentAsync({
@@ -148,9 +127,11 @@ const RegisterPage = () => {
     if (!phoneNo) {
       updatedInvalidFields.phoneNo = true;
       missingFields.push("Phone Number");
-    } else if (phoneNo.length < 10) {
+    } else if (!validatePhoneNumber(phoneNo)) {
       updatedInvalidFields.phoneNo = true;
-      specificErrors.push("Phone Number must be at least 10 digits.");
+      specificErrors.push(
+        "Phone Number must start with 0, have at least 10 digits, and cannot be a sequence of the same digit."
+      );
     } else {
       updatedInvalidFields.phoneNo = false;
     }
@@ -338,17 +319,244 @@ const RegisterPage = () => {
 
       {/* SafeAreaView wraps the content to ensure it's inside the safe area */}
       <SafeAreaView style={styles.safeAreaContainer}>
-        <KeyboardAvoidingView
+        {/* <KeyboardAvoidingView
           style={{ flex: 1 }}
           behavior={Platform.OS === "ios" ? "padding" : undefined}
           enabled
-        >
-          <ScrollView contentContainerStyle={styles.scrollView}>
+        > */}
+        <ScrollView contentContainerStyle={styles.scrollView}>
+          <View style={styles.container}>
+            {/* Full Name Input with Icon and Precautions */}
+            <View style={styles.inputContainer}>
+              <Ionicons
+                name="person"
+                size={24}
+                color="#666"
+                style={styles.icon}
+              />
+              <TextInput
+                style={[
+                  styles.input,
+                  invalidFields.fullName && styles.invalidInput,
+                ]}
+                placeholder="Full name"
+                value={fullName}
+                onChangeText={setFullName}
+              />
+            </View>
+            <Text style={styles.precautions}>
+              Make sure it matches the name on your government ID.
+            </Text>
+            {/* Phone Number Input with Icon */}
+            <View style={styles.inputContainer}>
+              <Ionicons
+                name="call"
+                size={24}
+                color="#666"
+                style={styles.icon}
+              />
+              <TextInput
+                style={[
+                  styles.input,
+                  invalidFields.phoneNo && styles.invalidInput,
+                ]}
+                placeholder="Phone No (Eg. 0123456789)"
+                value={phoneNo}
+                onChangeText={setPhoneNo}
+                keyboardType="phone-pad"
+              />
+            </View>
+            {/* Email Input with Icon */}
+            <View style={styles.inputContainer}>
+              <Ionicons
+                name="mail"
+                size={24}
+                color="#666"
+                style={styles.icon}
+              />
+              <TextInput
+                style={[
+                  styles.input,
+                  invalidFields.email && styles.invalidInput,
+                ]}
+                placeholder="Email Address"
+                value={email}
+                onChangeText={setEmail}
+                keyboardType="email-address"
+              />
+            </View>
+            {/* Identity Card Input with Icon and Precautions */}
+            <View style={styles.inputContainer}>
+              <Ionicons
+                name="card"
+                size={24}
+                color="#666"
+                style={styles.icon}
+              />
+              <TextInput
+                style={[
+                  styles.input,
+                  invalidFields.identityCard && styles.invalidInput,
+                ]}
+                placeholder="Identity Card Number"
+                value={identityCard}
+                onChangeText={setIdentityCard}
+                keyboardType="numeric"
+              />
+            </View>
+            <Text style={styles.precautions}>
+              We will send a notification after authentication succeeds.
+            </Text>
+            {/* Upload Identity Card with Camera Icon */}
+            <TouchableOpacity
+              style={styles.uploadButton}
+              onPress={() =>
+                handleFileSelection(
+                  setIdentityCardFile,
+                  setIdentityCardFileName
+                )
+              }
+            >
+              <Ionicons
+                name="camera"
+                size={24}
+                color="#fff"
+                style={styles.icon}
+              />
+              <Text style={styles.uploadButtonText}>
+                Upload Identity Card Photo
+              </Text>
+            </TouchableOpacity>
+            {identityCardFileName ? (
+              <Text style={styles.uploadFeedback}>
+                Uploaded file: {identityCardFileName}
+                {"\n"}
+              </Text>
+            ) : null}
+            <Text style={styles.uploadPrecautions}>
+              Please make sure there are both back and front photos of the
+              identity card.
+            </Text>
+            {/* Password Input with Icon and Visibility Toggle */}
+            <View style={styles.inputContainer}>
+              <Ionicons
+                name="lock-closed"
+                size={24}
+                color="#666"
+                style={styles.icon}
+              />
+              <TextInput
+                style={[
+                  styles.input,
+                  invalidFields.password && styles.invalidInput,
+                ]}
+                placeholder="Password"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry={!isPasswordVisible} // Toggle visibility
+              />
+              {/* Make sure TouchableOpacity wraps around the icon properly */}
+              <TouchableOpacity
+                onPress={() => setPasswordVisible(!isPasswordVisible)}
+                // onPress={togglePasswordVisibility}
+                style={{ marginLeft: 10 }}
+              >
+                <Ionicons
+                  name={isPasswordVisible ? "eye-off" : "eye"}
+                  size={24}
+                  color="gray"
+                />
+              </TouchableOpacity>
+            </View>
+            {/* Confirm Password Input with Icon and Visibility Toggle */}
+            <View style={styles.inputContainer}>
+              <Ionicons
+                name="lock-closed"
+                size={24}
+                color="#666"
+                style={styles.icon}
+              />
+              <TextInput
+                style={[
+                  styles.input,
+                  invalidFields.confirmPassword && styles.invalidInput,
+                ]}
+                placeholder="Confirm Password"
+                value={confirmPassword}
+                onChangeText={setConfirmPassword}
+                secureTextEntry={!isConfirmPasswordVisible}
+                // secureTextEntry={!isPasswordVisible} // Toggle visibility
+              />
+              {/* Make sure TouchableOpacity wraps around the icon properly */}
+              <TouchableOpacity
+                onPress={() =>
+                  setConfirmPasswordVisible(!isConfirmPasswordVisible)
+                }
+                // onPress={togglePasswordVisibility}
+                style={{ marginLeft: 10 }}
+              >
+                <Ionicons
+                  name={isConfirmPasswordVisible ? "eye-off" : "eye"}
+                  size={24}
+                  color="gray"
+                />
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* Role Section */}
+          <View style={styles.underline} />
+          <Text style={styles.question}>Role</Text>
+          <View style={styles.underline} />
+          <RadioButton.Group onValueChange={handleRoleChange} value={role}>
+            <View style={styles.radioButtonContainer}>
+              <RadioButton.Item
+                label="Elderly"
+                value="Elderly"
+                mode="android"
+                position="leading"
+                color={styles.radioButtonColor.color}
+                labelStyle={styles.radioLabel}
+              />
+            </View>
+            <View style={styles.radioButtonContainer}>
+              <RadioButton.Item
+                label="Family / Caregiver / Volunteer"
+                value="Family / Caregiver / Volunteer"
+                mode="android"
+                position="leading"
+                color={styles.radioButtonColor.color}
+                labelStyle={styles.radioLabel}
+              />
+            </View>
+            <View style={styles.radioButtonContainer}>
+              <RadioButton.Item
+                label="Healthcare Provider"
+                value="Healthcare Provider"
+                mode="android"
+                position="leading"
+                color={styles.radioButtonColor.color}
+                labelStyle={styles.radioLabel}
+              />
+            </View>
+            <View style={styles.radioButtonContainer}>
+              <RadioButton.Item
+                label="Community Organizer"
+                value="Community Organizer"
+                mode="android"
+                position="leading"
+                color={styles.radioButtonColor.color}
+                labelStyle={styles.radioLabel}
+              />
+            </View>
+          </RadioButton.Group>
+
+          {/* Dynamic Fields Based on Role */}
+          {role === "Healthcare Provider" && (
             <View style={styles.container}>
-              {/* Full Name Input with Icon and Precautions */}
               <View style={styles.inputContainer}>
                 <Ionicons
-                  name="person"
+                  name="medkit"
                   size={24}
                   color="#666"
                   style={styles.icon}
@@ -356,313 +564,86 @@ const RegisterPage = () => {
                 <TextInput
                   style={[
                     styles.input,
-                    invalidFields.fullName && styles.invalidInput,
+                    invalidFields.healthcareLicenseNo && styles.invalidInput,
                   ]}
-                  placeholder="Full name"
-                  value={fullName}
-                  onChangeText={setFullName}
+                  placeholder="MMC Registration Number"
+                  value={healthcareLicenseNo}
+                  onChangeText={setHealthcareLicenseNo}
+                  // Add relevant input and state for healthcare-specific fields
                 />
               </View>
-              <Text style={styles.precautions}>
-                Make sure it matches the name on your government ID.
-              </Text>
-              {/* Phone Number Input with Icon */}
-              <View style={styles.inputContainer}>
-                <Ionicons
-                  name="call"
-                  size={24}
-                  color="#666"
-                  style={styles.icon}
-                />
-                <TextInput
-                  style={[
-                    styles.input,
-                    invalidFields.phoneNo && styles.invalidInput,
-                  ]}
-                  placeholder="Phone No (Eg. 0123456789)"
-                  value={phoneNo}
-                  onChangeText={setPhoneNo}
-                  keyboardType="phone-pad"
-                />
-              </View>
-              {/* Email Input with Icon */}
-              <View style={styles.inputContainer}>
-                <Ionicons
-                  name="mail"
-                  size={24}
-                  color="#666"
-                  style={styles.icon}
-                />
-                <TextInput
-                  style={[
-                    styles.input,
-                    invalidFields.email && styles.invalidInput,
-                  ]}
-                  placeholder="Email Address"
-                  value={email}
-                  onChangeText={setEmail}
-                  keyboardType="email-address"
-                />
-              </View>
-              {/* Identity Card Input with Icon and Precautions */}
-              <View style={styles.inputContainer}>
-                <Ionicons
-                  name="card"
-                  size={24}
-                  color="#666"
-                  style={styles.icon}
-                />
-                <TextInput
-                  style={[
-                    styles.input,
-                    invalidFields.identityCard && styles.invalidInput,
-                  ]}
-                  placeholder="Identity Card Number"
-                  value={identityCard}
-                  onChangeText={setIdentityCard}
-                  keyboardType="numeric"
-                />
-              </View>
-              <Text style={styles.precautions}>
-                We will send a notification after authentication succeeds.
-              </Text>
-              {/* Upload Identity Card with Camera Icon */}
               <TouchableOpacity
                 style={styles.uploadButton}
                 onPress={() =>
                   handleFileSelection(
-                    setIdentityCardFile,
-                    setIdentityCardFileName
+                    setHealthcareLicenseFile,
+                    setHealthcareLicenseFileName
                   )
                 }
               >
                 <Ionicons
-                  name="camera"
+                  name="document"
                   size={24}
                   color="#fff"
                   style={styles.icon}
                 />
                 <Text style={styles.uploadButtonText}>
-                  Upload Identity Card Photo
+                  Upload Healthcare License Document
                 </Text>
               </TouchableOpacity>
-              {identityCardFileName ? (
+              {healthcareLicenseFileName ? (
                 <Text style={styles.uploadFeedback}>
-                  Uploaded file: {identityCardFileName}
+                  Uploaded file: {healthcareLicenseFileName}
                   {"\n"}
                 </Text>
               ) : null}
               <Text style={styles.uploadPrecautions}>
-                Please make sure there are both back and front photos of the
-                identity card.
+                Please upload related documents to verify your role identity.
               </Text>
-              {/* Password Input with Icon and Visibility Toggle */}
-              <View style={styles.inputContainer}>
-                <Ionicons
-                  name="lock-closed"
-                  size={24}
-                  color="#666"
-                  style={styles.icon}
-                />
-                <TextInput
-                  style={[
-                    styles.input,
-                    invalidFields.password && styles.invalidInput,
-                  ]}
-                  placeholder="Password"
-                  value={password}
-                  onChangeText={setPassword}
-                  secureTextEntry={!isPasswordVisible} // Toggle visibility
-                />
-                {/* Make sure TouchableOpacity wraps around the icon properly */}
-                <TouchableOpacity
-                  onPress={() => setPasswordVisible(!isPasswordVisible)}
-                  // onPress={togglePasswordVisibility}
-                  style={{ marginLeft: 10 }}
-                >
-                  <Ionicons
-                    name={isPasswordVisible ? "eye-off" : "eye"}
-                    size={24}
-                    color="gray"
-                  />
-                </TouchableOpacity>
-              </View>
-              {/* Confirm Password Input with Icon and Visibility Toggle */}
-              <View style={styles.inputContainer}>
-                <Ionicons
-                  name="lock-closed"
-                  size={24}
-                  color="#666"
-                  style={styles.icon}
-                />
-                <TextInput
-                  style={[
-                    styles.input,
-                    invalidFields.confirmPassword && styles.invalidInput,
-                  ]}
-                  placeholder="Confirm Password"
-                  value={confirmPassword}
-                  onChangeText={setConfirmPassword}
-                  secureTextEntry={!isConfirmPasswordVisible}
-                  // secureTextEntry={!isPasswordVisible} // Toggle visibility
-                />
-                {/* Make sure TouchableOpacity wraps around the icon properly */}
-                <TouchableOpacity
-                  onPress={() =>
-                    setConfirmPasswordVisible(!isConfirmPasswordVisible)
-                  }
-                  // onPress={togglePasswordVisibility}
-                  style={{ marginLeft: 10 }}
-                >
-                  <Ionicons
-                    name={isConfirmPasswordVisible ? "eye-off" : "eye"}
-                    size={24}
-                    color="gray"
-                  />
-                </TouchableOpacity>
-              </View>
             </View>
+          )}
 
-            {/* Role Section */}
-            <View style={styles.underline} />
-            <Text style={styles.question}>Role</Text>
-            <View style={styles.underline} />
-            <RadioButton.Group onValueChange={handleRoleChange} value={role}>
-              <View style={styles.radioButtonContainer}>
-                <RadioButton.Item
-                  label="Elderly"
-                  value="Elderly"
-                  mode="android"
-                  position="leading"
-                  color={styles.radioButtonColor.color}
-                  labelStyle={styles.radioLabel}
-                />
-              </View>
-              <View style={styles.radioButtonContainer}>
-                <RadioButton.Item
-                  label="Family / Caregiver / Volunteer"
-                  value="Family / Caregiver / Volunteer"
-                  mode="android"
-                  position="leading"
-                  color={styles.radioButtonColor.color}
-                  labelStyle={styles.radioLabel}
-                />
-              </View>
-              <View style={styles.radioButtonContainer}>
-                <RadioButton.Item
-                  label="Healthcare Provider"
-                  value="Healthcare Provider"
-                  mode="android"
-                  position="leading"
-                  color={styles.radioButtonColor.color}
-                  labelStyle={styles.radioLabel}
-                />
-              </View>
-              <View style={styles.radioButtonContainer}>
-                <RadioButton.Item
-                  label="Community Organizer"
-                  value="Community Organizer"
-                  mode="android"
-                  position="leading"
-                  color={styles.radioButtonColor.color}
-                  labelStyle={styles.radioLabel}
-                />
-              </View>
-            </RadioButton.Group>
-
-            {/* Dynamic Fields Based on Role */}
-            {role === "Healthcare Provider" && (
-              <View style={styles.container}>
-                <View style={styles.inputContainer}>
-                  <Ionicons
-                    name="medkit"
-                    size={24}
-                    color="#666"
-                    style={styles.icon}
-                  />
-                  <TextInput
-                    style={[
-                      styles.input,
-                      invalidFields.healthcareLicenseNo && styles.invalidInput,
-                    ]}
-                    placeholder="Healthcare License Number"
-                    value={healthcareLicenseNo}
-                    onChangeText={setHealthcareLicenseNo}
-                    // Add relevant input and state for healthcare-specific fields
-                  />
-                </View>
-                <TouchableOpacity
-                  style={styles.uploadButton}
-                  onPress={() =>
-                    handleFileSelection(
-                      setHealthcareLicenseFile,
-                      setHealthcareLicenseFileName
-                    )
-                  }
-                >
-                  <Ionicons
-                    name="document"
-                    size={24}
-                    color="#fff"
-                    style={styles.icon}
-                  />
-                  <Text style={styles.uploadButtonText}>
-                    Upload Healthcare License Document
-                  </Text>
-                </TouchableOpacity>
-                {healthcareLicenseFileName ? (
-                  <Text style={styles.uploadFeedback}>
-                    Uploaded file: {healthcareLicenseFileName}
-                    {"\n"}
-                  </Text>
-                ) : null}
-                <Text style={styles.uploadPrecautions}>
-                  Please upload related documents to verify your role identity.
-                </Text>
-              </View>
-            )}
-
-            {role === "Community Organizer" && (
-              <View style={styles.container}>
-                <TouchableOpacity
-                  style={styles.uploadButton}
-                  onPress={() =>
-                    handleFileSelection(
-                      setCommunityOrganizerFile,
-                      setCommunityOrganizerFileName
-                    )
-                  }
-                >
-                  <Ionicons
-                    name="document"
-                    size={24}
-                    color="#fff"
-                    style={styles.icon}
-                  />
-                  <Text style={styles.uploadButtonText}>
-                    Upload Community Organizer Document
-                  </Text>
-                </TouchableOpacity>
-                {communityOrganizerFileName ? (
-                  <Text style={styles.uploadFeedback}>
-                    Uploaded file: {communityOrganizerFileName}
-                    {"\n"}
-                  </Text>
-                ) : null}
-                <Text style={styles.uploadPrecautions}>
-                  Please upload related documents to verify your role identity.
-                </Text>
-              </View>
-            )}
-
+          {role === "Community Organizer" && (
             <View style={styles.container}>
-              {/* Sign Up Button */}
-              <TouchableOpacity style={styles.button} onPress={handleRegister}>
-                <Text style={styles.buttonText}>Sign Up</Text>
+              <TouchableOpacity
+                style={styles.uploadButton}
+                onPress={() =>
+                  handleFileSelection(
+                    setCommunityOrganizerFile,
+                    setCommunityOrganizerFileName
+                  )
+                }
+              >
+                <Ionicons
+                  name="document"
+                  size={24}
+                  color="#fff"
+                  style={styles.icon}
+                />
+                <Text style={styles.uploadButtonText}>
+                  Upload Community Organizer Document
+                </Text>
               </TouchableOpacity>
+              {communityOrganizerFileName ? (
+                <Text style={styles.uploadFeedback}>
+                  Uploaded file: {communityOrganizerFileName}
+                  {"\n"}
+                </Text>
+              ) : null}
+              <Text style={styles.uploadPrecautions}>
+                Please upload related documents to verify your role identity.
+              </Text>
             </View>
-          </ScrollView>
-        </KeyboardAvoidingView>
+          )}
+
+          <View style={styles.container}>
+            {/* Sign Up Button */}
+            <TouchableOpacity style={styles.button} onPress={handleRegister}>
+              <Text style={styles.buttonText}>Sign Up</Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+        {/* </KeyboardAvoidingView> */}
       </SafeAreaView>
     </ImageBackground>
   );

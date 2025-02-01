@@ -209,7 +209,7 @@ const HistoryAppDetails = ({ route, navigation }) => {
       </View>
 
       <View style={styles.uAContainer}>
-        <Text style={styles.label}>When:</Text>
+        <Text style={styles.label}>Selected Date and Time:</Text>
         <View style={styles.infoContainer}>
           {/* <Text style={styles.infoText}>
             {appointmentDetails.appointment_date}
@@ -298,7 +298,7 @@ const HistoryAppDetails = ({ route, navigation }) => {
                 </Text>
               </View>
               <View style={styles.tableRow}>
-                <Text style={styles.tableCell}>Notes:</Text>
+                <Text style={styles.tableCell}>Special Requests:</Text>
                 <Text style={styles.tableCell}>
                   {appointmentDetails.notes || "N/A"}
                 </Text>
@@ -326,12 +326,7 @@ const HistoryAppDetails = ({ route, navigation }) => {
                 </Text>
               </View>
             </View>
-            {/* <Text style={styles.sectionContent}>
-              Reason: {appointmentDetails.reason}
-            </Text>
-            <Text style={styles.sectionContent}>
-              Notes: {appointmentDetails.note || "N/A"}
-            </Text> */}
+
             {/* </View> */}
             <TouchableOpacity
               style={styles.signOutButton}

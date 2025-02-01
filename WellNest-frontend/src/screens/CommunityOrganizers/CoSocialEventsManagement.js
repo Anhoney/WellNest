@@ -145,17 +145,6 @@ const CoSocialEventsManagement = () => {
   // Get today's date
   const today = new Date();
 
-  // const chatRooms = [
-  //   {
-  //     id: "1",
-  //     title: "Dementia Support!",
-  //   },
-  //   {
-  //     id: "2",
-  //     title: "Mental Talk",
-  //   },
-  // ];
-
   return (
     <ImageBackground
       source={require("../../../assets/Assessment.png")}
@@ -295,6 +284,7 @@ const CoSocialEventsManagement = () => {
                     data={coChatRooms}
                     keyExtractor={(room) => room.id.toString()}
                     contentContainerStyle={styles.listContainer}
+                    ListEmptyComponent={renderEmptyComponent}
                     renderItem={({ item: room }) => (
                       <ChatRoomCard
                         key={room.id}

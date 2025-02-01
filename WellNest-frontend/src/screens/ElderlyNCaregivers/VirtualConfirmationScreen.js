@@ -346,7 +346,7 @@ const VirtualConfirmationScreen = ({ route, navigation }) => {
         </View>
       </View>
       <View style={styles.uAContainer}>
-        <Text style={styles.label}>When:</Text>
+        <Text style={styles.label}>Selected Date and Time:</Text>
         <View style={styles.infoContainer}>
           <Text style={styles.infoText}>{selectedDate}</Text>
           <Text style={styles.infoText}>{selectedTime}</Text>
@@ -380,7 +380,7 @@ const VirtualConfirmationScreen = ({ route, navigation }) => {
                 <Text style={styles.tableCell}>{userDetails.gender}</Text>
               </View>
               <View style={styles.tableRow}>
-                <Text style={styles.tableCell}>Notes:</Text>
+                <Text style={styles.tableCell}>Special Requests:</Text>
                 <Text style={styles.tableCell}>{note || "N/A"}</Text>
               </View>
               <View style={styles.tableRow}>

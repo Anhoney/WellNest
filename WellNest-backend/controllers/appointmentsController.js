@@ -332,9 +332,9 @@ const getPastAppointments = async (req, res) => {
 
     const result = await pool.query(query, [hpId]);
 
-    if (result.rows.length === 0) {
-      return res.status(404).json({ message: "No past appointments found." });
-    }
+    // if (result.rows.length === 0) {
+    //   return res.status(404).json({ message: "No past appointments found." });
+    // }
 
     res.status(200).json(result.rows);
   } catch (error) {
@@ -714,9 +714,9 @@ const getPastVirtualAppointments = async (req, res) => {
 
     const result = await pool.query(query, [hpId]);
 
-    if (result.rows.length === 0) {
-      return res.status(404).json({ message: "No past appointments found." });
-    }
+    // if (result.rows.length === 0) {
+    //   return res.status(404).json({ message: "No past appointments found." });
+    // }
 
     res.status(200).json(result.rows);
   } catch (error) {

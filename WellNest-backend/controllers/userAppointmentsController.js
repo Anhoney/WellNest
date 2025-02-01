@@ -510,7 +510,7 @@ const getDoctorAppointmentDetails = async (req, res) => {
       `
         SELECT 
           p.username,
-          p.phone_number,
+      
           p.education,
           p.experience,
           p.credentials,
@@ -534,7 +534,8 @@ END AS profile_image,
           a.hospital_address,
           u.healthcare_license,
           u.email, 
-          u.full_name
+          u.full_name,
+          u.phone_no
         FROM hp_profile p
         JOIN hp_availability a ON p.user_id = a.user_id
         JOIN users u ON p.user_id = u.id
@@ -1355,7 +1356,6 @@ const getVirtualDoctorAppointmentDetails = async (req, res) => {
       `
         SELECT 
           p.username,
-          p.phone_number,
           p.education,
           p.experience,
           p.credentials,
@@ -1382,7 +1382,8 @@ END AS profile_image,
        a.hp_id,
           u.healthcare_license,
           u.email, 
-          u.full_name
+          u.full_name,
+          u.phone_no
         FROM hp_profile p
         JOIN hp_virtual_availability a ON p.user_id = a.hp_id
         JOIN users u ON p.user_id = u.id

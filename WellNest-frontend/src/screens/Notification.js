@@ -360,7 +360,7 @@ const Notifications = () => {
           }
         />
       </View>
-      <NavigationBar navigation={navigation} activePage="Notifications" />
+      {/* <NavigationBar navigation={navigation} activePage="Notifications" /> */}
     </ImageBackground>
   );
 };

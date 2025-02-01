@@ -195,9 +195,18 @@ const EditCarePlanScreen = ({ route, navigation }) => {
           value={plan}
           onChangeText={setPlan}
         />
-        <Text style={styles.label}>Plan By: {writerName || "You"}</Text>
+        {/* <Text style={styles.label}>Plan By: {writerName || "You"}</Text>
         <Text style={styles.label}>Updated By:</Text>
-        <Text>{formatDate(carePlan.updated_at)}</Text>
+        <Text>{formatDate(carePlan.updated_at)}</Text> */}
+
+        {/* Only show these fields if editing an existing care plan */}
+        {carePlan && (
+          <>
+            <Text style={styles.label}>Plan By: {writerName || "You"}</Text>
+            <Text style={styles.label}>Updated By:</Text>
+            <Text>{formatDate(carePlan.updated_at)}</Text>
+          </>
+        )}
 
         <TouchableOpacity
           style={[styles.signOutButton, { marginTop: 100 }]}

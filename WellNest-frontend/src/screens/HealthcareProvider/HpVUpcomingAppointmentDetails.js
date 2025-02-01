@@ -125,69 +125,6 @@ const HpVUpcomingAppointmentDetails = ({ route }) => {
     }
   };
 
-  // In your render method, log the created_at value
-  //   console.log("Created At:", appointments.created_at);
-  // Format the created_at date to a more human-readable format
-  //   const formatCreatedAt = (dateString) => {
-  //     return format(new Date(dateString), "MMMM d, yyyy, h:mm a");
-  //   };
-  //   const handleDelete = async (id) => {
-  //     try {
-  //       const token = await AsyncStorage.getItem("token");
-  //       if (!token) {
-  //         alert("No token found. Please log in.");
-  //         return;
-  //       }
-
-  //       await axios.delete(`${API_BASE_URL}/appointments/${id}`, {
-  //         headers: { Authorization: `Bearer ${token}` },
-  //       });
-  //       Alert.alert("Deleted", "Appointment deleted successfully");
-  //       fetchAppointments(userId);
-  //     } catch (error) {
-  //       console.error("Error deleting appointment:", error);
-  //       Alert.alert("Error", "Failed to delete appointment");
-  //     }
-  //   };
-
-  //   const renderAppointment = ({ item }) => (
-  //     <View style={styles.hpAppointmentContainer}>
-  //       <View style={styles.appointmentHeader}>
-  //         <Text style={styles.createdByText}>Created by: </Text>
-  //         <TouchableOpacity onPress={() => handleDelete(item.id)}>
-  //           <FontAwesome name="trash" size={20} color="black" />
-  //         </TouchableOpacity>
-  //       </View>
-  //       <Text style={styles.appointmentDate}>
-  //         {new Date(item.created_at).toLocaleDateString("en-GB", {
-  //           day: "2-digit",
-  //           month: "long",
-  //           year: "numeric",
-  //           hour: "2-digit",
-  //           minute: "2-digit",
-  //           hour12: true,
-  //         })}
-  //       </Text>
-  //       <Text style={styles.category}>
-  //         Category: {item.category || "N/A"} {/* Display category */}
-  //       </Text>
-  //       <View style={styles.hpAbuttonContainer}>
-  //         <TouchableOpacity
-  //           style={styles.hpAbutton}
-  //           onPress={() => handleEdit(item.id)}
-  //           // onPress={() => navigation.navigate("HpAppointmentEditPage")}
-  //         >
-  //           <Text style={styles.hpAbuttonText}>Edit creation</Text>
-  //         </TouchableOpacity>
-  //         <TouchableOpacity style={styles.hpAbutton}>
-  //           <Text style={styles.hpAbuttonText}>Preview</Text>
-  //         </TouchableOpacity>
-  //       </View>
-  //     </View>
-  //   );
-  //   const handleEdit = (appointmentId) => {
-  //     navigation.navigate("HpAppointmentEditPage", { appointmentId });
-  //   };
   const imageUri = appointments.profile_image
     ? `data:image/png;base64${appointments.profile_image}`
     : "https://via.placeholder.com/150";
@@ -298,7 +235,7 @@ const HpVUpcomingAppointmentDetails = ({ route }) => {
                 <Text style={styles.tableCell}>{appointments.phone_no}</Text>
               </View>
               <View style={styles.tableRow}>
-                <Text style={styles.tableCell}>Notes:</Text>
+                <Text style={styles.tableCell}>Special Requests:</Text>
                 <Text style={styles.tableCell}>
                   {appointments.notes || "N/A"}
                 </Text>
@@ -391,21 +328,6 @@ const HpVUpcomingAppointmentDetails = ({ route }) => {
           }}
         />
 
-        {/* <View style={styles.modalContainer}>
-          <View style={styles.modalView}>
-            <Text style={styles.modalTitle}>Receipt</Text>
-            <Image
-              source={{ uri: appointments.receipt_url }} // Assuming receipt_url is available in appointments
-              style={styles.receiptImage} // Add a style for the receipt image
-            />
-            <TouchableOpacity
-              style={styles.modalCloseButton}
-              onPress={() => setReceiptVisible(false)}
-            >
-              <Text style={styles.modalCloseButtonText}>Close</Text>
-            </TouchableOpacity>
-          </View>
-        </View> */}
         {isPDF ? (
           <WebView
             source={{ uri: appointments.receipt_url }} // Use selectedReceipt.url
@@ -427,36 +349,6 @@ const HpVUpcomingAppointmentDetails = ({ route }) => {
             }}
           />
         )}
-
-        {/* <View style={styles.modalButtonContainer}>
-          <TouchableOpacity
-            style={styles.HpVapproveButton}
-            onPress={() => {
-              updateAppointmentStatus(
-                selectedReceipt.hpva_id,
-                "approved",
-                "checked"
-              );
-              setSelectedReceipt(null);
-            }}
-          >
-            <Text style={styles.HpVapproveText}>Approve</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.HpVproblemButton}
-            onPress={() => {
-              updateAppointmentStatus(
-                selectedReceipt.hpva_id,
-                "receipt problem",
-                "checked"
-              );
-              setSelectedReceipt(null);
-            }}
-          >
-            <Text style={styles.HpVproblemText}>Receipt Problem</Text>
-          </TouchableOpacity> */}
-        {/* </View>
-        </View> */}
       </Modal>
 
       <HpNavigationBar navigation={navigation} />

@@ -220,125 +220,6 @@ const HpCreateOrEditVApp = () => {
     }
   };
 
-  // const handleSubmit = async () => {
-  //   const selectedServices = servicesProvide
-  //     .filter((service) => service.selected)
-  //     .map(({ service, price }) => ({ service, price }));
-  //   if (!selectedServices.length) {
-  //     alert("Please select at least one service and set its price.");
-  //     return;
-  //   }
-
-  //   try {
-  //     const token = await AsyncStorage.getItem("token");
-
-  //     if (!token) {
-  //       alert("No token found. Please log in.");
-  //       return;
-  //     }
-
-  //   const requestBody = {
-  //     description,
-  //     servicesProvide: selectedServices,
-  //     category,
-  //     availableDays,
-  //     availableTimes,
-  //     bank_receiver_name: bankReceiverName,
-  //     bank_name: bankName,
-  //     account_number: accountNumber,
-  //   };
-
-  //   if (existingAppointment) {
-  //     const response = await axios.put(
-  //       `${API_BASE_URL}/appointments/${appointmentId}`,
-  //       requestBody,
-  //       {
-  //         headers: { Authorization: `Bearer ${token}` },
-  //       }
-  //     );
-  //     if (response.status === 200) {
-  //       alert("Appointment updated successfully!");
-  //       navigation.goBack();
-  //     }
-  //   } else {
-  //     const response = await axios.post(
-  //       `${API_BASE_URL}/virtualConsultation/create`,
-  //       requestBody,
-  //       {
-  //         headers: { Authorization: `Bearer ${token}` },
-  //       }
-  //     );
-  //     //   const response = await axios.post(
-  //     //     `${API_BASE_URL}/virtualConsultation/create`,
-  //     //     {
-  //     //       description,
-  //     //       servicesProvide: selectedServices,
-  //     //       category,
-  //     //       availableDays,
-  //     //       availableTimes,
-  //     //     },
-  //     //     {
-  //     //       headers: { Authorization: `Bearer ${token}` },
-  //     //     }
-  //     //   );
-
-  //     if (response.status === 200) {
-  //       alert("Appointment created successfully!");
-  //       navigation.goBack();
-  //     }
-  //   }
-  // } catch (error) {
-  //   console.error("Error creating appointment:", error);
-  //   alert("Failed to create appointment.");
-  // }
-
-  //     const requestBody = {
-  //       hp_id: userId, // Pass the user ID as hp_id
-  //       description,
-  //       servicesProvide: selectedServices,
-  //       category: category === "Others" ? otherCategory : category, // Handle custom category
-  //       availableDays,
-  //       availableTimes,
-  //       bank_receiver_name: bankReceiverName,
-  //       bank_name: bankName,
-  //       account_number: accountNumber,
-  //     };
-
-  //     if (existingAppointment) {
-  //       // Update existing appointment
-  //       const response = await axios.put(
-  //         `${API_BASE_URL}/virtualConsultation/update/${userId}`,
-  //         requestBody,
-  //         {
-  //           headers: { Authorization: `Bearer ${token}` },
-  //         }
-  //       );
-
-  //       if (response.status === 200) {
-  //         alert("Appointment updated successfully!");
-  //         navigation.goBack();
-  //       }
-  //     } else {
-  //       // Create new appointment
-  //       const response = await axios.post(
-  //         `${API_BASE_URL}/virtualConsultation/create`,
-  //         requestBody,
-  //         {
-  //           headers: { Authorization: `Bearer ${token}` },
-  //         }
-  //       );
-
-  //       if (response.status === 200) {
-  //         alert("Appointment created successfully!");
-  //         navigation.goBack();
-  //       }
-  //     }
-  //   } catch (error) {
-  //     console.error("Error creating or updating appointment:", error);
-  //     alert("Failed to save appointment.");
-  //   }
-  // };
-
   const handleDelete = async () => {
     Alert.alert(
       "Confirm Delete",
@@ -377,16 +258,6 @@ const HpCreateOrEditVApp = () => {
     );
   };
 
-  //   if (loading) {
-  //     return (
-  //       <View style={styles.centeredContainer}>
-  //         <Text style={styles.loadingText}>
-  //           Checking existing appointments...
-  //         </Text>
-  //       </View>
-  //     );
-  //   }
-
   return (
     <ImageBackground
       source={require("../../../assets/PlainGrey.png")}
@@ -415,6 +286,7 @@ const HpCreateOrEditVApp = () => {
           <TextInput
             style={styles.hpInput}
             value={description}
+            placeholder={"Enter Description"}
             onChangeText={setDescription}
             multiline
           />
@@ -440,13 +312,13 @@ const HpCreateOrEditVApp = () => {
                 <View>
                   <Text style={styles.label}>{`Price for ${service.service
                     .replace(/([A-Z])/g, " $1")
-                    .trim()} (RM) :`}</Text>
+                    .trim()} (RM per hour) :`}</Text>
 
                   <TextInput
                     style={styles.hpInput}
                     placeholder={`Price for ${service.service
                       .replace(/([A-Z])/g, " $1")
-                      .trim()} (RM)`}
+                      .trim()} (RM per hour)`}
                     // placeholderTextColor="#000"
                     keyboardType="numeric"
                     value={service.price}
@@ -458,78 +330,6 @@ const HpCreateOrEditVApp = () => {
               )}
             </View>
           ))}
-
-          {/* {servicesProvide.map((service, index) => (
-            <View key={index} style={styles.checkboxContainer}>
-              <CheckBox
-                title={service.service.replace(/([A-Z])/g, " $1").trim()}
-                checked={service.selected ?? false} // Use default parameter
-                onPress={() =>
-                  handleServiceChange(index, "selected", !service.selected)
-                }
-                containerStyle={{
-                  backgroundColor: "transparent",
-                  borderWidth: 0,
-                  marginBottom: -5,
-                }}
-                textStyle={{ fontSize: 16, fontWeight: "normal" }}
-              />
-              {service.selected && (
-                <View>
-                  <Text style={styles.label}>{`Price for ${service.service
-                    .replace(/([A-Z])/g, " $1")
-                    .trim()} (RM):`}</Text>
-                  <TextInput
-                    style={styles.hpInput}
-                    placeholder={`Price for ${service.service
-                      .replace(/([A-Z])/g, " $1")
-                      .trim()} (RM)`}
-                    keyboardType="numeric"
-                    value={service.price}
-                    onChangeText={(text) =>
-                      handleServiceChange(index, "price", text)
-                    }
-                  />
-                </View>
-              )}
-            </View>
-          ))} */}
-
-          {/* {servicesProvide.map((service, index) => (
-            <View key={index} style={styles.checkboxContainer}>
-              <CustomCheckBox
-                title={service.service.replace(/([A-Z])/g, " $1").trim()}
-                checked={service.selected ?? false}
-                onPress={() =>
-                  handleServiceChange(index, "selected", !service.selected)
-                }
-                containerStyle={{
-                  backgroundColor: "transparent",
-                  borderWidth: 0,
-                  marginBottom: -5,
-                }}
-                textStyle={{ fontSize: 16, fontWeight: "normal" }}
-              />
-              {service.selected && (
-                <View>
-                  <Text style={styles.label}>{`Price for ${service.service
-                    .replace(/([A-Z])/g, " $1")
-                    .trim()} (RM):`}</Text>
-                  <TextInput
-                    style={styles.hpInput}
-                    placeholder={`Price for ${service.service
-                      .replace(/([A-Z])/g, " $1")
-                      .trim()} (RM)`}
-                    keyboardType="numeric"
-                    value={service.price}
-                    onChangeText={(text) =>
-                      handleServiceChange(index, "price", text)
-                    }
-                  />
-                </View>
-              )}
-            </View>
-          ))} */}
 
           <Text style={styles.label}>Available Days</Text>
           <RadioButton.Group
@@ -686,8 +486,11 @@ const HpCreateOrEditVApp = () => {
                 is24Hour={false}
                 display="default"
                 onChange={(event, selectedDate) => {
-                  if (event.type === "set") {
-                    setNewTime(selectedDate || newTime);
+                  // if (event.type === "set") {
+                  //   setNewTime(selectedDate || newTime);
+                  // }
+                  if (selectedDate) {
+                    setNewTime(selectedDate); // Always update with the selected time
                   }
                 }}
               />
@@ -704,6 +507,7 @@ const HpCreateOrEditVApp = () => {
           <TextInput
             style={styles.hpInput}
             value={bankReceiverName}
+            placeholder={"Enter Bank Receiver Name"}
             onChangeText={setBankReceiverName}
           />
 
@@ -711,6 +515,7 @@ const HpCreateOrEditVApp = () => {
           <TextInput
             style={styles.hpInput}
             value={bankName}
+            placeholder={"Enter Bank Name"}
             onChangeText={setBankName}
           />
 
@@ -718,6 +523,7 @@ const HpCreateOrEditVApp = () => {
           <TextInput
             style={styles.hpInput}
             value={accountNumber}
+            placeholder={"Enter Account Number"}
             onChangeText={setAccountNumber}
           />
 

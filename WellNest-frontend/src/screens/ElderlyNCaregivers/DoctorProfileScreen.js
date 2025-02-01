@@ -143,7 +143,7 @@ const DoctorProfileScreen = () => {
               {doctor.credentials}
             </Text>
             <Text style={styles.sectionContent}>
-              Medical Registration Number:{"\n"}
+              Malaysian Medical Council (MMC) Registration Number:{"\n"}
               {doctor.healthcare_license}
             </Text>
 

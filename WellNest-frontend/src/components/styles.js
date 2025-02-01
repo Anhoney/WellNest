@@ -1184,9 +1184,9 @@ export default StyleSheet.create({
   },
   infoText: {
     flex: 1,
-    fontSize: 14,
+    fontSize: 16,
     color: "#333",
-    // fontWeight: "bold",
+    fontWeight: "bold",
   },
   profileButton: {
     backgroundColor: "#4CAF50",

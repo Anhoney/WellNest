@@ -261,7 +261,7 @@ const HpUpcomingAppointmentDetails = ({ route }) => {
                 <Text style={styles.tableCell}>{appointments.phone_no}</Text>
               </View>
               <View style={styles.tableRow}>
-                <Text style={styles.tableCell}>Notes:</Text>
+                <Text style={styles.tableCell}>Special Requests:</Text>
                 <Text style={styles.tableCell}>
                   {appointments.note || "N/A"}
                 </Text>

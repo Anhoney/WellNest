@@ -103,19 +103,7 @@ const VirtualBookingDetails = ({ route, navigation }) => {
 
   const handleContinue = async () => {
     const userDetails = await fetchUserDetails(userId); // Function to fetch user profile
-    // navigation.navigate("AppointmentConfirmation", {
-    //   doctorId: doctorId,
-    //   doctor,
-    //   selectedService,
-    //   selectedDate,
-    //   selectedTime,
-    //   medicalCoverage,
-    //   whoWillSee,
-    //   patientSeenBefore,
-    //   reason,
-    //   note,
-    //   userDetails,
-    // });
+
     // Dynamically build the navigation payload with only the filled-in data
     const navigationPayload = {
       doctorId,
@@ -158,54 +146,6 @@ const VirtualBookingDetails = ({ route, navigation }) => {
       alert("Could not fetch user details. Please try again.");
       return null;
     }
-    // const bookingDetails = {
-    //   hp_id: doctor.id,
-    //   u_id: userId, // Logged-in user ID
-    //   //   health_record: "12345", // Example health record
-    //   app_date: selectedDate,
-    //   app_time: selectedTime,
-    //   app_status: "Pending",
-    //   app_sickness: reason, // User-entered reason
-    //   app_description: reason,
-    //   app_address: doctor.location, // Doctor's location
-    //   medicalCoverage,
-    //   whoWillSee,
-    //   patientSeenBefore,
-    //   note,
-    // };
-    // try {
-    //   const token = await AsyncStorage.getItem("token");
-    //   if (!token) {
-    //     alert("No token found. Please log in.");
-    //     return;
-    //   }
-    //   console.log("Authorization token:", token); // Debugging log
-    //   const response = await fetch(`${API_BASE_URL}/bookAppointment`, {
-    //     headers: {
-    //       Authorization: `Bearer ${token}`,
-    //       "Content-Type": "application/json",
-    //     },
-    //     method: "POST",
-
-    //     body: JSON.stringify(bookingDetails),
-    //   });
-
-    //   const result = await response.json();
-
-    //   if (response.ok) {
-    //     alert("Appointment booked successfully!");
-    //     navigation.navigate("AppointmentConfirmation", {
-    //       appointmentId: result.appointmentId,
-    //     });
-    //   } else {
-    //     alert(result.error || "Failed to book appointment");
-    //   }
-    // } catch (error) {
-    //   console.error("Error booking appointment:", error);
-    //   alert("An error occurred while booking the appointment.");
-    // }
-    // Navigate to the next step or send bookingDetails to backend
-    // navigation.navigate("AppointmentConfirmation", { bookingDetails });
   };
 
   return (
@@ -247,7 +187,7 @@ const VirtualBookingDetails = ({ route, navigation }) => {
         </View>
       </View>
       <View style={styles.uAContainer}>
-        <Text style={styles.label}>When:</Text>
+        <Text style={styles.label}>Selected Date and Time:</Text>
         <View style={styles.infoContainer}>
           <Text style={styles.infoText}>{selectedDate}</Text>
 
@@ -375,7 +315,7 @@ const VirtualBookingDetails = ({ route, navigation }) => {
               </RadioButton.Group>
 
               {/* Notes */}
-              <Text style={styles.aLabel}>Note</Text>
+              <Text style={styles.aLabel}>Special Request</Text>
               <View style={styles.displayUnderline} />
               <TextInput
                 style={styles.borderInput}

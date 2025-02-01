@@ -355,6 +355,7 @@ const HpAppointmentCreationPage = () => {
             // onChangeText={setDescription}
             // multiline
             style={getInputStyle(!errors.description)}
+            placeholder={"Enter Description"}
             value={description}
             onChangeText={(text) => {
               setDescription(text);
@@ -369,6 +370,7 @@ const HpAppointmentCreationPage = () => {
             // value={location}
             // onChangeText={setLocation}
             style={getInputStyle(!errors.location)}
+            placeholder={"Enter Hospital Name / Location"}
             value={location}
             onChangeText={(text) => {
               setLocation(text);
@@ -383,6 +385,7 @@ const HpAppointmentCreationPage = () => {
             // onChangeText={setDescription}
             // multiline
             style={getInputStyle(!errors.hospitalAdds)}
+            placeholder={"Enter Hospital Address"}
             value={hospitalAdds}
             onChangeText={(text) => {
               setHospitalAdds(text);
