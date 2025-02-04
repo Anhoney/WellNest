@@ -7,8 +7,7 @@ const getAllUsers = async (req, res) => {
         id,
         full_name,
         phone_no,
-        email,
-        profile_image
+        email
     FROM 
         users
     ORDER BY 

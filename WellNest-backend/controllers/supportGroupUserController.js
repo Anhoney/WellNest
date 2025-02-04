@@ -68,8 +68,7 @@ const getAllSupportGroupUserByGroupId = async (req, res) => {
         support_group_user.user_id,
         users.full_name,
         users.phone_no,
-        users.email,
-        users.profile_image
+        users.email
     FROM
         support_group_user
     JOIN
@@ -128,8 +127,7 @@ const getAllSupportGroupByUserId = async (req, res) => {
         support_group_user.user_id,
         users.full_name,
         users.phone_no,
-        users.email,
-        users.profile_image
+        users.email
     FROM
         support_group_user
     JOIN

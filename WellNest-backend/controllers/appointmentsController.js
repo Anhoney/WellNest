@@ -167,10 +167,10 @@ const getUpcomingAppointments = async (req, res) => {
   try {
     const query = `
     SELECT 
-      ha.hp_app_id, ha.hp_id, ha.u_id, ha.health_record, 
+      ha.hp_app_id, ha.hp_id, ha.u_id, 
       TO_CHAR(ha.app_date, 'YYYY-MM-DD') AS app_date,
       TO_CHAR(ha.app_time, 'HH12:MI AM') AS app_time,
-      ha.app_status, ha.app_sickness, ha.app_description, ha.app_address, 
+      ha.app_status, ha.app_sickness, 
       ha.medical_coverage, ha.who_will_see, ha.patient_seen_before, ha.note, 
       ha.created_at, ha.updated_at , 
       CASE 
@@ -248,11 +248,10 @@ const getAppointmentDetailsByHpAppId = async (req, res) => {
   try {
     const query = `
       SELECT 
-        ha.hp_app_id, ha.hp_id, ha.u_id, ha.health_record, 
+        ha.hp_app_id, ha.hp_id, ha.u_id, 
         TO_CHAR(ha.app_date, 'YYYY-MM-DD') AS app_date,
         TO_CHAR(ha.app_time, 'HH12:MI AM') AS app_time,
-        ha.app_status, ha.app_sickness, ha.app_description, 
-        ha.app_address, ha.medical_coverage, ha.who_will_see, 
+        ha.app_status, ha.app_sickness, ha.medical_coverage, ha.who_will_see, 
         ha.patient_seen_before, ha.note, ha.created_at, ha.updated_at,
         CASE 
             WHEN p.profile_image IS NOT NULL 
@@ -310,11 +309,10 @@ const getPastAppointments = async (req, res) => {
   try {
     const query = `
       SELECT 
-        ha.hp_app_id, ha.hp_id, ha.u_id, ha.health_record, 
+        ha.hp_app_id, ha.hp_id, ha.u_id,
         TO_CHAR(ha.app_date, 'YYYY-MM-DD') AS app_date,
         TO_CHAR(ha.app_time, 'HH12:MI AM') AS app_time,
-        ha.app_status, ha.app_sickness, ha.app_description, 
-        ha.app_address, ha.medical_coverage, ha.who_will_see, 
+        ha.app_status, ha.app_sickness, ha.medical_coverage, ha.who_will_see, 
         ha.patient_seen_before, ha.note, ha.created_at, ha.updated_at,
         CASE 
             WHEN p.profile_image IS NOT NULL 

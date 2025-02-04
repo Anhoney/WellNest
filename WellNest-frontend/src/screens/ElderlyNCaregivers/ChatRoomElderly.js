@@ -175,7 +175,7 @@ const ChatRoomElderly = ({ route }) => {
           style={{ marginLeft: "auto" }} // Align to right
           //   style={styles.plusButton}
         >
-          <AntDesign name="plus" size={24} color="#000" />
+          <Ionicons name="people" size={24} color="#000" />
         </TouchableOpacity>
       </View>
       <View style={[{ marginBottom: 25 }]}></View>

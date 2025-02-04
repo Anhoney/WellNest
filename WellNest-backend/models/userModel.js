@@ -21,12 +21,12 @@ const findUserByPhoneNo = async (phoneNo) => {
   }
 };
 
-const updateProfileImage = async (userId, profileImage) => {
-  const query = "UPDATE users SET profile_image = $1 WHERE id = $2";
-  await pool.query(query, [profileImage, userId]);
-};
+// const updateProfileImage = async (userId, profileImage) => {
+//   const query = "UPDATE users SET profile_image = $1 WHERE id = $2";
+//   await pool.query(query, [profileImage, userId]);
+// };
 
 module.exports = {
   findUserByPhoneNo,
-  updateProfileImage,
+  // updateProfileImage,
 };
