@@ -17,7 +17,7 @@ import { Ionicons } from "@expo/vector-icons";
 import styles from "../../components/styles";
 import axios from "axios";
 import API_BASE_URL from "../../../config/config";
-import NavigationBar from "../../components/CoNavigationBar"; // Import your custom navigation bar component
+import NavigationBar from "../../components/NavigationBar"; // Import your custom navigation bar component
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getUserIdFromToken } from "../../../services/authService";
 

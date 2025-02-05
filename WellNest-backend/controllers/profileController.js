@@ -83,7 +83,7 @@ const getHpProfile = async (req, res) => {
     } else if (userRole === "3") {
       // Query for healthcare provider profile users
       profileQuery = `
-        SELECT id, user_id, username, age, gender, date_of_birth, email, 
+        SELECT id, user_id, username, age, gender, date_of_birth,  
         address, emergency_contact, summary, education, credentials, languages, services, business_hours, 
         business_days, experience, specialist, hospital, profile_image
         FROM hp_profile WHERE user_id = $1

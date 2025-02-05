@@ -110,8 +110,8 @@ const AddReminder = ({ route, navigation }) => {
 
         await notifee.createTriggerNotification(
           {
-            title: "Medication Reminder Title",
-            body: "Medication Reminder Body",
+            title: "Medication Reminder - Time for Your Aspirin",
+            body: "1 tablet",
             ios: {
               channelId: "your-channel-id",
               sound: "default",

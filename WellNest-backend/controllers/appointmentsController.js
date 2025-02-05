@@ -429,7 +429,6 @@ const getVirtualAvailabilityDetails = async (req, res) => {
         category, 
         available_days, 
         available_times, 
-        price, 
         bank_receiver_name, 
         bank_name, 
         account_number, 
