@@ -51,7 +51,6 @@ const AddReminder = ({ route, navigation }) => {
         const expoCalendarIds = calendars
           .filter((calendar) => calendar.title === "Expo Calendar")
           .map((calendar) => calendar.id);
-        console.log("Expo Calendar IDs:", expoCalendarIds);
       }
     })();
   }, []);
