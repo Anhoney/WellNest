@@ -22,7 +22,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import API_BASE_URL from "../../../config/config";
 import { scheduleAlarmNotification } from "../../utils/notificationUtils"; // Custom utility for scheduling notifications
 import * as Calendar from "expo-calendar";
-// import notifee, { TriggerType } from "@notifee/react-native";
 
 const AddReminder = ({ route, navigation }) => {
   const { edit, medicationData, medicationId } = route.params || {}; // Get data from route params
