@@ -1,4 +1,4 @@
-//HpNavigationBar.js
+// HpNavigationBar.js
 import React from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
@@ -10,8 +10,6 @@ const HpNavigationBar = ({ navigation, activePage }) => {
 
   const tabs = [
     { name: "HealthcareProviderMainPage", label: "Home", icon: "home-outline" },
-    // { name: "Schedule", label: "Schedule", icon: "calendar-outline" },
-    // { name: "Chat", label: "Chat", icon: "chatbubble-ellipses-outline" },
     {
       name: "HpNotification",
       label: "Notification",
@@ -40,11 +38,6 @@ const HpNavigationBar = ({ navigation, activePage }) => {
               </View>
             )}
           </View>
-          {/* <Ionicons
-            name={tab.icon}
-            size={28}
-            color={activePage === tab.name ? "#e67e22" : "#273746"}
-          /> */}
           <Text
             style={[
               styles.navText,

@@ -1,11 +1,10 @@
+// CoSocialEventDetails.js
 import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
-  Button,
   Image,
   ScrollView,
-  StyleSheet,
   TouchableOpacity,
   ImageBackground,
   Alert,
@@ -56,10 +55,6 @@ const CoSocialEventDetails = () => {
     }
   };
 
-  //   const formatDate = (dateString) => {
-  //     const options = { day: "numeric", month: "long", year: "numeric" };
-  //     return new Date(dateString).toLocaleDateString("en-US", options);
-  //   };
   const formatDate = (dateString) => {
     const options = { day: "numeric", month: "long", year: "numeric" };
     const date = new Date(dateString);

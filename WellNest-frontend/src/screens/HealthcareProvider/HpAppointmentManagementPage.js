@@ -1,24 +1,18 @@
-//hpAppointmentManagementPage.js
-import React, { useState } from "react"; // <-- Add useState here
+// HpAppointmentManagementPage.js
+import React, { useState } from "react";
 import {
   View,
   Text,
   ImageBackground,
-  TextInput,
   TouchableOpacity,
   ScrollView,
-  StyleSheet,
-  Image,
 } from "react-native";
 import styles from "../../components/styles"; // Import shared styles
 import { Ionicons } from "@expo/vector-icons"; // Import icons from Expo
 import { useNavigation } from "@react-navigation/native";
-import Icon from "react-native-vector-icons/FontAwesome";
-import DateTimePickerModal from "react-native-modal-datetime-picker"; // Ensure this is imported
-import HpNavigationBar from "../../components/HpNavigationBar"; // Import your custom navigation bar component
+import HpNavigationBar from "../../components/HpNavigationBar";
 
 const HpAppointmentManagementPage = ({}) => {
-  const [userName, setUserName] = useState("");
   const navigation = useNavigation();
 
   return (
@@ -47,15 +41,6 @@ const HpAppointmentManagementPage = ({}) => {
               Create or Edit Physical Appointments
             </Text>
           </TouchableOpacity>
-
-          {/* <TouchableOpacity
-            style={styles.hpButton}
-            onPress={() => navigation.navigate("HpPreviewAppointment")}
-          >
-            <Text style={styles.hpButtonText}>
-              Physical Appointments Preview
-            </Text>
-          </TouchableOpacity> */}
 
           <TouchableOpacity
             style={styles.hpButton}

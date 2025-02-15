@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useCallback } from "react";
+// CategoryDoctorsScreen.js
+import React, { useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -17,7 +18,6 @@ import {
 } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import API_BASE_URL from "../../../config/config";
-import { Buffer } from "buffer";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import NavigationBar from "../../components/NavigationBar"; // Import here
 
@@ -30,7 +30,6 @@ const CategoryDoctorsScreen = () => {
   // Manage favorites outside render function
   const [favorites, setFavorites] = useState([]);
   const selectedDate = searchParams?.date; // Extract the date
-  // console.log("Lastest cate selectedDate:", selectedDate);
 
   // Fetch doctors and favorites when the screen is focused
   const fetchDoctors = async () => {
@@ -91,118 +90,14 @@ const CategoryDoctorsScreen = () => {
     }, [pollData])
   );
 
-  // Fetch doctors and favorites when the screen is focused
-  // useFocusEffect(
-  // React.useCallback(() => {
-  //   const fetchDoctors = async () => {
-  //     setLoading(true);
-  //     try {
-  //       let response;
-  //       if (category) {
-  //         // Fetch doctors by category
-  //         response = await axios.get(`${API_BASE_URL}/searchByCategory`, {
-  //           params: { category },
-  //         });
-  //         console.log("Category received on backend:", category);
-  //       } else if (searchParams) {
-  //         // Fetch doctors by search parameters
-  //         response = await axios.post(`${API_BASE_URL}/search`, searchParams);
-  //       }
-  //       //   console.log("API category Response:", response.data);
-  //       setDoctors(response.data || []);
-  //     } catch (error) {
-  //       console.error("Error fetching doctors:", error);
-  //       setDoctors([]);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-  //     const fetchFavorites = async () => {
-  //       try {
-  //         const token = await AsyncStorage.getItem("token");
-  //         if (!token) {
-  //           console.error("No token found");
-  //           return;
-  //         }
-
-  //         const response = await axios.get(`${API_BASE_URL}/getFavorites`, {
-  //           headers: { Authorization: `Bearer ${token}` },
-  //         });
-  //         const favoriteIds = response.data.map(
-  //           (doctor) => doctor.availability_id
-  //         ); // Adjust based on your API response
-  //         // Store the favorites in AsyncStorage
-  //         await AsyncStorage.setItem("favorites", JSON.stringify(favoriteIds));
-  //         setFavorites(favoriteIds);
-  //       } catch (error) {
-  //         console.error("Error fetching favorites:", error);
-  //       }
-  //     };
-
-  //     fetchDoctors();
-  //     fetchFavorites();
-  //   }, [category, searchParams]) // Dependencies for the effect
-  // );
-
-  //   useEffect(() => {
-  //     const fetchDoctors = async () => {
-  //       setLoading(true);
-  //       try {
-  //         let response;
-  //         if (category) {
-  //           // Fetch doctors by category
-  //           response = await axios.get(`${API_BASE_URL}/searchByCategory`, {
-  //             params: { category },
-  //           });
-  //           console.log("Category received on backend:", category);
-  //         } else if (searchParams) {
-  //           // Fetch doctors by search parameters
-  //           response = await axios.post(`${API_BASE_URL}/search`, searchParams);
-  //         }
-  //         console.log("API category Response:", response.data);
-
-  //         setDoctors(response.data || []);
-  //       } catch (error) {
-  //         console.error("Error fetching doctors:", error);
-  //         setDoctors([]);
-  //       } finally {
-  //         setLoading(false);
-  //       }
-  //     };
-  //     const fetchFavorites = async () => {
-  //       try {
-  //         const token = await AsyncStorage.getItem("token");
-  //         if (!token) {
-  //           console.error("No token found");
-  //           return;
-  //         }
-
-  //         const response = await axios.get(`${API_BASE_URL}/getFavorites`, {
-  //           headers: { Authorization: `Bearer ${token}` },
-  //         });
-  //         const favoriteIds = response.data.map(
-  //           (doctor) => doctor.availability_id
-  //         ); // Adjust based on your API response
-  //         // Store the favorites in AsyncStorage
-  //         await AsyncStorage.setItem("favorites", JSON.stringify(favoriteIds));
-  //         setFavorites(favoriteIds);
-  //       } catch (error) {
-  //         console.error("Error fetching favorites:", error);
-  //       }
-  //     };
-
-  //     fetchDoctors();
-  //     fetchFavorites();
-  //   }, [category, searchParams]);
-
   const toggleFavorite = async (doctorId) => {
     try {
       // Retrieve the token from AsyncStorage
-      const token = await AsyncStorage.getItem("token"); // Replace 'token' with the actual key you used to store the token
+      const token = await AsyncStorage.getItem("token"); // Replace 'token' with the actual key  used to store the token
 
       if (!token) {
         console.error("No token found");
-        return; // Optionally handle the case where no token is found
+        return;
       }
 
       const response = await axios.post(
@@ -217,12 +112,6 @@ const CategoryDoctorsScreen = () => {
         }
       );
       if (response.data.success) {
-        // setFavorites((prevFavorites) => {
-        //   if (prevFavorites.includes(doctorId)) {
-        //     return prevFavorites.filter((id) => id !== doctorId);
-        //   } else {
-        //     return [...prevFavorites, doctorId];
-        //   }
         setFavorites((prevFavorites) => {
           const newFavorites = prevFavorites.includes(doctorId)
             ? prevFavorites.filter((id) => id !== doctorId)
@@ -241,25 +130,12 @@ const CategoryDoctorsScreen = () => {
   };
 
   const renderDoctorCard = ({ item }) => {
-    //console.log("Doctor item:", item); // Log the entire item to see its structure
     // Determine if doctor is a favorite
     const isFavorite = favorites.includes(item.id);
-    // console.log("Available Id:", item.id);
 
-    // let imageUri;
     let imageUri = item.profile_image
       ? item.profile_image // Base64 string returned from the backend
       : "https://via.placeholder.com/150";
-
-    // if (item.profile_image?.data) {
-    //   // Convert binary data to base64 string
-    //   imageUri = `data:image/png;base64,${Buffer.from(
-    //     item.profile_image.data
-    //   ).toString("base64")}`;
-    // } else {
-    //   // Fallback to a placeholder image
-    //   imageUri = "https://via.placeholder.com/150";
-    // }
 
     return (
       <TouchableOpacity
@@ -292,18 +168,6 @@ const CategoryDoctorsScreen = () => {
       </TouchableOpacity>
     );
   };
-  //     (
-
-  //     <View style={styles.doctorCard}>
-  //       <Image source={{ uri: item.profile_image }} style={styles.doctorImage} />
-  //       <View style={styles.doctorInfo}>
-  //         <Text style={styles.doctorName}>{item.username}</Text>
-  //         <Text style={styles.doctorCategory}>{item.category}</Text>
-  //         <Text style={styles.doctorCategory}>{item.location}</Text>
-  //         <Text style={styles.doctorRating}>⭐ {item.rating || "N/A"}</Text>
-  //       </View>
-  //     </View>
-  //   );
 
   return (
     <ImageBackground

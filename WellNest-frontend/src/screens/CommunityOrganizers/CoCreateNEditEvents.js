@@ -1,4 +1,4 @@
-//CoCreateEvents.js
+// CoCreateEvents.js
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -22,10 +22,6 @@ import { RadioButton } from "react-native-paper"; // For the radio button
 import CoNavigationBar from "../../components/CoNavigationBar"; // Import your custom navigation bar component
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import DateTimePickerModal from "react-native-modal-datetime-picker"; // Ensure this is imported
-import {
-  validateFields,
-  getInputStyle,
-} from "../../components/validationUtils"; // Import validation functions
 import API_BASE_URL from "../../../config/config";
 import { getUserIdFromToken } from "../../../services/authService";
 import * as ImagePicker from "expo-image-picker";
@@ -116,10 +112,8 @@ const CoCreateNEditEvents = () => {
         aspect: [4, 3],
         quality: 1,
       });
-      console.log("ImagePicker result:", result);
+
       if (!result.canceled) {
-        // console.log("Image selected:", result.assets[0].uri);
-        // setSelectedFile(result.assets[0].uri);
         setPhoto(result.assets[0].uri);
         setSelectedFile(result);
       } else {
@@ -154,17 +148,6 @@ const CoCreateNEditEvents = () => {
   };
 
   const handleSubmit = async () => {
-    console.log("UserId:", userId);
-    console.log("Event ID:", eventId); // Log the event ID
-    console.log("Title:", title); // Log the title
-    console.log("Fees:", fee); // Log the fees
-    console.log("Location:", location); // Log the location
-    console.log("Date:", date); // Log the date
-    console.log("Time:", time); // Log the time
-    console.log("Notes:", note); // Log the notes
-    console.log("Terms and Conditions:", TnC); // Log TnC
-    console.log("Capacity:", capacity); // Log capacity
-    console.log("Event Status:", eventStatus); // Log event status
     if (!validateForm()) return;
     try {
       const token = await AsyncStorage.getItem("token");
@@ -183,7 +166,6 @@ const CoCreateNEditEvents = () => {
       formData.append("terms_and_conditions", TnC);
       formData.append("capacity", capacity);
       formData.append("event_status", eventStatus);
-      // formData.append("registration_due", registrationDue);
 
       // Format registrationDue as a string in 'YYYY-MM-DD' format
       if (registrationDue) {
@@ -199,20 +181,8 @@ const CoCreateNEditEvents = () => {
         }
         return uri;
       };
-      console.log(photo);
-      // Preserve or update photo
-      // if (selectedFile && selectedFile.assets) {
-      //   const file = selectedFile.assets[0];
-      //   formData.append("photo", {
-      //     uri: file.uri,
-      //     name: file.fileName || file.uri.split("/").pop(),
-      //     type: file.type || "image/jpeg",
-      //   });
-      // } else if (photo) {
-      //   // Send the existing photo as a base64-encoded string if no new file
-      //   formData.append("photo", photo);
-      // }
 
+      // Preserve or update photo
       if (photo) {
         const uri = normalizeFilePath(photo);
         const filename = uri.split("/").pop();
@@ -231,47 +201,6 @@ const CoCreateNEditEvents = () => {
         }
       }
 
-      // if (photo) {
-      //   // const uri = profile_image;
-      //   // const uri = profile_image.startsWith("file://")
-      //   //   ? profile_image
-      //   //   : `file://${profile_image}`; // Ensure correct URI format
-      //   // const localUri = uri;
-      //   const uri = normalizeFilePath(photo);
-      //   const filename = uri.split("/").pop();
-      //   const type = `image/${filename.split(".").pop()}`;
-
-      //   const file = {
-      //     uri: photo,
-      //     name: filename,
-      //     type: type,
-      //   };
-      //   // console.log("Appending image to FormData:", file);
-      //   formData.append("photo", file);
-      // } else {
-      //   // If no new photo is selected, append the existing photo URL
-      //   formData.append("photo", existingPhoto);
-      //   // console.log("No photo to upload.");
-      // }
-      // if (photo)
-      //   formData.append("photo", {
-      //     uri: uri,
-      //     name: assets[0].name,
-      //     type: selectedFile.mimeType,
-      //   });
-      //   formData.append("photo", photo);
-      console.log("Form Data:", {
-        title,
-        fees: fee,
-        location,
-        date,
-        time,
-        notes: note,
-        terms_and_conditions: TnC,
-        capacity,
-        event_status: eventStatus,
-        registration_due: registrationDue,
-      });
       const config = {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -331,16 +260,6 @@ const CoCreateNEditEvents = () => {
       ]
     );
   };
-
-  //   if (loading) {
-  //     return (
-  //       <View style={styles.centeredContainer}>
-  //         <Text style={styles.loadingText}>
-  //           Checking existing appointments...
-  //         </Text>
-  //       </View>
-  //     );
-  //   }
 
   // Functions to handle date picker
   const showDatePicker = () => {
@@ -477,8 +396,6 @@ const CoCreateNEditEvents = () => {
             mode="date"
             display="inline"
             onConfirm={handleDateConfirm}
-            // value={registrationDue}
-            // onCancel={hideDatePicker}
             onCancel={() => setDatePickerVisibility(false)}
             date={registrationDue || new Date()} // Default to current date
             minimumDate={new Date()} // Prevent past dates
@@ -492,13 +409,7 @@ const CoCreateNEditEvents = () => {
             onChangeText={setCapacity}
             keyboardType="numeric"
           />
-          {/* <Text style={styles.label}>Event Status</Text>
-          <TextInput
-            style={styles.hpInput}
-            placeholder="Event Status"
-            value={eventStatus}
-            onChangeText={setEventStatus}
-          /> */}
+
           <Text style={styles.label}>Event Status</Text>
           <RadioButton.Group onValueChange={setEventStatus} value={eventStatus}>
             <View style={styles.hpradioButtonContainer}>

@@ -1,3 +1,4 @@
+// routes/assessmentRoute.js
 const express = require("express");
 const router = express.Router();
 const {
@@ -24,11 +25,12 @@ router.post(
   authenticateToken,
   upload.single("photo"),
   createAssessment
-); // Pass `createAssessment` as the callback
+);
 
 // Route to get assessments by co_id
 router.get("/get/assessments/:co_id", authenticateToken, getAssessmentsByCoId);
 
+// Route to get a single assessment by assessmentId
 router.get(
   "/single/assessment/:assessmentId",
   authenticateToken,
@@ -41,6 +43,8 @@ router.put(
   authenticateToken,
   updateAssessment
 );
+
+// Route to delete an assessment by assessmentId
 router.delete(
   "/delete/assessment/:assessmentId",
   authenticateToken,
@@ -68,6 +72,7 @@ router.put(
   updateAssessmentResults
 );
 
+// Route to get all assessments for a user
 router.get("/user/allAssessments", authenticateToken, getAllAssessments);
 
 // Route to fetch questions and answers for a specific assessment

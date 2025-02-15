@@ -7,9 +7,7 @@ import {
   TouchableOpacity,
   ImageBackground,
   ScrollView,
-  Platform,
   Alert,
-  Image,
 } from "react-native";
 import styles from "../components/styles"; // Import shared styles
 import { KeyboardAvoidingView } from "react-native";
@@ -80,16 +78,10 @@ const RegisterPage = () => {
         copyToCacheDirectory: false,
       });
 
-      console.log(result);
-
       if (result && result.assets != null) {
-        // console.log();
         setFileState(result);
         setFileName(result.assets[0].name);
-        // console.log(result.type);
-        // console.log(healthcareLicenseFileName);
       } else {
-        console.log("No file selected or result is null");
         Alert.alert("File Selection", "File selection was canceled");
       }
     } catch (error) {
@@ -148,15 +140,9 @@ const RegisterPage = () => {
 
     if (!password) {
       updatedInvalidFields.password = true;
-      // Alert.alert("Error", "Password is required.");
       missingFields.push("Password");
-      // return;
     } else if (!validatePassword(password)) {
       updatedInvalidFields.password = true;
-      // Alert.alert(
-      //   "Invalid Password",
-      //   "Password must be more than 6 characters long and contain both letters and numbers."
-      // );
       specificErrors.push(
         "Password must be more than 8 characters long and include a mix of letters, numbers, and symbols."
       );
@@ -166,15 +152,10 @@ const RegisterPage = () => {
 
     if (!confirmPassword) {
       updatedInvalidFields.confirmPassword = true;
-      // Alert.alert("Error", "Password is required.");
       missingFields.push("Password");
-      // return;
     } else if (password !== confirmPassword) {
       updatedInvalidFields.confirmPassword = true;
-      // Alert.alert("Error", "Passwords do not match.");
-      // missingFields.push("Password Confirmation");
       specificErrors.push("Password confirmation does not match.");
-      // return;
     } else {
       updatedInvalidFields.confirmPassword = false;
     }
@@ -182,10 +163,6 @@ const RegisterPage = () => {
     // Validate healthcare license number if role is Healthcare Provider
     if (role === "Healthcare Provider" && !healthcareLicenseNo) {
       updatedInvalidFields.healthcareLicenseNo = true;
-      // Alert.alert(
-      //   "Error",
-      //   "Healthcare license number is required for Healthcare Providers."
-      // );
       missingFields.push("Healthcare License Number");
     } else {
       updatedInvalidFields.healthcareLicenseNo = false;
@@ -281,13 +258,11 @@ const RegisterPage = () => {
             headers: { "Content-Type": "multipart/form-data" },
           }
         );
-        console.log(response);
         Alert.alert("Success", "You are registered successfully!", [
           { text: "OK", onPress: () => navigation.navigate("LoginPage") },
         ]);
       } catch (error) {
         Alert.alert("Error", "Failed to register. Please try again.");
-        console.log("Registration error:", error);
       }
     }
   };
@@ -319,11 +294,6 @@ const RegisterPage = () => {
 
       {/* SafeAreaView wraps the content to ensure it's inside the safe area */}
       <SafeAreaView style={styles.safeAreaContainer}>
-        {/* <KeyboardAvoidingView
-          style={{ flex: 1 }}
-          behavior={Platform.OS === "ios" ? "padding" : undefined}
-          enabled
-        > */}
         <ScrollView contentContainerStyle={styles.scrollView}>
           <View style={styles.container}>
             {/* Full Name Input with Icon and Precautions */}
@@ -485,14 +455,12 @@ const RegisterPage = () => {
                 value={confirmPassword}
                 onChangeText={setConfirmPassword}
                 secureTextEntry={!isConfirmPasswordVisible}
-                // secureTextEntry={!isPasswordVisible} // Toggle visibility
               />
               {/* Make sure TouchableOpacity wraps around the icon properly */}
               <TouchableOpacity
                 onPress={() =>
                   setConfirmPasswordVisible(!isConfirmPasswordVisible)
                 }
-                // onPress={togglePasswordVisibility}
                 style={{ marginLeft: 10 }}
               >
                 <Ionicons
@@ -569,7 +537,6 @@ const RegisterPage = () => {
                   placeholder="MMC Registration Number"
                   value={healthcareLicenseNo}
                   onChangeText={setHealthcareLicenseNo}
-                  // Add relevant input and state for healthcare-specific fields
                 />
               </View>
               <TouchableOpacity
@@ -643,7 +610,6 @@ const RegisterPage = () => {
             </TouchableOpacity>
           </View>
         </ScrollView>
-        {/* </KeyboardAvoidingView> */}
       </SafeAreaView>
     </ImageBackground>
   );

@@ -1,12 +1,11 @@
-//MedicationReminderPage.js
-import React, { useState, useEffect, useCallback } from "react";
+// MedicationReminderPage.js
+import React, { useState, useCallback } from "react";
 import {
   ImageBackground,
   View,
   Text,
   TouchableOpacity,
   FlatList,
-  Alert,
   Image,
 } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
@@ -27,7 +26,6 @@ const MedicationReminderPage = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const { userId } = route.params;
-  // const [userId, setUserId] = useState(null);
 
   // Fetch medications from the backend
   const fetchMedications = useCallback(async (id) => {
@@ -37,7 +35,7 @@ const MedicationReminderPage = () => {
         alert("No token found. Please log in.");
         return;
       }
-      console.log(id);
+
       const response = await axios.get(`${API_BASE_URL}/get/medication/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -50,9 +48,7 @@ const MedicationReminderPage = () => {
   useFocusEffect(
     useCallback(() => {
       const fetchUserIdAndMedications = async () => {
-        // const id = await getUserIdFromToken();
         if (userId) {
-          // setUserId(userId);
           fetchMedications(userId);
         }
       };
@@ -81,13 +77,6 @@ const MedicationReminderPage = () => {
     </View>
   );
 
-  // const handleMarkAsDone = (id) => {
-  //   const updatedList = medicationList.map((med) =>
-  //     med.id === id ? { ...med, status: "Completed" } : med
-  //   );
-  //   setMedicationList(updatedList);
-  // };
-
   const handleMarkAsDone = async (id) => {
     try {
       await axios.patch(`${API_BASE_URL}/update-status/${id}`, {
@@ -109,8 +98,6 @@ const MedicationReminderPage = () => {
           medicationData: item, // Pass the item to edit
           medicationId: item.id,
         });
-        // Alert.alert("Edit/Delete", `Options for ${item.pill_name}`);
-        // Navigate to a detailed view or edit/delete functionality
       }}
     >
       <View style={styles.mrCardContent}>
@@ -122,7 +109,6 @@ const MedicationReminderPage = () => {
         ) : (
           <Ionicons name="medkit-outline" size={40} color="#FF9800" />
         )}
-        {/* <Ionicons name="medkit-outline" size={24} color="#FF9800" /> */}
         <View style={styles.mrCardTextContainer}>
           <Text style={styles.mrCardTitle}>{item.pill_name}</Text>
           <Text style={styles.mrCardSubText}>{item.time}</Text>
@@ -147,57 +133,10 @@ const MedicationReminderPage = () => {
           >
             <Text style={styles.doneButtonText}>Done</Text>
           </TouchableOpacity>
-          {/* <TouchableOpacity
-            style={styles.remindButton}
-            onPress={() => handleRemindMeLater(item.id)}
-          >
-            <Text style={styles.remindButtonText}>Remind Me Later</Text>
-          </TouchableOpacity> */}
         </View>
       )}
-      {/* <Text
-            style={[
-              styles.mrCardStatus,
-              { color: item.status === "Pending" ? "#FF9800" : "#4CAF50" },
-            ]}
-          >
-            {item.status || "Pending"}
-          </Text>
-        </View>
-      </View>
-      {item.status === "Pending" && (
-        <TouchableOpacity
-          // style={{
-          //   backgroundColor: "#FF9800",
-          //   padding: 10,
-          //   borderRadius: 5,
-          // }}
-          style={styles.doneButton}
-          onPress={() => handleMarkAsDone(item.id)}
-        >
-          <Text style={styles.doneButtonText}>Done</Text>
-        </TouchableOpacity>
-      )} */}
     </TouchableOpacity>
   );
-
-  //         <Text style={{ fontSize: 14, color: "#4CAF50" }}>{item.status}</Text>
-  //       </View>
-  //     </View>
-  //     {item.status === "Pending" && (
-  //       <TouchableOpacity
-  //         style={{
-  //           backgroundColor: "#FF9800",
-  //           padding: 10,
-  //           borderRadius: 5,
-  //         }}
-  //         onPress={() => handleMarkAsDone(item.id)}
-  //       >
-  //         <Text style={{ color: "#FFF", fontSize: 14 }}>Done</Text>
-  //       </TouchableOpacity>
-  //     )}
-  //   </TouchableOpacity>
-  // );
 
   return (
     <ImageBackground
@@ -232,10 +171,7 @@ const MedicationReminderPage = () => {
           renderItem={renderMedicationItem}
           keyExtractor={(item) => item.id.toString()}
           showsVerticalScrollIndicator={false}
-          ListEmptyComponent={
-            <EmptyReminder />
-            // <Text style={styles.noDataText}>No favorites yet</Text>
-          }
+          ListEmptyComponent={<EmptyReminder />}
         />
       </View>
 

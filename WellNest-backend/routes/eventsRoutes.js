@@ -43,6 +43,7 @@ router.put(
 // Route to delete event by ID
 router.delete("/events/:event_id", authenticateToken, deleteEvent);
 
+// Retrieves a list of events created by a user
 router.get("/get/events/:co_id", authenticateToken, getEventsByUserId);
 
 // Add participant to an event
@@ -66,22 +67,33 @@ router.get(
   getParticipantCount
 );
 
+// Route to fetch events available for elderly users
 router.get("/user/getEvents", authenticateToken, getEventsElderlySite);
 
+// Retrieves a list of events a user has signed up for
 router.get(
   "/user/:user_id/registered-events",
   authenticateToken,
   getRegisteredEventsByUserId
 );
+
+// Moves an event to an "archived" state instead of deleting it
 router.patch("/user/:user_id/archive-event/:event_id", archiveEvent);
+
+// Retrieves a list of events that the user has attended or completed
 router.get("/user/:user_id/past-events", getPastEventsByUserId);
+
+// Restores an archived event back to an active state
 router.patch("/user/:user_id/unarchive-event/:event_id", unarchiveEvent);
 
+// Returns registration status for an event
 router.get(
   "/user/:user_id/event/:event_id/registration",
   authenticateToken,
   checkEventRegistration
 );
+
+// Deletes a participant's registration from an event
 router.delete(
   "/events/:event_id/participants/:user_id", // Route to delete a participant by ID
   authenticateToken,

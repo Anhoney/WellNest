@@ -22,9 +22,6 @@ export const getToken = async () => {
   }
 };
 
-/**
- * Clear the stored authentication token.
- */
 // Clear the token on logout
 export const clearToken = async () => {
   try {
@@ -39,7 +36,6 @@ export const getUserIdFromToken = async () => {
     const token = await getToken();
     if (token) {
       const decodedToken = jwt_decode(token);
-      console.log("Decoded token:", decodedToken);
       return decodedToken.id; // Adjust the key based on the actual token payload
     }
     return null;

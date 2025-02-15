@@ -1,4 +1,4 @@
-//MainPage.js
+// MainPage.js
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -9,9 +9,8 @@ import {
   ScrollView,
 } from "react-native";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
-import { Ionicons } from "@expo/vector-icons"; // Make sure you have Ionicons installed
-import styles from "../../components/styles"; // Assuming you have your styles.js setup
-import NavigationBar from "../../components/NavigationBar"; // Import here
+import styles from "../../components/styles";
+import NavigationBar from "../../components/NavigationBar";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import API_BASE_URL from "../../../config/config";
 import axios from "axios";
@@ -39,7 +38,6 @@ const MainPage = ({ medicineReminder }) => {
         alert("No token found. Please log in.");
         return;
       }
-      console.log("Authorization token:", token); // Debugging log
 
       if (!userId) {
         console.warn("No userId found. Redirecting to login.");
@@ -75,7 +73,6 @@ const MainPage = ({ medicineReminder }) => {
   // Refresh data when the screen comes into focus
   useFocusEffect(
     React.useCallback(() => {
-      console.log("Screen focused, refreshing user data");
       fetchUserName();
     }, [])
   );
@@ -132,7 +129,6 @@ const MainPage = ({ medicineReminder }) => {
               >
                 <Image
                   source={require("../../../assets/AppointmentBooking.png")}
-                  // style={styles.icon}
                 />
                 <Text style={styles.iconText}>Appointment {"\n"} Booking</Text>
               </TouchableOpacity>
@@ -142,7 +138,6 @@ const MainPage = ({ medicineReminder }) => {
               >
                 <Image
                   source={require("../../../assets/VirtualConsultation.png")}
-                  // style={styles.icon}
                 />
                 <Text style={styles.iconText}>Virtual {"\n"} Consultation</Text>
               </TouchableOpacity>

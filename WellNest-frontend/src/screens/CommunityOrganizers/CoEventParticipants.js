@@ -1,10 +1,9 @@
-//CoEventParticipants.js
+// CoEventParticipants.js
 import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
   FlatList,
-  StyleSheet,
   TouchableOpacity,
   ImageBackground,
   Image,
@@ -47,7 +46,7 @@ const CoEventParticipants = () => {
         alert("No token found. Please log in.");
         return;
       }
-      console.log("fetchEventId", eventId);
+
       const response = await axios.get(
         `${API_BASE_URL}/events/${eventId}/participants`,
         {
@@ -56,8 +55,6 @@ const CoEventParticipants = () => {
           },
         }
       );
-      // Check the response data
-      console.log("Response data:", response.data);
 
       // Ensure the participants are set correctly
       if (response.data.participants) {
@@ -66,8 +63,6 @@ const CoEventParticipants = () => {
       } else {
         console.error("No participants found in response.");
       }
-      //   setParticipants(response.data.participants);
-      //   console.log("Fetched participants:", response.data.participants);
     } catch (error) {
       console.error("Error fetching participants:", error);
     } finally {
@@ -89,9 +84,6 @@ const CoEventParticipants = () => {
           },
         }
       );
-
-      // Check the response data
-      console.log("Participant count response:", response.data);
 
       if (response.data.count !== undefined) {
         setParticipantCount(response.data.count);
@@ -153,7 +145,6 @@ const CoEventParticipants = () => {
           keyExtractor={(item) =>
             item.id ? item.id.toString() : Math.random().toString()
           } // Handle undefined IDs
-          //   keyExtractor={(item) => item.id.toString()}
           renderItem={renderParticipant}
           ListEmptyComponent={renderEmptyComponent}
         />

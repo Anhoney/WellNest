@@ -1,8 +1,8 @@
+// FamilyCollabScreen.js
 import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
-  StyleSheet,
   Image,
   TouchableOpacity,
   ImageBackground,
@@ -23,9 +23,7 @@ import {
   useRoute,
   useFocusEffect,
 } from "@react-navigation/native";
-import Icon from "react-native-vector-icons/FontAwesome";
 
-// Sample screen for a caregiver collaboration
 const FamilyCollabScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
@@ -53,7 +51,6 @@ const FamilyCollabScreen = () => {
       });
     } else {
       console.log(`Navigating to: ${feature}`);
-      // Handle other navigation cases
     }
   };
 
@@ -72,7 +69,6 @@ const FamilyCollabScreen = () => {
             headers: { Authorization: `Bearer ${token}` },
           }
         );
-        console.log("User details:", response.data);
         setUserDetails(response.data); // Set user details
       } catch (error) {
         console.error("Error fetching user details:", error);
@@ -81,29 +77,6 @@ const FamilyCollabScreen = () => {
 
     fetchUserDetails();
   }, [userToCollabId]);
-
-  //   const handleDisconnect = async () => {
-  //     const token = await AsyncStorage.getItem("token");
-  //     if (!token) {
-  //       Alert.alert("Error", "No token found. Please log in.");
-  //       return;
-  //     }
-
-  //     try {
-  //       const response = await axios.delete(
-  //         `${API_BASE_URL}/delete/collaboration/${collabId}`, // Assuming userToCollabId is the collabId
-  //         {
-  //           headers: { Authorization: `Bearer ${token}` },
-  //         }
-  //       );
-
-  //       Alert.alert("Success", response.data.message);
-  //       navigation.goBack(); // Navigate back after successful deletion
-  //     } catch (error) {
-  //       console.error("Error disconnecting collaboration:", error);
-  //       Alert.alert("Error", "An error occurred while disconnecting.");
-  //     }
-  //   };
 
   const handleDisconnect = (collabId) => {
     setCollabIdToDelete(collabId); // Set the ID of the collaboration to delete
@@ -167,7 +140,6 @@ const FamilyCollabScreen = () => {
               {/* Health Order Status Section */}
               <View style={styles.sectionContainer}>
                 <Text style={styles.sectionTitle}>Health Status</Text>
-                {/* <View style={styles.section}> */}
                 <View style={styles.statusOptions}>
                   <TouchableOpacity
                     onPress={() => handleNavigation("Prescription Report")}
@@ -200,37 +172,8 @@ const FamilyCollabScreen = () => {
                     />
                     <Text style={styles.statusText}>Medication Reminder</Text>
                   </TouchableOpacity>
-
-                  {/* <TouchableOpacity
-                onPress={() => handleNavigation("Appointment Booking")}
-                style={styles.statusCard}
-              >
-                <Image
-                  source={require("../../../assets/AppointmentBooking.png")}
-                  style={styles.statusIcon}
-                />
-                <Text style={styles.statusText}>Appointment Booking</Text>
-              </TouchableOpacity> */}
-                  {/* </View> */}
                 </View>
               </View>
-
-              {/* Reminder Section */}
-              {/* <View style={styles.sectionContainer}>
-            <Text style={styles.sectionTitle}>Reminder</Text>
-            <View style={styles.statusOptions}>
-              <TouchableOpacity
-                onPress={() => handleNavigation("Medication Reminder")}
-                style={styles.statusCard}
-              >
-                <Image
-                  source={require("../../../assets/MedicationReminder.png")}
-                  style={styles.statusIcon}
-                />
-                <Text style={styles.statusText}>Medication Reminder</Text>
-              </TouchableOpacity>
-            </View>
-          </View> */}
 
               {/* Care Plan Section */}
               <View style={styles.sectionContainer}>
@@ -303,10 +246,6 @@ const FamilyCollabScreen = () => {
             <View style={styles.modalButtons}>
               <TouchableOpacity
                 style={styles.modalConfirmButton}
-                // onPress={() => {
-                //   handleDelete();
-                //   setDeleteModalVisible(false);
-                // }}
                 onPress={confirmDeletion}
               >
                 <Text style={styles.modalConfirmButtonText}>Confirm</Text>

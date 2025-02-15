@@ -1,13 +1,10 @@
-//SocialEventsScreen.js
+// SocialEventsScreen.js
 import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
   TextInput,
-  Button,
-  StyleSheet,
   Image,
-  ScrollView,
   TouchableOpacity,
   ImageBackground,
   FlatList,
@@ -22,7 +19,6 @@ import NavigationBar from "../../components/NavigationBar"; // Import your custo
 import API_BASE_URL from "../../../config/config";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/FontAwesome";
-import DateTimePickerModal from "react-native-modal-datetime-picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 
@@ -47,16 +43,9 @@ const SocialEventsScreen = () => {
     }, [])
   );
 
-  // useFocusEffect(
-  //   React.useCallback(() => {
-  //     fetchEvents();
-  //   }, [])
-  // );
-
   const fetchEvents = async (query = "") => {
     try {
       setLoading(true);
-      // const userId = await getUserIdFromToken();
       const token = await AsyncStorage.getItem("token");
       if (!token) {
         alert("No token found. Please log in.");
@@ -109,7 +98,7 @@ const SocialEventsScreen = () => {
       alert("No token found. Please log in.");
       return;
     }
-    console.log("userId", userId);
+
     try {
       const response = await axios.get(
         `${API_BASE_URL}/getUnjoin/support_group/${userId}/`,
@@ -119,11 +108,10 @@ const SocialEventsScreen = () => {
           },
         }
       );
-      console.log("response.data", response.data);
+
       if (response.status === 200) {
         // Handle the response data
         setChatRooms(response.data);
-        console.log("Available support groups:", response.data);
       }
     } catch (error) {
       console.log("Error fetching chat room", error);
@@ -147,7 +135,6 @@ const SocialEventsScreen = () => {
           },
         }
       );
-      console.log("response.data", response.data);
 
       setJoinedChatRooms(response.data);
     } catch (error) {
@@ -267,9 +254,6 @@ const SocialEventsScreen = () => {
   };
 
   const handleSearch = (query) => {
-    console.log("Search:", searchQuery);
-    // Implement search functionality here
-    // setSearchQuery(query);
     fetchEvents(searchQuery);
   };
 
@@ -314,11 +298,9 @@ const SocialEventsScreen = () => {
           </TouchableOpacity>
           <TextInput
             style={styles.searchInput}
-            // {styles.searchInput}
             placeholder="Search Events and Groups..."
             value={searchQuery}
             onChangeText={setSearchQuery}
-            // onChangeText={(text) => handleSearch(text)}
           />
         </View>
 
@@ -330,10 +312,6 @@ const SocialEventsScreen = () => {
               activeTab === "events" && styles.seActiveTab,
             ]}
             onPress={() => handleTabChange("events")}
-            // onPress={() => {
-            //   setActiveTab("events");
-            //   fetchEvents();
-            // }}
           >
             <Text style={styles.seTabText}>Events</Text>
           </TouchableOpacity>
@@ -343,7 +321,6 @@ const SocialEventsScreen = () => {
               activeTab === "chat" && styles.seActiveTab,
             ]}
             onPress={() => handleTabChange("chat")}
-            // onPress={() => setActiveTab("chat")}
           >
             <Text style={styles.seTabText}>Chat Room</Text>
           </TouchableOpacity>
@@ -352,10 +329,6 @@ const SocialEventsScreen = () => {
               styles.seTabButton,
               activeTab === "ongoing" && styles.seActiveTab,
             ]}
-            // onPress={() => {
-            //   setActiveTab("ongoing");
-            //   fetchEvents(); // Fetch registered events when switching tabs
-            // }}
             onPress={() => handleTabChange("ongoing")}
           >
             <Text style={styles.seTabText}>
@@ -367,10 +340,6 @@ const SocialEventsScreen = () => {
               styles.seTabButton,
               activeTab === "past" && styles.seActiveTab,
             ]}
-            // onPress={() => {
-            //   setActiveTab("past");
-            //   fetchEvents();
-            // }}
             onPress={() => handleTabChange("past")}
           >
             <Text style={styles.seTabText}>Past Events</Text>
@@ -378,7 +347,6 @@ const SocialEventsScreen = () => {
         </View>
 
         <View style={styles.eEventsScrollView}>
-          {/* <ScrollView contentContainerStyle={styles.scrollView}> */}
           {loading ? (
             <ActivityIndicator size="large" color="#0000ff" />
           ) : (
@@ -388,7 +356,6 @@ const SocialEventsScreen = () => {
                   <Text style={styles.sectionTitle}>Events</Text>
                   <View style={styles.displayUnderline}></View>
                   <FlatList
-                    // data={events}
                     data={events.sort(
                       (a, b) => new Date(b.created_at) - new Date(a.created_at)
                     )} // Sort by created_at in descending order
@@ -493,15 +460,6 @@ const SocialEventsScreen = () => {
                             group_photo={room.group_photo}
                             fetchChatRoom={fetchJoinedChatRoom}
                             contentContainerStyle={styles.flexListContainer}
-                            // onJoin={() => alert(`Joining ${room.group_name}`)}
-                            //     onJoin={() =>
-                            //       navigation.navigate("chatRoom", {
-                            //         group_id: room.id,
-                            //         group_name: room.group_name,
-                            //       })
-                            //     }
-                            //   />
-                            // )}
                             onJoin={() =>
                               navigation.navigate("ChatRoomElderly", {
                                 group_id: room.group_id,
@@ -533,15 +491,6 @@ const SocialEventsScreen = () => {
                             group_photo={room.group_photo}
                             fetchChatRoom={fetchChatRoom}
                             contentContainerStyle={styles.flexListContainer}
-                            // onJoin={() => alert(`Joining ${room.group_name}`)}
-                            // onJoin={() =>
-                            //   navigation.navigate("chatRoom", {
-                            //     group_id: room.id,
-                            //     group_name: room.group_name,
-                            //   })
-                            // }
-                            //onJoin={() => joinSupportGroup(room.id, userId)}
-                            // onJoin={() => handleJoinChatRoom(room)}
                             onJoin={() => handleJoinChatRoom(room)} // Action for joining public chat
                             isJoined={false} // Pass false for public rooms
                           />
@@ -569,7 +518,6 @@ const SocialEventsScreen = () => {
                       .sort(
                         (a, b) => new Date(a.joined_at) - new Date(b.joined_at)
                       )} // Sort by joined_at in ascending order
-                    // data={events}
                     keyExtractor={(item) => item.id.toString()}
                     contentContainerStyle={styles.listContainer}
                     ListEmptyComponent={renderEmptyComponent}
@@ -608,7 +556,6 @@ const SocialEventsScreen = () => {
                   <View style={styles.displayUnderline}></View>
                   <FlatList
                     data={events}
-                    // data={events.filter((event) => event.status === "Past")}
                     keyExtractor={(item) => item.id.toString()}
                     contentContainerStyle={styles.listContainer}
                     ListEmptyComponent={renderEmptyComponent}

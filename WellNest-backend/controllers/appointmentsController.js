@@ -1,12 +1,9 @@
 // appointmentsController.js
 const pool = require("../config/db");
 const { format } = require("date-fns"); // Install via `npm install date-fns`
-// const {
-//   triggerNotification,
-// } = require("../controllers/notificationController"); // Import the triggerNotification function
 const { notifyUser } = require("../controllers/notificationController");
 
-// Function to format time
+// Function to format time from 24-hour to 12-hour format
 const formatTime = (timeString) => {
   const timeParts = timeString.split(":");
   let hours = parseInt(timeParts[0], 10);
@@ -23,6 +20,7 @@ const formatDate = (dateString) => {
   return format(date, "dd MMM yyyy"); // e.g., "16 Dec 2024"
 };
 
+// Function to create a new appointment
 const createAppointment = async (req, res) => {
   const {
     description,
@@ -33,21 +31,8 @@ const createAppointment = async (req, res) => {
     category,
   } = req.body;
   const userId = req.userId; // Get user ID from request
-  // console.log("Appointment data received:", req.body);
 
   try {
-    // Check if an appointment with the same category already exists for the user
-    // const existingAppointment = await pool.query(
-    //   "SELECT id FROM hp_availability WHERE user_id = $1 AND category = $2",
-    //   [userId, category]
-    // );
-
-    // if (existingAppointment.rows.length > 0) {
-    //   return res.status(400).json({
-    //     error: `You have already created an appointment for the category "${category}".`,
-    //   });
-    // }
-
     // Insert the new appointment if no conflict exists
     const query = `
       INSERT INTO hp_availability (description, location, available_days, available_times, category, hospital_address, user_id)
@@ -63,7 +48,6 @@ const createAppointment = async (req, res) => {
       hospitalAdds,
       userId,
     ]);
-    // console.log(result.data);
     res.status(200).json(result.rows[0]);
   } catch (error) {
     console.error("Error creating appointment:", error);
@@ -86,6 +70,7 @@ const getAppointments = async (req, res) => {
     res.status(500).json({ error: "Failed to fetch appointments" });
   }
 };
+
 // Function to delete an appointment by ID
 const deleteAppointment = async (req, res) => {
   const { id } = req.params;
@@ -132,9 +117,9 @@ const updateAppointment = async (req, res) => {
   }
 };
 
+// Function to fetch a single appointment by its ID
 const getSingleAppointment = async (req, res) => {
   const { appointmentId } = req.params;
-  // console.log("Fetching appointment with ID:", appointmentId); // Log the appointment ID
 
   // Convert appointmentId to an integer if necessary
   const id = parseInt(appointmentId, 10);
@@ -148,8 +133,6 @@ const getSingleAppointment = async (req, res) => {
       [id]
     );
 
-    // console.log("Query result:", result.rows); // Log the result of the query
-
     if (result.rows.length === 0) {
       return res.status(404).json({ message: "Appointment not found" });
     }
@@ -160,10 +143,11 @@ const getSingleAppointment = async (req, res) => {
     res.status(500).json({ message: "Error fetching appointment", error });
   }
 };
+
+// Function to fetch upcoming appointments for a specific healthcare provider
 const getUpcomingAppointments = async (req, res) => {
   const { hpId } = req.params;
-  // console.log("Fetching upcoming appointments for hpId:", hpId);
-  console.log("getupcomingappointmenthpd", hpId);
+
   try {
     const query = `
     SELECT 
@@ -194,6 +178,8 @@ const getUpcomingAppointments = async (req, res) => {
     res.status(500).json({ error: "Failed to fetch upcoming appointments" });
   }
 };
+
+// Function to approve an appointment by the healthcare provider
 const approveAppointment = async (req, res) => {
   const { appointmentId } = req.params;
 
@@ -213,13 +199,10 @@ const approveAppointment = async (req, res) => {
     }
 
     const appointment = result.rows[0];
-    // const { u_id, app_date, app_time } = appointment;
+
     // Format the appointment date and time
     const formattedTime = formatTime(appointment.app_time); // e.g., "1:00 PM"
     const formattedDate = formatDate(appointment.app_date); // e.g., "16 Dec 2024"
-
-    // // Send notification to user for calendar event creation
-    // sendCalendarEventNotification(u_id, formattedDate, formattedTime);
 
     // Notify the user directly
     await notifyUser(
@@ -227,9 +210,6 @@ const approveAppointment = async (req, res) => {
       `Your physical appointment at ${formattedTime} on ${formattedDate} has been approved.`,
       "appointment_approved"
     );
-
-    // Send real-time notification
-    // sendNotification(appointment.u_id, "Your appointment has been approved.");
 
     res.status(200).json({
       message: "Appointment approved successfully.",
@@ -280,6 +260,7 @@ const getAppointmentDetailsByHpAppId = async (req, res) => {
   }
 };
 
+// Function to delete an appointment by hp_app_id
 const deleteSingleAppointment = async (req, res) => {
   const { hp_app_id } = req.params;
   console.log("Deleting appointment with ID:", hp_app_id);
@@ -302,9 +283,9 @@ const deleteSingleAppointment = async (req, res) => {
   }
 };
 
+// Function to fetch past appointments for a specific healthcare provider
 const getPastAppointments = async (req, res) => {
   const { hpId } = req.params;
-  // console.log("Fetching past appointments for hpId:", hpId);
 
   try {
     const query = `
@@ -322,17 +303,13 @@ const getPastAppointments = async (req, res) => {
           u.full_name
       FROM hp_appointments ha
       JOIN profile p ON ha.u_id = p.user_id
-    JOIN users u ON ha.u_id = u.id
+      JOIN users u ON ha.u_id = u.id
       WHERE ha.hp_id = $1 
       AND ha.app_date < CURRENT_DATE
       ORDER BY ha.app_date DESC, ha.app_time DESC;
     `;
 
     const result = await pool.query(query, [hpId]);
-
-    // if (result.rows.length === 0) {
-    //   return res.status(404).json({ message: "No past appointments found." });
-    // }
 
     res.status(200).json(result.rows);
   } catch (error) {
@@ -341,6 +318,7 @@ const getPastAppointments = async (req, res) => {
   }
 };
 
+// Function to update or insert virtual consultation details
 const upsertVirtualConsultation = async (req, res) => {
   const {
     description,
@@ -418,6 +396,7 @@ const upsertVirtualConsultation = async (req, res) => {
   }
 };
 
+// Function to fetch virtual availability details created by the healthcare provider
 const getVirtualAvailabilityDetails = async (req, res) => {
   const { hpId } = req.params;
   try {
@@ -450,7 +429,7 @@ const getVirtualAvailabilityDetails = async (req, res) => {
   }
 };
 
-// Function to delete an appointment by ID
+// Function to delete a virtual appointment by ID
 const deleteVirtualConsultation = async (req, res) => {
   const { id } = req.params;
   try {
@@ -466,9 +445,9 @@ const deleteVirtualConsultation = async (req, res) => {
   }
 };
 
+// Function to update virtual appointment details
 const getUpcomingVirtualAppointments = async (req, res) => {
   const { hpId } = req.params;
-  // console.log("Fetching upcoming appointments for hpId:", hpId);
 
   try {
     const query = `
@@ -495,13 +474,6 @@ const getUpcomingVirtualAppointments = async (req, res) => {
   `;
     const result = await pool.query(query, [hpId]);
 
-    // if (result.rows.length === 0) {
-    //   return res
-    //     .status(404)
-    //     .json({ message: "No upcoming appointments found." });
-    // }
-    // console.log("Database query result:", result.rows);
-
     res.status(200).json(result.rows);
   } catch (error) {
     console.error("Error fetching upcoming appointments:", error);
@@ -509,6 +481,7 @@ const getUpcomingVirtualAppointments = async (req, res) => {
   }
 };
 
+// Approve the virtual appointment by the healthcare provider
 const approveVirtualAppointment = async (req, res) => {
   const { appointmentId } = req.params;
 
@@ -528,10 +501,6 @@ const approveVirtualAppointment = async (req, res) => {
     }
 
     const appointment = result.rows[0];
-
-    // Log the values to check their formats
-    console.log("hpva_time:", appointment.hpva_time);
-    console.log("hpva_date:", appointment.hpva_date);
 
     // Format the appointment date and time
     const formattedTime = formatTime(appointment.hpva_time); // e.g., "1:00 PM"
@@ -554,13 +523,10 @@ const approveVirtualAppointment = async (req, res) => {
   }
 };
 
+// Function to update virtual appointment status
 const updateVirtualAppointmentStatus = async (req, res) => {
   const { appointmentId } = req.params;
   const { status, paymentStatus } = req.body; // Extract status and paymentStatus from the request body
-
-  console.log("VAppStatusReceived appointmentId:", appointmentId);
-  console.log("Received status:", status);
-  console.log("Received paymentStatus:", paymentStatus);
 
   try {
     const query = `
@@ -580,7 +546,6 @@ const updateVirtualAppointmentStatus = async (req, res) => {
     }
 
     const appointment = result.rows[0];
-    console.log("Appointment u_id:", appointment.u_id);
 
     // Format the appointment date and time
     const formattedTime = formatTime(appointment.hpva_time); // e.g., "1:00 PM"
@@ -588,11 +553,6 @@ const updateVirtualAppointmentStatus = async (req, res) => {
 
     // Prepare the notification message based on the new status
     let message;
-    // if (status === "approved") {
-    //   message = `Your virtual consultation at ${formattedTime} on ${formattedDate} has been approved.`;
-    // } else if (status === "canceled") {
-    //   message = `Your virtual consultation has been canceled.`;
-    // }
     let notificationType;
 
     if (status === "approved") {
@@ -659,9 +619,10 @@ const getVirtualAppointmentDetailsByHpAppId = async (req, res) => {
   }
 };
 
+// Delete respectively virtual appointment
 const deleteVirtualSingleAppointment = async (req, res) => {
   const { hpva_id } = req.params;
-  console.log("Deleting appointment with ID:", hpva_id);
+
   try {
     const query = `
       DELETE FROM hp_virtual_appointment
@@ -681,9 +642,9 @@ const deleteVirtualSingleAppointment = async (req, res) => {
   }
 };
 
+// Function to get past virtual appointments
 const getPastVirtualAppointments = async (req, res) => {
   const { hpId } = req.params;
-  // console.log("Fetching past appointments for hpId:", hpId);
 
   try {
     const query = `
@@ -703,17 +664,13 @@ const getPastVirtualAppointments = async (req, res) => {
           u.full_name
       FROM hp_virtual_appointment hv
       JOIN profile p ON hv.u_id = p.user_id
-    JOIN users u ON hv.u_id = u.id
+      JOIN users u ON hv.u_id = u.id
       WHERE hv.hp_id = $1 
       AND hv.hpva_date < CURRENT_DATE
       ORDER BY hv.hpva_date DESC, hv.hpva_time DESC;
     `;
 
     const result = await pool.query(query, [hpId]);
-
-    // if (result.rows.length === 0) {
-    //   return res.status(404).json({ message: "No past appointments found." });
-    // }
 
     res.status(200).json(result.rows);
   } catch (error) {
@@ -722,12 +679,10 @@ const getPastVirtualAppointments = async (req, res) => {
   }
 };
 
+// Function to update virtual appointment meeting link for the patient
 const updateVirtualAppointmentMeetingLink = async (req, res) => {
   const { hpva_id } = req.params;
   const { meetingLink } = req.body; // Added meetingLink to request body
-
-  console.log("VAppStatusReceived appointmentId:", hpva_id);
-  console.log("Received meetingLink:", meetingLink); // Log the received meeting link
 
   try {
     const query = `
@@ -743,7 +698,6 @@ const updateVirtualAppointmentMeetingLink = async (req, res) => {
     }
 
     const appointment = result.rows[0];
-    console.log("Appointment details:", appointment);
 
     res.status(200).json({
       message: "Meeting link updated successfully.",

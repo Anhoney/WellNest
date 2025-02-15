@@ -1,4 +1,4 @@
-//HpUpcomingAppointments.js
+// HpVUpcomingAppointments.js
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -18,8 +18,6 @@ import API_BASE_URL from "../../../config/config";
 import styles from "../../components/styles"; // Import shared styles
 import HpNavigationBar from "../../components/HpNavigationBar";
 import ImageViewer from "react-native-image-zoom-viewer"; // Import the zoom viewer
-import * as DocumentPicker from "expo-document-picker"; // Import DocumentPicker
-import * as FileSystem from "expo-file-system"; // Import FileSystem
 import { WebView } from "react-native-webview";
 import * as Calendar from "expo-calendar";
 
@@ -44,13 +42,10 @@ const HpVUpcomingAppointments = () => {
         const calendars = await Calendar.getCalendarsAsync(
           Calendar.EntityTypes.EVENT
         );
-        // console.log("Here are all your calendars:");
-        // console.log({ calendars });
 
         const expoCalendarIds = calendars
           .filter((calendar) => calendar.title === "Expo Calendar")
           .map((calendar) => calendar.id);
-        console.log("Expo Calendar IDs:", expoCalendarIds);
       }
     })();
   }, []);
@@ -61,10 +56,6 @@ const HpVUpcomingAppointments = () => {
   }
 
   async function createCalendar() {
-    // const defaultCalendarSource =
-    //   Platform.OS === 'ios'
-    //     ? await getDefaultCalendarSource()
-    //     : { isLocalAccount: true, name: 'Expo Calendar' };
     const defaultCalendarSource = await getDefaultCalendarSource();
     const newCalendarID = await Calendar.createCalendarAsync({
       title: "Expo Calendar",
@@ -76,7 +67,6 @@ const HpVUpcomingAppointments = () => {
       ownerAccount: "personal",
       accessLevel: Calendar.CalendarAccessLevel.OWNER,
     });
-    console.log(`Your new calendar ID is: ${newCalendarID}`);
   }
 
   const setReminder = async (hpva_date, hpva_time, u_id) => {
@@ -110,11 +100,13 @@ const HpVUpcomingAppointments = () => {
         accessLevel: Calendar.CalendarAccessLevel.OWNER,
       });
     }
+
     // Check if hpva_time is defined
     if (!hpva_time) {
       console.error("hpva_time is undefined");
       return;
     }
+
     // Parse the appointment date and time
     try {
       // Combine date and time, then parse into a 24-hour ISO format
@@ -146,8 +138,6 @@ const HpVUpcomingAppointments = () => {
         timeZone: "GMT",
         alarms: [{ relativeOffset: -60 }], // Alert 1 hour before
       });
-      console.log("Reminder set for appointment:", parsedDate);
-      // console.log("Reminder set for appointment:", appointmentDate);
     } catch (error) {
       console.error("Error creating reminder:", error.message);
     }
@@ -218,7 +208,6 @@ const HpVUpcomingAppointments = () => {
   };
 
   const handleConfirmMeetingLink = async (appointmentId) => {
-    // Here, you can update the meeting link in the backend.
     try {
       const response = await fetch(
         `${API_BASE_URL}/virtual/appointments/updateMeetingLink/${appointmentId}`,
@@ -232,7 +221,6 @@ const HpVUpcomingAppointments = () => {
 
       Alert.alert("Success", "Meeting link updated.");
       setIsEditing((prev) => ({ ...prev, [appointmentId]: true }));
-      // setIsEditing(false); // Reset edit mode
     } catch (error) {
       console.error("Error updating meeting link:", error);
       Alert.alert("Error", "Failed to update meeting link.");
@@ -247,10 +235,8 @@ const HpVUpcomingAppointments = () => {
         receiptUrl.startsWith("http://") ||
         receiptUrl.startsWith("https://")
       ) {
-        // setSelectedReceipt(receiptUrl);
         setSelectedReceipt({ url: receiptUrl, hpva_id, hpva_date, hpva_time }); // Store both URL and hpva_id
       } else {
-        // setSelectedReceipt(`http://localhost:5001/${receiptUrl}`);
         setSelectedReceipt({
           url: `http://localhost:5001/${receiptUrl}`,
           hpva_id,
@@ -278,10 +264,6 @@ const HpVUpcomingAppointments = () => {
           <Text style={styles.details}>Date: {item.hpva_date}</Text>
           <Text style={styles.details}>Time: {item.hpva_time}</Text>
           <Text style={styles.details}>Patient: {item.who_will_see}</Text>
-          {/* <Text style={styles.details}>Status: {item.status}</Text>
-          <Text style={styles.details}>
-            Payment Status: {item.payment_status}
-          </Text> */}
           <Text
             style={[
               styles.details,
@@ -361,26 +343,10 @@ const HpVUpcomingAppointments = () => {
           style={styles.HpVcloseIcon}
           onPress={() => setSelectedReceipt(null)}
         />
-        {/* {isPDF ? (
-          <View style={{ flex: 1 }}>
-            <TouchableOpacity
-              onPress={async () => {
-                const fileUri = await FileSystem.downloadAsync(
-                  selectedReceipt,
-                  FileSystem.documentDirectory +
-                    selectedReceipt.split("/").pop()
-                );
-                // Open the downloaded PDF using the default PDF viewer
-                await FileSystem.openDocument(fileUri.uri);
-              }}
-            >
-              <Text style={styles.openPdfText}>Open PDF</Text>
-            </TouchableOpacity>
-          </View> */}
+
         {isPDF ? (
           <WebView
             source={{ uri: selectedReceipt.url }} // Use selectedReceipt.url
-            // source={{ uri: selectedReceipt }}
             style={{ flex: 1 }}
             onError={(error) => {
               console.error("WebView Error:", error);
@@ -390,7 +356,6 @@ const HpVUpcomingAppointments = () => {
         ) : (
           <ImageViewer
             imageUrls={[{ url: selectedReceipt.url }]} // Use selectedReceipt.url
-            // imageUrls={[{ url: selectedReceipt }]} // Single image array
             enableSwipeDown
             onSwipeDown={() => setSelectedReceipt(null)}
           />
@@ -399,21 +364,8 @@ const HpVUpcomingAppointments = () => {
         <View style={styles.modalButtonContainer}>
           <TouchableOpacity
             style={styles.HpVapproveButton}
-            // onPress={() => {
-            //   updateAppointmentStatus(
-            //     selectedReceipt.hpva_id,
-            //     "approved",
-            //     "checked"
-            //   );
-            //   setSelectedReceipt(null);
-            // }}
             onPress={async () => {
               try {
-                console.log(
-                  "selectedReceipt.hpva_date",
-                  selectedReceipt.hpva_date
-                );
-                // const { hpva_id, hpva_date, hpva_time, u_id } = selectedReceipt; // Destructure needed values
                 await updateAppointmentStatus(
                   selectedReceipt.hpva_id,
                   "approved",
@@ -502,8 +454,7 @@ const HpVUpcomingAppointments = () => {
         </View>
         <Text>{"/n"}</Text>
         <View style={styles.singleUnderline}></View>
-        {/* <View style={styles.hpContainer}> */}
-        {/* <Text style={styles.sectionTitle}>Upcoming Virtual Appointments</Text> */}
+
         <View style={styles.singleUnderline}></View>
         <View style={[{ marginBottom: 20 }]}></View>
         <FlatList
@@ -512,7 +463,6 @@ const HpVUpcomingAppointments = () => {
           renderItem={renderAppointment}
           contentContainerStyle={styles.hpContainer}
         />
-        {/* </View> */}
         {renderReceiptModal()}
         <HpNavigationBar navigation={navigation} />
       </ImageBackground>

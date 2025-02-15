@@ -1,4 +1,4 @@
-//Notification.js
+// HpNotification.js
 import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
@@ -6,8 +6,6 @@ import {
   FlatList,
   TouchableOpacity,
   ImageBackground,
-  StyleSheet,
-  Alert,
 } from "react-native";
 import axios from "axios";
 import styles from "../../components/styles"; // Import shared styles
@@ -32,7 +30,6 @@ const HpNotification = () => {
 
   const fetchUserId = async () => {
     const userId = await getUserIdFromToken();
-    // console.log("userId:", userId);
     if (userId) {
       setUserId(userId);
       fetchNotifications(userId); // Fetch notifications when userId is available
@@ -49,7 +46,6 @@ const HpNotification = () => {
       const unread = response.data.filter((notif) => !notif.is_read).length;
       setUnreadCount(unread);
     } catch (error) {
-      //   console.error("Error fetching notifications:", error);
       console.error(
         "Error fetching notifications:",
         error.response ? error.response.data : error.message
@@ -77,17 +73,11 @@ const HpNotification = () => {
       setUnreadCount((prevCount) =>
         Math.max(prevCount - notificationIds.length, 0)
       );
-      //   fetchNotifications(userId); // Refresh notifications after marking as read
     } catch (error) {
       console.error("Error marking notifications as read:", error);
     }
   };
 
-  //   useEffect(() => {
-  //     if (userId) {
-  //       fetchNotifications();
-  //     }
-  //   }, [userId]);
   useEffect(() => {
     const interval = setInterval(() => {
       fetchUserId(); // Re-fetch userId to ensure notifications are up to date
@@ -97,68 +87,6 @@ const HpNotification = () => {
     }, 30000); // Poll every 30 seconds
     return () => clearInterval(interval);
   }, [userId]);
-
-  //   useEffect(() => {
-  //     const ws = new WebSocket("ws://localhost:8080"); // Connect to WebSocket server
-
-  //     ws.onopen = () => {
-  //       console.log("Connected to WebSocket server");
-  //     };
-
-  //     ws.onmessage = (event) => {
-  //       const notification = JSON.parse(event.data);
-  //       if (notification.userId === userId) {
-  //         setNotifications((prevNotifications) => [
-  //           ...prevNotifications,
-  //           {
-  //             notification_id: notification.id, // Assuming the notification has an ID
-  //             message: notification.message,
-  //             is_read: false,
-  //             created_at: new Date(),
-  //           },
-  //         ]);
-  //         setUnreadCount((prevCount) => prevCount + 1);
-  //       }
-  //     };
-
-  //     ws.onclose = () => {
-  //       console.log("Disconnected from WebSocket server");
-  //     };
-
-  //     return () => {
-  //       ws.close(); // Clean up WebSocket connection on component unmount
-  //     };
-  //   }, [userId]);
-  //   useEffect(() => {
-  //     const ws = new WebSocket("ws://localhost:8080"); // Connect to WebSocket server
-
-  //     ws.onopen = () => {
-  //       console.log("Connected to WebSocket server");
-  //     };
-
-  //     ws.onmessage = (event) => {
-  //       const notification = JSON.parse(event.data);
-  //       if (notification.userId === userId) {
-  //         setNotifications((prevNotifications) => [
-  //           ...prevNotifications,
-  //           {
-  //             message: notification.message,
-  //             is_read: false,
-  //             created_at: new Date(),
-  //           },
-  //         ]);
-  //         setUnreadCount((prevCount) => prevCount + 1);
-  //       }
-  //     };
-
-  //     ws.onclose = () => {
-  //       console.log("Disconnected from WebSocket server");
-  //     };
-
-  //     return () => {
-  //       ws.close(); // Clean up WebSocket connection on component unmount
-  //     };
-  //   }, [userId]);
 
   return (
     <ImageBackground
@@ -176,11 +104,6 @@ const HpNotification = () => {
         <Text style={styles.title}>Notification</Text>
       </View>
       <View style={styles.notiContainer}>
-        {/* <TouchableOpacity style={styles.iconContainer}>
-          <Text style={styles.notificationIcon}>🔔</Text>
-          {unreadCount > 0 && <View style={styles.redDot} />}
-        </TouchableOpacity> */}
-
         <FlatList
           data={notifications}
           keyExtractor={(item) => item.notification_id.toString()}

@@ -27,7 +27,6 @@ const scheduleNotifications = async () => {
         `Time to take your medication: ${reminder.pill_name}`,
         "medication_reminder"
       );
-      console.log(`Notification sent for medication: ${reminder.pill_name}`);
     });
   });
 };
@@ -37,6 +36,3 @@ schedule.scheduleJob("* * * * *", () => {
   console.log("Checking for upcoming medication reminders...");
   scheduleNotifications();
 });
-
-// Schedule the alarm check every minute
-// cron.schedule("* * * * *", checkAlarms); // Runs every minute

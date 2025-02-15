@@ -51,6 +51,7 @@ router.delete(
   deleteOpportunity
 );
 
+// Route to get all opportunities for a specific user (by co_id)
 router.get(
   "/get/opportunities/:co_id",
   authenticateToken,
@@ -78,32 +79,43 @@ router.get(
   getParticipantCount
 );
 
+// Route to get all available opportunities for elderly users
 router.get(
   "/user/getOpportunities",
   authenticateToken,
   getOpportunitiesElderlySite
 );
 
+// Route to get all registered opportunities for a user
 router.get(
   "/user/:user_id/registered-opportunities",
   authenticateToken,
   getRegisteredOpportunitiesByUserId
 );
+
+// Route to archive a specific opportunity
 router.patch(
   "/user/:user_id/archive-opportunity/:opportunity_id",
   archiveOpportunity
 );
+
+// Route to get past opportunities for a user
 router.get("/user/:user_id/past-opportunities", getPastOpportunitiesByUserId);
+
+// Route to unarchive an opportunity
 router.patch(
   "/user/:user_id/unarchive-opportunity/:opportunity_id",
   unarchiveOpportunity
 );
+
+// Route to check if a user is registered for an opportunity
 router.get(
   "/user/:user_id/opportunity/:opportunity_id/registration",
   authenticateToken,
   checkOpportunityRegistration
 );
 
+// Route to delete a participant from an opportunity by user ID
 router.delete(
   "/opportunities/:opportunity_id/participants/:user_id", // Route to delete a participant by ID
   authenticateToken,

@@ -1,3 +1,4 @@
+// ManageChatRoomElderly.js
 import React, { useEffect, useState } from "react";
 import {
   ImageBackground,
@@ -15,7 +16,6 @@ import API_BASE_URL from "../../../config/config";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { getUserIdFromToken } from "../../../services/authService";
-import { SelectList } from "react-native-dropdown-select-list";
 
 const ManageChatRoomElderly = ({ route }) => {
   const { group_id, group_name } = route.params;
@@ -25,7 +25,7 @@ const ManageChatRoomElderly = ({ route }) => {
   const [userId, setUserId] = useState("");
   const [selectedUser, setSelectedUser] = useState(null);
   const [notExistedUsers, setNotExistedUsers] = useState([]);
-  console.log("userId", userId);
+
   useEffect(() => {
     const fetchUserId = async () => {
       const user_Id = await getUserIdFromToken();
@@ -43,27 +43,20 @@ const ManageChatRoomElderly = ({ route }) => {
   }, [allUsers, existedUsers]);
 
   const filterUser = () => {
-    console.log("All Users", allUsers);
-    console.log("Existed Users", existedUsers);
-
     const filteredUsers = allUsers.filter(
       (allUser) =>
         !existedUsers.some((existedUser) => existedUser.user_id === allUser.id)
     );
 
     setNotExistedUsers(filteredUsers);
-    console.log("Not Existed User:", filteredUsers);
   };
 
   const handleAddUser = async () => {
     const userData = allUsers.find((user) => user.id === selectedUser);
     try {
       const now = new Date();
-
       const token = await AsyncStorage.getItem("token");
-
       const url = `${API_BASE_URL}/support_group_user/`;
-
       const config = {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -94,18 +87,13 @@ const ManageChatRoomElderly = ({ route }) => {
   const fetchExistedUser = async () => {
     try {
       const token = await AsyncStorage.getItem("token");
-
       const url = `${API_BASE_URL}/support_group_user/${group_id}`;
-
       const config = {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       };
-
       const response = await axios.get(url, config);
-
-      // console.log(response.data);
 
       setExistedUsers(response.data);
     } catch (error) {
@@ -116,9 +104,7 @@ const ManageChatRoomElderly = ({ route }) => {
   const fetchAllUser = async () => {
     try {
       const token = await AsyncStorage.getItem("token");
-
       const url = `${API_BASE_URL}/users/`;
-
       const config = {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -127,37 +113,12 @@ const ManageChatRoomElderly = ({ route }) => {
 
       const response = await axios.get(url, config);
 
-      // console.log(response.data);
-
       setAllUsers(response.data);
     } catch (error) {
       console.error("Error add user:", error.message);
       Alert.alert("Error", "Failed to remove user. Try again later");
     }
   };
-
-  //   const handleDeleteUser = async (delete_user_id) => {
-  //     console.log("Delete User ID:", userId);
-  //     try {
-  //       const token = await AsyncStorage.getItem("token");
-  //       const url = `${API_BASE_URL}/support_group_user/`;
-
-  //       const config = {
-  //         headers: {
-  //           Authorization: `Bearer ${token}`,
-  //         },
-  //         data: {
-  //           group_id: group_id,
-  //           user_id: delete_user_id,
-  //         },
-  //       };
-
-  //       const response = await axios.delete(url, config);
-  //     } catch (error) {
-  //       console.log("Error deleting users:", error.message);
-  //       Alert.alert("Error", "Failed to delete user. Try again later.");
-  //     }
-  //   };
 
   const handleDeleteUser = async (delete_user_id) => {
     Alert.alert(
@@ -196,9 +157,6 @@ const ManageChatRoomElderly = ({ route }) => {
                   "Failed to exit the group. Unexpected response from the server."
                 );
               }
-              //   const response = await axios.delete(url, config);
-              //   Alert.alert("Success", "You have exited the group.");
-              //   navigation.navigate("SocialEventsScreen");
             } catch (error) {
               console.log("Error deleting users:", error.message);
               Alert.alert(
@@ -319,13 +277,12 @@ const localstyles = StyleSheet.create({
     color: "#fff",
     fontWeight: "bold",
   },
-  // Modified userInfo style for better layout and readability
   userInfo: {
     flex: 1,
-    paddingLeft: 12, // Added padding to the left
-    paddingRight: 8, // Optional: added right padding
-    justifyContent: "center", // Center-align content vertically
-    flexDirection: "column", // Stack items vertically
+    paddingLeft: 12,
+    paddingRight: 8,
+    justifyContent: "center",
+    flexDirection: "column",
     backgroundColor: "#fff",
     borderRadius: 5,
   },

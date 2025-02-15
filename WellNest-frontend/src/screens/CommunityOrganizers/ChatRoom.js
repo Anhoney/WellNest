@@ -1,4 +1,4 @@
-//ChatRoom.js
+// ChatRoom.js
 import React, { useEffect, useState } from "react";
 import {
   ImageBackground,
@@ -63,8 +63,6 @@ const ChatRoom = ({ route }) => {
 
       setNewMessage("");
       fetchAllGroupMessage();
-
-      // Alert.alert("Success", response.data.message);
     } catch (error) {
       console.error("Error send message:", error.message);
       Alert.alert("Error", "Failed to send message. Try again later");
@@ -87,65 +85,6 @@ const ChatRoom = ({ route }) => {
       console.log("Error fetching chat room message", error);
     }
   };
-
-  //   const renderItem = ({ item }) => (
-  //     <View
-  //       style={[
-  //         localstyles.messageContainer,
-  //         item.user_id === userId
-  //           ? localstyles.messageContainerRight
-  //           : localstyles.messageContainerLeft,
-  //         // && localstyles.messageContainerRight,
-  //       ]}
-  //     >
-  //       <Text style={localstyles.messageText}>{item.message}</Text>
-  //       <Text style={localstyles.messageDate}>
-  //         {new Date(item.message_date).toLocaleDateString()}
-  //       </Text>
-  //       <Text style={localstyles.messageTime}>{item.message_time}</Text>
-  //     </View>
-  //     // <View
-  //     //   style={[
-  //     //     localstyles.messageContainer,
-  //     //     item.user_id === userId
-  //     //       ? localstyles.messageContainerRight
-  //     //       : localstyles.messageContainerLeft,
-  //     //   ]}
-  //     // >
-  //     //   <Text style={localstyles.messageText}>{item.message}</Text>
-  //     //   <Text
-  //     //     style={localstyles.messageTime}
-  //     //   >{`${item.message_date} ${item.message_time}`}</Text>
-  //     // </View>
-  //   );
-
-  //   const renderItem = ({ item, index }) => {
-  //     const showDate =
-  //       index === 0 ||
-  //       new Date(messages[index - 1].message_date).toLocaleDateString() !==
-  //         new Date(item.message_date).toLocaleDateString();
-
-  //     return (
-  //       <View>
-  //         {showDate && (
-  //           <Text style={localstyles.messageDate}>
-  //             {new Date(item.message_date).toLocaleDateString()}
-  //           </Text>
-  //         )}
-  //         <View
-  //           style={[
-  //             localstyles.messageContainer,
-  //             item.user_id === userId
-  //               ? localstyles.messageContainerRight
-  //               : localstyles.messageContainerLeft,
-  //           ]}
-  //         >
-  //           <Text style={localstyles.messageText}>{item.message}</Text>
-  //           <Text style={localstyles.messageTime}>{item.message_time}</Text>
-  //         </View>
-  //       </View>
-  //     );
-  //   };
 
   const renderItem = ({ item, index }) => {
     const showDate =
@@ -213,7 +152,6 @@ const ChatRoom = ({ route }) => {
         >
           <Ionicons name="chevron-back" size={24} color="#000" />
         </TouchableOpacity>
-        {/* <Text style={styles.hpTitle}>{group_name}</Text> */}
         <View style={{ flex: 1, alignItems: "center" }}>
           <Text style={styles.hpTitle}>{group_name}</Text>
         </View>
@@ -225,12 +163,12 @@ const ChatRoom = ({ route }) => {
             })
           }
           style={{ marginLeft: "auto" }} // Align to right
-          //   style={styles.plusButton}
         >
           <AntDesign name="plus" size={24} color="#000" />
         </TouchableOpacity>
       </View>
       <View style={[{ marginBottom: 25 }]}></View>
+
       <FlatList
         data={messages}
         renderItem={renderItem}
@@ -255,68 +193,6 @@ const ChatRoom = ({ route }) => {
 };
 
 const localstyles = StyleSheet.create({
-  // background: {
-  //     flex: 1,
-  // },
-  // smallHeaderContainer: {
-  //     flexDirection: 'row',
-  //     alignItems: 'center',
-  //     padding: 16,
-  // },
-  // backButton: {
-  //     marginRight: 8,
-  // },
-  // hpTitle: {
-  //     fontSize: 18,
-  //     fontWeight: 'bold',
-  // },
-  // messageContainer: {
-  //     padding: 16,
-  //     borderBottomWidth: 1,
-  //     borderBottomColor: '#ccc',
-  //     alignSelf: 'flex-start', // Align to left by default
-  // },
-  // messageContainerRight: {
-  //     alignSelf: 'flex-end', // Align to right if user_id matches
-  //     backgroundColor: '#e0f7fa', // Optional: Different background color for user's messages
-  // },
-  // messageText: {
-  //     fontSize: 16,
-  // },
-  // messageDate: {
-  //     fontSize: 14,
-  //     color: '#888',
-  // },
-  // messageTime: {
-  //     fontSize: 14,
-  //     color: '#888',
-  // },
-  // inputContainer: {
-  //     flexDirection: 'row',
-  //     alignItems: 'center',
-  //     padding: 16,
-  //     borderTopWidth: 1,
-  //     borderTopColor: '#ccc',
-  //     backgroundColor: '#fff',
-  // },
-  // input: {
-  //     flex: 1,
-  //     padding: 10,
-  //     borderWidth: 1,
-  //     borderColor: '#ccc',
-  //     borderRadius: 5,
-  // },
-  // sendButton: {
-  //     marginLeft: 10,
-  //     padding: 10,
-  //     backgroundColor: '#007bff',
-  //     borderRadius: 5,
-  // },
-  // sendButtonText: {
-  //     color: '#fff',
-  //     fontWeight: 'bold',
-  // },
-
   headerContainer: {
     flexDirection: "row",
     alignItems: "center",

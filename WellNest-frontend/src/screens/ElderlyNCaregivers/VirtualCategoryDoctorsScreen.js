@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useCallback } from "react";
+// VirtualCategoryDoctorsScreen.js
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -17,7 +18,6 @@ import {
 } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import API_BASE_URL from "../../../config/config";
-import { Buffer } from "buffer";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import NavigationBar from "../../components/NavigationBar"; // Import here
 
@@ -30,7 +30,6 @@ const VirtualCategoryDoctorsScreen = () => {
   // Manage favorites outside render function
   const [favorites, setFavorites] = useState([]);
   const selectedDate = searchParams?.date; // Extract the date
-  // console.log("Lastest cate selectedDate:", selectedDate);
 
   // Fetch doctors and favorites when the screen is focused
   const fetchDoctors = async () => {
@@ -52,8 +51,6 @@ const VirtualCategoryDoctorsScreen = () => {
 
       setDoctors(response.data || []);
     } catch (error) {
-      //   console.error("Error fetching doctors:", error);
-      //   setDoctors([]);
       if (error.response) {
         // The request was made and the server responded with a status code
         // that falls out of the range of 2xx
@@ -95,30 +92,12 @@ const VirtualCategoryDoctorsScreen = () => {
       });
       const favoriteIds = response.data.map(
         (doctor) => doctor.virtual_availability_id
-      ); // Adjust based on your API response
+      );
       setFavorites(favoriteIds);
     } catch (error) {
       console.error("Error fetching favorites:", error);
     }
   };
-
-  // Polling function to keep data updated
-  //   const pollData = useCallback(() => {
-  //     fetchDoctors();
-  //     fetchFavorites();
-  //   }, []);
-
-  //   useFocusEffect(
-  //     useCallback(() => {
-  //       pollData(); // Initial fetch
-
-  //       // Set up polling to fetch data every 10 seconds
-  //       const intervalId = setInterval(pollData, 10000); // Poll every 10 seconds
-
-  //       // Cleanup function to clear the interval
-  //       return () => clearInterval(intervalId);
-  //     }, [pollData])
-  //   );
 
   // Fetch doctors and favorites when the screen is focused
   useFocusEffect(
@@ -131,11 +110,11 @@ const VirtualCategoryDoctorsScreen = () => {
   const toggleFavorite = async (availabilityId) => {
     try {
       // Retrieve the token from AsyncStorage
-      const token = await AsyncStorage.getItem("token"); // Replace 'token' with the actual key you used to store the token
+      const token = await AsyncStorage.getItem("token");
 
       if (!token) {
         console.error("No token found");
-        return; // Optionally handle the case where no token is found
+        return;
       }
 
       const response = await axios.post(
@@ -145,11 +124,11 @@ const VirtualCategoryDoctorsScreen = () => {
         },
         {
           headers: {
-            Authorization: `Bearer ${token}`, // Include the token in the Authorization header
+            Authorization: `Bearer ${token}`,
           },
         }
       );
-      console.log("availabilityId", availabilityId);
+
       if (response.data.success) {
         setFavorites((prevFavorites) => {
           const newFavorites = prevFavorites.includes(availabilityId)
@@ -175,18 +154,12 @@ const VirtualCategoryDoctorsScreen = () => {
   };
 
   const renderDoctorCard = ({ item }) => {
-    //console.log("Doctor item:", item); // Log the entire item to see its structure
     // Determine if doctor is a favorite
     const isFavorite = favorites.includes(item.virtual_availability_id);
-    // console.log("Available Id:", item.id);
 
-    // let imageUri;
     let imageUri = item.profile_image
       ? item.profile_image // Base64 string returned from the backend
       : "https://via.placeholder.com/150";
-
-    // Log the services_provide before parsing
-    // console.log("Raw services_provide:", item.services_provide);
 
     // Parse the services_provide JSON string
     let services = [];
@@ -196,7 +169,6 @@ const VirtualCategoryDoctorsScreen = () => {
       console.error("Error parsing services_provide:", error);
       services = []; // Default to an empty array if parsing fails
     }
-    console.log("Render Id:", item.virtual_availability_id);
     return (
       <TouchableOpacity
         onPress={() =>
@@ -222,7 +194,6 @@ const VirtualCategoryDoctorsScreen = () => {
             ) : (
               <Text style={styles.doctorCategory}>No services available</Text>
             )}
-            {/* <Text style={styles.doctorCategory}>Location: {item.location}</Text> */}
             <Text style={styles.doctorRating}>⭐ {item.rating || "N/A"}</Text>
           </View>
           <TouchableOpacity

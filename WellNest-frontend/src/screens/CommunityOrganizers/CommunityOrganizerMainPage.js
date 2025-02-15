@@ -1,4 +1,4 @@
-//HealthcareProviderMainPage.js
+// HealthcareProviderMainPage.js
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -9,11 +9,9 @@ import {
   ScrollView,
 } from "react-native";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
-import { Ionicons } from "@expo/vector-icons"; // Make sure you have Ionicons installed
 import styles from "../../components/styles"; // Assuming you have your styles.js setup
 import CoNavigationBar from "../../components/CoNavigationBar"; // Import here
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import BlankSpacer from "react-native-blank-spacer";
 import axios from "axios";
 import API_BASE_URL from "../../../config/config";
 
@@ -29,7 +27,6 @@ const CommunityOrganizerMainPage = ({}) => {
         alert("No token found. Please log in.");
         return;
       }
-      console.log("Authorization token:", token); // Debugging log
 
       if (!userId) {
         console.warn("No userId found. Redirecting to login.");
@@ -65,7 +62,6 @@ const CommunityOrganizerMainPage = ({}) => {
   // Refresh data when the screen comes into focus
   useFocusEffect(
     React.useCallback(() => {
-      console.log("Screen focused, refreshing user data");
       fetchUserName();
     }, [])
   );

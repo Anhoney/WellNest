@@ -1,4 +1,4 @@
-//SocialEventsManagement.js
+// CoVolunteerOpportunitiesManagement.js
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -23,7 +23,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 const CoVolunteerOpportunities = () => {
   const navigation = useNavigation();
   const [searchQuery, setSearchQuery] = useState("");
-  const [location, setLocation] = useState("");
   const [activeTab, setActiveTab] = useState("upcomingOpportunities"); // State to manage active tab
   const [co_id, setCo_id] = useState(null);
   const [opportunities, setOpportunities] = useState([]);
@@ -73,7 +72,7 @@ const CoVolunteerOpportunities = () => {
 
   const handleSearch = () => {
     console.log("Search:", searchQuery);
-    // Implement search functionality here
+    // Search functionality
     fetchOpportunities(co_id, searchQuery);
   };
 
@@ -123,7 +122,6 @@ const CoVolunteerOpportunities = () => {
         </TouchableOpacity>
         <TextInput
           style={styles.searchInput}
-          // {styles.searchInput}
           placeholder="Search Opportunity ..."
           value={searchQuery}
           onChangeText={setSearchQuery}
@@ -157,7 +155,6 @@ const CoVolunteerOpportunities = () => {
         </View>
 
         <View style={styles.scrollView}>
-          {/* <ScrollView contentContainerStyle={styles.scrollView}> */}
           {loading ? (
             <ActivityIndicator size="large" color="#0000ff" />
           ) : (
@@ -282,7 +279,6 @@ const CoVolunteerOpportunities = () => {
               )}
             </>
           )}
-          {/* </ScrollView> */}
         </View>
       </View>
       <CoNavigationBar navigation={navigation} activePage="" />

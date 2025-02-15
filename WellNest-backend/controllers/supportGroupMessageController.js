@@ -1,5 +1,7 @@
+//supportGroupMessageController.js
 const pool = require("../config/db");
 
+// Function to add a message to a support group
 const addSupportGroupMesssage = async (req, res) => {
   const { group_id, user_id, message, message_date, message_time } = req.body;
 
@@ -26,6 +28,7 @@ const addSupportGroupMesssage = async (req, res) => {
   }
 };
 
+// Function to fetch messages for a specific support group by group ID
 const getSupportGroupMessageByGroupId = async (req, res) => {
   const { group_id } = req.params;
 
@@ -65,6 +68,7 @@ const getSupportGroupMessageByGroupId = async (req, res) => {
   }
 };
 
+// Function to update an existing support group message
 const updateSupportGroupMessage = async (req, res) => {
   const { message, message_date, message_time } = req.body;
   const { message_id } = req.params;
@@ -91,12 +95,15 @@ const updateSupportGroupMessage = async (req, res) => {
   }
 };
 
+// Function to delete a support group message
 const deleteSupportGroupMessage = async (req, res) => {
   const { message_id } = req.params;
 
-  const query = `DELETE FROM support_group_message
+  const query =
+    // Return the deleted row for confirmation
+    ` DELETE FROM support_group_message
     WHERE id = $1 RETURNING *;
-    `;
+  `;
 
   const values = [message_id];
 

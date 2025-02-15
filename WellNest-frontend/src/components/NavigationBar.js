@@ -1,16 +1,11 @@
-//NavigationBar.js
-// import React from "react";
+// NavigationBar.js
 import React, { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import styles from "./styles";
 import { useNotification } from "../../context/NotificationProvider";
 import { getUserIdFromToken } from "../../services/authService";
-import {
-  useNavigation,
-  useRoute,
-  useFocusEffect,
-} from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 
 const NavigationBar = ({ activePage }) => {
   const route = useRoute();
@@ -21,10 +16,8 @@ const NavigationBar = ({ activePage }) => {
   useEffect(() => {
     const fetchUserId = async () => {
       const userId = await getUserIdFromToken();
-      // console.log("userId:", userId);
       if (userId) {
         setUserId(userId);
-        // fetchProfile(userId);
       }
     };
     fetchUserId();
@@ -45,12 +38,6 @@ const NavigationBar = ({ activePage }) => {
   return (
     <View style={styles.navigationBar}>
       {tabs.map((tab, index) => (
-        // <TouchableOpacity
-        //   key={index}
-        //   onPress={() => navigation.navigate(tab.name)}
-        //   style={styles.tabButton}
-        // >
-
         <TouchableOpacity
           key={index}
           onPress={() => {

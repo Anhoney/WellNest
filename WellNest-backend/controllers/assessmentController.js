@@ -1,6 +1,4 @@
 const pool = require("../config/db");
-
-const { notifyUser } = require("./notificationController");
 const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
@@ -17,13 +15,11 @@ const storage = multer.diskStorage({
     cb(null, "uploads/"); // Ensure this folder exists in your project
   },
   filename: function (req, file, cb) {
-    //   cb(null, `${Date.now()}_${file.originalname}`);
-    // },
+    // Generate a unique filename using the current timestamp and the original file extension
     cb(null, Date.now() + path.extname(file.originalname)); // Generate unique filename
   },
 });
 
-// const upload = multer({ storage: storage });
 const upload = multer({
   storage: storage,
   limits: { fileSize: 5 * 1024 * 1024 }, // Limit file size to 5MB
@@ -37,40 +33,25 @@ const upload = multer({
     if (extname && mimetype) {
       return cb(null, true);
     }
-    cb(new Error("Only image files are allowed!"), false);
+    cb(new Error("Only image files are allowed!"), false); // Reject files that do not match the allowed types
   },
 }); // Define upload but do not call .single here
 
 // Create a new assessment
 const createAssessment = async (req, res) => {
-  const { co_id } = req.params;
-  const { title, questions, photo, scores } = req.body;
-  //   console.log(co_id, title, photo, questions);
-  // For binary data storage
-  // const photo = req.file ? req.file.path : null;
-  // console.log(photo);
-  // let photoData = null;
-  // if (photo) {
-  //   try {
-  //     // Read the image file as binary data
-  //     photoData = fs.readFileSync(photo);
-  //   } catch (error) {
-  //     console.error("Error reading profile image:", error);
-  //     return res.status(500).json({ error: "Failed to read profile image" });
-  //   }
-  // }
+  const { co_id } = req.params; // Get the co_id from the request parameters
+  const { title, questions, photo, scores } = req.body; // Extract assessment details from the request body
+
   try {
+    // Insert the assessment into the database and get the assessment ID
     const assessmentResult = await pool.query(
       "INSERT INTO co_assessments (co_id, title, photo) VALUES ($1, $2, $3) RETURNING assessment_id",
       [co_id, title, photo ? Buffer.from(photo, "base64") : null]
     );
     const assessmentId = assessmentResult.rows[0].assessment_id;
 
+    // Insert questions and their answers into the database
     for (const question of questions) {
-      //   // Validate question and answers
-      //   if (!question.question.trim() || question.answers.length === 0) {
-      //     continue; // Skip this question if it's empty or has no answers
-      //   }
       // Validate question and answers
       if (!question.question || !question.question.trim()) {
         console.warn(`Skipping question: ${question.question}`);
@@ -121,8 +102,9 @@ const createAssessment = async (req, res) => {
 
 // Fetch assessments by co_id
 const getAssessmentsByCoId = async (req, res) => {
-  const { co_id } = req.params;
+  const { co_id } = req.params; // Get the co_id from the request parameters
   try {
+    // Query to fetch assessments associated with the given co_id
     const assessmentsResult = await pool.query(
       `SELECT assessment_id, title, created_at,
        CASE 
@@ -133,13 +115,14 @@ const getAssessmentsByCoId = async (req, res) => {
       [co_id]
     );
 
+    // Map the results to a more usable format
     const assessments = assessmentsResult.rows.map((assessment) => ({
       assessment_id: assessment.assessment_id,
       title: assessment.title,
       photo: assessment.photo ? assessment.photo.toString("base64") : null,
     }));
-    // console.log(assessments);
-    res.status(200).json(assessments);
+
+    res.status(200).json(assessments); // Return the assessments as JSON
   } catch (error) {
     console.error("Error fetching assessments:", error);
     res
@@ -147,10 +130,12 @@ const getAssessmentsByCoId = async (req, res) => {
       .json({ error: "An error occurred while fetching assessments." });
   }
 };
+
 // Fetch a specific assessment by ID
 const getAssessmentById = async (req, res) => {
   const { assessmentId } = req.params;
   try {
+    // Query to fetch the assessment details
     const assessmentResult = await pool.query(
       "SELECT assessment_id, title, photo FROM co_assessments WHERE assessment_id = $1",
       [assessmentId]
@@ -162,13 +147,14 @@ const getAssessmentById = async (req, res) => {
 
     const assessment = assessmentResult.rows[0];
 
+    // Fetch questions associated with the assessment
     const questionsResult = await pool.query(
       `SELECT question_id, question_text
-       
        FROM co_assessment_questions WHERE assessment_id = $1`,
       [assessment.assessment_id]
     );
 
+    // Fetch answers for each question
     const questions = await Promise.all(
       questionsResult.rows.map(async (question) => {
         const answersResult = await pool.query(
@@ -185,6 +171,7 @@ const getAssessmentById = async (req, res) => {
       })
     );
 
+    // Return the assessment details along with its questions and answers
     res.json({
       assessment_id: assessment.assessment_id,
       title: assessment.title,
@@ -250,6 +237,7 @@ const updateAssessment = async (req, res) => {
   }
 };
 
+// Delete an assessment by ID
 const deleteAssessment = async (req, res) => {
   const { assessmentId } = req.params; // Extract assessmentId from request params
 
@@ -292,6 +280,7 @@ const createAssessmentResults = async (req, res) => {
   const { scores } = req.body; // Get scores from request body
 
   try {
+    // Insert each score into the assessment results table
     for (const score of scores) {
       await pool.query(
         "INSERT INTO assessment_results (assessment_id, score_range, result_text) VALUES ($1, $2, $3)",
@@ -312,13 +301,15 @@ const createAssessmentResults = async (req, res) => {
 
 // Fetch assessment results by assessment ID
 const getAssessmentResultsById = async (req, res) => {
-  const { assessmentId } = req.params;
+  const { assessmentId } = req.params; // Get assessment ID from route params
   try {
+    // Query to fetch results associated with the given assessment ID
     const resultsResult = await pool.query(
       "SELECT score_range, result_text FROM assessment_results WHERE assessment_id = $1",
       [assessmentId]
     );
 
+    // Map the results to a more usable format
     const results = resultsResult.rows.map((result) => ({
       range: result.score_range,
       result: result.result_text,
@@ -365,9 +356,10 @@ const updateAssessmentResults = async (req, res) => {
 };
 
 //Elderly
+// Fetch all assessments created by the community organizer
 const getAllAssessments = async (req, res) => {
-  // const { co_id } = req.params;
   try {
+    // Query to fetch all assessments
     const assessmentsResult = await pool.query(
       `SELECT assessment_id, title, created_at,
        CASE 
@@ -377,12 +369,12 @@ const getAllAssessments = async (req, res) => {
         END AS photo FROM co_assessments ORDER BY created_at DESC`
     );
 
+    // Map the results to a more usable format
     const assessments = assessmentsResult.rows.map((assessment) => ({
       assessment_id: assessment.assessment_id,
       title: assessment.title,
       photo: assessment.photo ? assessment.photo.toString("base64") : null,
     }));
-    // console.log(assessments);
     res.status(200).json(assessments);
   } catch (error) {
     console.error("Error fetching assessments:", error);
@@ -538,7 +530,7 @@ const getAssessmentHistory = async (req, res) => {
   }
 };
 
-// Correctly export the function
+// Export the function
 module.exports = {
   createAssessment,
   upload,

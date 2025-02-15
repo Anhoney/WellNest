@@ -1,4 +1,4 @@
-//AppointmentDoctorDetails.js
+// VirtualDoctorDetails.js
 import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
@@ -13,7 +13,6 @@ import {
 import DateTimePickerModal from "react-native-modal-datetime-picker"; // Ensure this is imported
 import styles from "../../components/styles"; // Assuming you have a styles file
 import axios from "axios";
-import { useRoute } from "@react-navigation/native";
 import NavigationBar from "../../components/NavigationBar"; // Import here
 import { Ionicons } from "@expo/vector-icons"; // Import icons from Expo
 import { FontAwesome } from "@expo/vector-icons"; // Import FontAwesome for the heart icon
@@ -24,7 +23,6 @@ import { RadioButton } from "react-native-paper"; // For the radio button
 const VirtualDoctorDetails = ({ route, navigation }) => {
   const { doctorId, selectedDate } = route.params;
   const [doctor, setDoctor] = useState({});
-  //   const [selectedDate, setSelectedDate] = useState("");
   const [availableTimes, setAvailableTimes] = useState([]);
   const [selectedTime, setSelectedTime] = useState("");
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false); // Date picker visibility state
@@ -32,7 +30,6 @@ const VirtualDoctorDetails = ({ route, navigation }) => {
   const isFavorite = favorites.includes(doctorId);
   const [selectedService, setSelectedService] = useState(null);
   const [services, setServices] = useState([]);
-  //   const route = useRoute();
 
   const imageUri = doctor.profile_image
     ? `data:image/png;base64,${doctor.profile_image}`
@@ -63,14 +60,6 @@ const VirtualDoctorDetails = ({ route, navigation }) => {
         if (parsedServices.length > 0) {
           setSelectedService(parsedServices[0]); // Set the first service as default
         }
-        // Extract services from the database JSONB field
-        // const fetchedServices = response.data.services_provide || [];
-        // setServices(fetchedServices);
-
-        // // Auto-select a service if only one is available
-        // if (fetchedServices.length === 1) {
-        //   setSelectedService(fetchedServices[0]);
-        // }
       } catch (error) {
         Alert.alert("Error", "Failed to fetch doctor details.");
         console.error(error);
@@ -93,7 +82,7 @@ const VirtualDoctorDetails = ({ route, navigation }) => {
         );
         const favoriteIds = response.data.map(
           (doctor) => doctor.virtual_availability_id
-        ); // Adjust based on your API response
+        );
         setFavorites(favoriteIds);
       } catch (error) {
         console.error("Error fetching favorites:", error);
@@ -176,7 +165,6 @@ const VirtualDoctorDetails = ({ route, navigation }) => {
 
   // Handle the selected date
   const handleConfirmDate = async (selectedDate) => {
-    // const formattedDate = selectedDate.toISOString().split("T")[0]; // Format to YYYY-MM-DD
     // Format the date as YYYY-MM-DD using local time
     const formattedDate = `${selectedDate.getFullYear()}-${(
       selectedDate.getMonth() + 1
@@ -309,7 +297,6 @@ const VirtualDoctorDetails = ({ route, navigation }) => {
             ) : (
               <Text style={styles.doctorCategory}>No services available</Text>
             )}
-            {/* <Text style={styles.description}>Location: {doctor.location}</Text> */}
             <Text style={styles.doctorRating}>⭐ {doctor.rating || "N/A"}</Text>
           </View>
           <TouchableOpacity
@@ -358,7 +345,6 @@ const VirtualDoctorDetails = ({ route, navigation }) => {
             { key: "DatePicker" },
             { key: "TimeSlots" },
             { key: "NextButton" },
-            // { key: "BookButton" },
           ]}
           keyExtractor={(item) => item.key}
           renderItem={({ item }) => {
@@ -369,7 +355,6 @@ const VirtualDoctorDetails = ({ route, navigation }) => {
                   onPress={() => {
                     navigation.navigate("VirtualDoctorProfileScreen", {
                       doctorId: doctorId, // Assuming item.id is the doctor's ID
-                      // selectedDate: date.toISOString().split("T")[0], // Pass the selected date
                     });
                   }}
                 >
@@ -397,40 +382,6 @@ const VirtualDoctorDetails = ({ route, navigation }) => {
                 </>
               );
             }
-
-            // if (item.key === "Services") {
-            //   return (
-            //     <>
-            //       <Text style={styles.aSectionTitle}>Select Services</Text>
-            //       <View style={styles.displayUnderline} />
-            //       {services.length > 0 ? (
-            //         services.map((service, index) => (
-            //           <TouchableOpacity
-            //             key={index}
-            //             style={[
-            //               styles.serviceOption,
-            //               selectedService?.service === service.service
-            //                 ? styles.selectedServiceOption
-            //                 : null,
-            //             ]}
-            //             onPress={() => setSelectedService(service)}
-            //           >
-            //             <Text style={styles.serviceText}>
-            //               {service.service
-            //                 ? formatServiceName(service.service)
-            //                 : "Service"}{" "}
-            //               - RM {service.price || "N/A"}
-            //             </Text>
-            //           </TouchableOpacity>
-            //         ))
-            //       ) : (
-            //         <Text style={styles.noTimesText}>
-            //           No services available.
-            //         </Text>
-            //       )}
-            //     </>
-            //   );
-            // }
 
             if (item.key === "Services") {
               return (
@@ -470,22 +421,6 @@ const VirtualDoctorDetails = ({ route, navigation }) => {
                 </>
               );
             }
-
-            // if (item.key === "About") {
-            //   return (
-            //     <>
-            //       <Text style={styles.aSectionTitle}>About</Text>
-            //       <View style={styles.displayUnderline} />
-            //       <Text style={styles.sectionContent}>
-            //         📞 {doctor.phone_number || "N/A"}
-            //       </Text>
-            //       <Text style={styles.sectionContent}>
-            //         📍 {doctor.location || "N/A"} {"\n"}{" "}
-            //         {doctor.hospital_address || ""}
-            //       </Text>
-            //     </>
-            //   );
-            // }
 
             if (item.key === "DatePicker") {
               return (
@@ -529,9 +464,7 @@ const VirtualDoctorDetails = ({ route, navigation }) => {
                   <FlatList
                     data={availableTimes}
                     keyExtractor={(time) => time}
-                    renderItem={(
-                      { item } // {renderItem}
-                    ) => (
+                    renderItem={({ item }) => (
                       <TouchableOpacity
                         onPress={() => setSelectedTime(item)}
                         style={[
@@ -557,15 +490,12 @@ const VirtualDoctorDetails = ({ route, navigation }) => {
             }
 
             if (item.key === "NextButton") {
-              // if (item.key === "BookButton") {
               return (
                 <TouchableOpacity
                   style={styles.signOutButton}
                   onPress={handleNext}
-                  // onPress={handleBookAppointment}
                 >
                   <Text style={styles.buttonText}>Next</Text>
-                  {/* <Text style={styles.buttonText}>Book Appointment</Text> */}
                 </TouchableOpacity>
               );
             }

@@ -1,13 +1,11 @@
-//HpPastAppointments.js
-import React, { useEffect, useState } from "react";
+// HpPastAppointments.js
+import React, { useState } from "react";
 import {
   View,
   Text,
   FlatList,
   TouchableOpacity,
-  StyleSheet,
   Alert,
-  ScrollView,
   ImageBackground,
   Image,
 } from "react-native";
@@ -17,7 +15,6 @@ import API_BASE_URL from "../../../config/config";
 import axios from "axios";
 import { getUserIdFromToken } from "../../../services/authService";
 import Ionicons from "react-native-vector-icons/Ionicons";
-import { format } from "date-fns";
 import HpNavigationBar from "../../components/HpNavigationBar"; // Import your custom navigation bar component
 import styles from "../../components/styles"; // Import shared styles
 
@@ -35,7 +32,7 @@ const HpPastAppointments = () => {
   const fetchPastAppointments = async () => {
     try {
       const hpId = await getUserIdFromToken(); // Get healthcare provider ID
-      console.log("hpId:", hpId);
+
       if (!hpId) {
         Alert.alert("Error", "Unable to fetch user information.");
         return;
@@ -56,17 +53,11 @@ const HpPastAppointments = () => {
           const reportExists = await checkMedicalReportExists(
             appointment.hp_app_id
           );
-          // Debugging: Log the report existence for each appointment
-          console.log(
-            `Appointment ID: ${appointment.hp_app_id}, Report Exists: ${reportExists}`
-          );
 
           return { ...appointment, reportExists };
         })
       );
       setAppointments(updatedAppointments);
-      // setAppointments(data);
-      console.log("appointments", data);
     } catch (error) {
       console.error("Error fetching appointments:", error);
       Alert.alert("Error", "Failed to fetch appointments.");
@@ -95,14 +86,10 @@ const HpPastAppointments = () => {
   };
   const checkMedicalReportExists = async (hp_app_id) => {
     try {
-      console.log("checkMedicalReport:", hp_app_id);
       const response = await axios.get(
         `${API_BASE_URL}/medicalReports/check/${hp_app_id}/physical`
       );
-      // Debugging: Log the response from the backend
-      console.log("Response from checkMedicalReportExists:", response.data);
-
-      return response.data.exists; // Assume the API returns { exists: true/false }
+      return response.data.exists;
     } catch (error) {
       console.error("Error checking medical report existence:", error);
       return false; // Default to false in case of an error
@@ -110,11 +97,6 @@ const HpPastAppointments = () => {
   };
 
   const renderAppointment = ({ item }) => {
-    // Log the appointment date for debugging
-    console.log("appointments", item.app_date);
-    // Convert date and time into readable formats
-    //   const formattedDate = item.app_date; // Already formatted by backend
-    //   const formattedTime = item.app_time; // Already formatted by backend
     let imageUri = item.profile_image
       ? item.profile_image // Base64 string returned from the backend
       : "https://via.placeholder.com/150";
@@ -136,22 +118,6 @@ const HpPastAppointments = () => {
           <Text style={styles.details}>Patient: {item.who_will_see}</Text>
           <Text style={styles.details}>Status: {item.app_status}</Text>
 
-          {/* Conditional rendering for the "Write Medical Report" button */}
-          {/* {item.app_status === "approved" && (
-            <TouchableOpacity
-              style={styles.approveButton}
-              onPress={() =>
-                navigation.navigate("MedicalReportWriting", {
-                  appointmentId: item.hp_app_id,
-                })
-              }
-            >
-              <View style={styles.buttonStatusContainer}>
-                <Ionicons name="document-text" size={24} color="#FFFFFF" />
-                <Text style={styles.medicalText}> Write Medical Report</Text>
-              </View>
-            </TouchableOpacity>
-          )} */}
           {/* Conditional rendering for the "Approve" and "Write Medical Report" buttons */}
           {item.app_status === "pending" && (
             <TouchableOpacity
@@ -174,7 +140,6 @@ const HpPastAppointments = () => {
                 })
               }
             >
-              {/* <View style={styles.buttonStatusContainer}> */}
               <View
                 style={[
                   styles.buttonStatusContainer,
@@ -189,7 +154,6 @@ const HpPastAppointments = () => {
                     ? " Edit Medical Report"
                     : " Write Medical Report"}
                 </Text>
-                {/* <Text style={styles.medicalText}> Write Medical Report</Text> */}
               </View>
             </TouchableOpacity>
           )}
@@ -231,41 +195,6 @@ const HpPastAppointments = () => {
   }
 
   return (
-    //     <ImageBackground
-    //       source={require("../../../assets/PlainGrey.png")}
-    //       style={styles.background}
-    //     >
-    //       {/* Title Section with Back chevron-back */}
-    //       <View style={styles.smallHeaderContainer}>
-    //         <TouchableOpacity
-    //           onPress={() => navigation.goBack()}
-    //           style={styles.backButton}
-    //         >
-    //           <Ionicons name="chevron-back" size={24} color="#000" />
-    //         </TouchableOpacity>
-    //         <Text style={styles.hpTitle}>Past Appointments </Text>
-    //       </View>
-    //       {/* <View style={styles.hpContainer}> */}
-    //       <ScrollView contentContainerStyle={styles.hpContainer}>
-    //         <Text style={styles.sectionTitle}>Past Appointments</Text>
-    //         <View style={styles.singleUnderline}></View>
-    //         {loading ? (
-    //           <Text>Loading...</Text>
-    //         ) : (
-    //           <FlatList
-    //             data={appointments}
-    //             keyExtractor={(item) => item.hp_app_id.toString()}
-    //             renderItem={renderAppointment}
-    //             ListEmptyComponent={<Text>No upcoming appointments found.</Text>}
-    //           />
-    //         )}
-    //       </ScrollView>
-    //       {/* </View> */}
-    //       {/* Navigation Bar */}
-    //       <HpNavigationBar navigation={navigation} />
-    //     </ImageBackground>
-    //   );
-    // };
     <View style={{ flex: 1 }}>
       <ImageBackground
         source={require("../../../assets/PlainGrey.png")}
@@ -281,7 +210,6 @@ const HpPastAppointments = () => {
           <Text style={styles.hpTitle}>Past Physical {"\n"} Appointments </Text>
         </View>
         <Text>{"/n"}</Text>
-        {/* <Text style={styles.sectionTitle}>Past Appointments</Text> */}
         <View style={styles.singleUnderline}></View>
         <FlatList
           data={appointments}

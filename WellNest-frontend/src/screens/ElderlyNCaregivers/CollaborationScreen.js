@@ -1,4 +1,4 @@
-//CollaborationScreen.js
+// CollaborationScreen.js
 import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
@@ -6,22 +6,16 @@ import {
   ImageBackground,
   TouchableOpacity,
   FlatList,
-  StyleSheet,
   Image,
-  ScrollView,
-  Modal,
-  Alert,
 } from "react-native";
 import styles from "../../components/styles";
 import { Ionicons } from "@expo/vector-icons";
 import API_BASE_URL from "../../../config/config";
 import axios from "axios";
-import { FontAwesome } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getUserIdFromToken } from "../../../services/authService";
 import NavigationBar from "../../components/NavigationBar";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
-import Icon from "react-native-vector-icons/FontAwesome";
 
 const FamilyCaregiverCollaboration = ({}) => {
   const navigation = useNavigation();
@@ -30,48 +24,6 @@ const FamilyCaregiverCollaboration = ({}) => {
   const [collaborations, setCollaborations] = useState([]); // List of collaborations including accepted and pending
   const [userId, setUserId] = useState(null);
   const [pendingRequests, setPendingRequests] = useState([]);
-  // const [collaborationRequests, setCollaborationRequests] = useState([
-  //   {
-  //     id: "1",
-  //     name: "Karina",
-  //     relationship: "Daughter",
-  //   },
-  // ]); // List of incoming collaboration requests
-
-  // const [acceptedCollaborations, setAcceptedCollaborations] = useState([
-  //   {
-  //     id: "2",
-  //     name: "Jenny",
-  //     role: "Caregiver",
-  //   },
-  // ]); // List of accepted collaborations
-
-  // useEffect(() => {
-  //   const fetchRequests = async () => {
-  //     const token = await AsyncStorage.getItem("token");
-  //     const userId = await getUserIdFromToken(token);
-
-  //     try {
-  //       const response = await axios.get(
-  //         `${API_BASE_URL}/collaborators/requests/${userId}`,
-  //         {
-  //           headers: { Authorization: `Bearer ${token}` },
-  //         }
-  //       );
-  //       setCollaborationRequests(response.data);
-  //     } catch (error) {
-  //       console.error("Error fetching requests:", error);
-  //     }
-  //   };
-
-  //   fetchRequests();
-  // }, []);
-
-  // useEffect(() => {
-  //   getUserIdFromToken().then((userId) => {
-  //     setUserId(userId);
-  //   });
-  // }, []);
 
   useEffect(() => {
     const fetchUserId = async () => {
@@ -82,9 +34,6 @@ const FamilyCaregiverCollaboration = ({}) => {
     fetchUserId();
   }, []);
 
-  // useEffect(() => {
-  //   fetchRequests();
-  // }, [userId]);
   useFocusEffect(
     useCallback(() => {
       fetchRequests();
@@ -99,8 +48,7 @@ const FamilyCaregiverCollaboration = ({}) => {
       console.error("No token found. Please log in.");
       return;
     }
-    // const userId = await getUserIdFromToken(token);
-    console.log("fetch requests userId", userId);
+
     try {
       // Fetch pending requests
       const requestsResponse = await axios.get(
@@ -157,10 +105,7 @@ const FamilyCaregiverCollaboration = ({}) => {
       console.error("No token found. Please log in.");
       return;
     }
-    // const userId = await getUserIdFromToken(token);
-    console.log("fetch requests userId", userId);
-    console.log("Accepting request:", collabId);
-    console.log("Authorization token:", token);
+
     try {
       const response = await axios.put(
         `${API_BASE_URL}/update/accepted/${collabId}`,
@@ -189,10 +134,7 @@ const FamilyCaregiverCollaboration = ({}) => {
       console.error("No token found. Please log in.");
       return;
     }
-    // const userId = await getUserIdFromToken(token);
-    console.log("fetch requests userId", userId);
-    console.log("Accepting request:", collabId);
-    console.log("Authorization token:", token);
+
     try {
       const response = await axios.put(
         `${API_BASE_URL}/${collabId}/decline`,
@@ -208,30 +150,10 @@ const FamilyCaregiverCollaboration = ({}) => {
         );
         await fetchRequests();
       }
-
-      // setCollaborationRequests(
-      //   collaborationRequests.filter((req) => req.collab_id !== collabId)
-      // );
     } catch (error) {
       console.error("Error declining request:", error);
     }
   };
-
-  // const handleAccept = (id) => {
-  //   const acceptedRequest = collaborationRequests.find((req) => req.id === id);
-  //   if (acceptedRequest) {
-  //     setAcceptedCollaborations([...acceptedCollaborations, acceptedRequest]);
-  //     setCollaborationRequests(
-  //       collaborationRequests.filter((req) => req.id !== id)
-  //     );
-  //   }
-  // };
-
-  // const handleDecline = (id) => {
-  //   setCollaborationRequests(
-  //     collaborationRequests.filter((req) => req.id !== id)
-  //   );
-  // };
 
   const renderRequest = () => {
     if (collaborationRequests.length > 0) {
@@ -244,7 +166,6 @@ const FamilyCaregiverCollaboration = ({}) => {
           <View style={styles.buttonRow}>
             <TouchableOpacity
               style={styles.acceptButton}
-              // onPress={navigation.navigate("CaregiverCollabScreen")}
               onPress={() => handleAccept(request.collab_id)}
             >
               <Text style={styles.coButtonText}>Yes</Text>
@@ -264,11 +185,6 @@ const FamilyCaregiverCollaboration = ({}) => {
 
   const renderCollaborationCard = ({ item }) => {
     const handlePress = () => {
-      // if (item.relationship === "Family") {
-      //   navigation.navigate("FamilyCollabScreen", { userId: item.user_id });
-      // } else if (item.relationship === "Caregiver") {
-      //   navigation.navigate("CaregiverCollabScreen", { userId: item.user_id });
-      // }
       const userToCollabId =
         item.user_id === userId ? item.collaborator_id : item.user_id;
       navigation.navigate("FamilyCollabScreen", {
@@ -328,19 +244,9 @@ const FamilyCaregiverCollaboration = ({}) => {
             </Text>
             <View style={styles.displayUnderline}></View>
             <View style={styles.pendingRequestsContainer}>
-              {/* <Text style={styles.pendingRequestsTitle}>
-              Pending Collaboration Requests
-            </Text> */}
               <Text style={styles.pendingRequestText}>
                 You have sent the following collaboration requests:
               </Text>
-              {/* {pendingRequests.map((request) => (
-                <Text key={request.id} style={styles.pendingRequestText}>
-                  {` - ${
-                    request.collaborator_username || request.full_name
-                  } (Relationship: ${request.relationship}) `}
-                </Text>
-              ))} */}
               {pendingRequests.map((request, index) => (
                 <Text
                   key={request.id || `pending-${index}`}
@@ -360,14 +266,6 @@ const FamilyCaregiverCollaboration = ({}) => {
         <FlatList
           data={acceptedCollaborations}
           renderItem={renderCollaborationCard}
-          // keyExtractor={(item) => item.collab_id}
-          // .toString()
-          // keyExtractor={(item) => item.collab_id.toString()}
-          // keyExtractor={(item) =>
-          //   item.collab_id
-          //     ? item.collab_id.toString()
-          //     : item.id || Math.random().toString()
-          // }
           keyExtractor={(item, index) =>
             item.collab_id ? item.collab_id.toString() : `collab-${index}`
           }
@@ -380,14 +278,6 @@ const FamilyCaregiverCollaboration = ({}) => {
         >
           <Text style={styles.connectButtonText}>Connect with others</Text>
         </TouchableOpacity>
-
-        {/* <TouchableOpacity
-          style={styles.acceptButton}
-          onPress={navigation.navigate("CaregiverCollabScreen")}
-          // onPress={() => handleAccept(request.id)}
-        >
-          <Text style={styles.coButtonText}>Testing CaregiverCollabScreen</Text>
-        </TouchableOpacity> */}
       </View>
 
       <NavigationBar navigation={navigation} activePage="" />

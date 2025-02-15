@@ -1,8 +1,10 @@
+//careplanController.js
 const pool = require("../config/db");
+
 // Get all care plans
 const getAllCarePlans = async (req, res) => {
   const { user_id } = req.params;
-  console.log("getAllCarePlans", user_id);
+
   try {
     const result = await pool.query(
       "SELECT cp.*, u.full_name, p.username FROM care_plans cp LEFT JOIN users u ON cp.writer_id = u.id LEFT JOIN profile p ON cp.writer_id = p.user_id WHERE cp.user_id = $1 ORDER BY created_at DESC",
@@ -18,7 +20,7 @@ const getAllCarePlans = async (req, res) => {
 const createCarePlan = async (req, res) => {
   const { user_id } = req.params;
   const { title, plan, writerId } = req.body;
-  console.log("createCarePlan", user_id, title, plan, writerId);
+
   try {
     const result = await pool.query(
       "INSERT INTO care_plans (title, plan, user_id, writer_id) VALUES ($1, $2, $3, $4) RETURNING *",
@@ -52,7 +54,6 @@ const updateCarePlan = async (req, res) => {
     } else {
       res.status(404).json({ message: "Care plan not found." });
     }
-    // res.json(result.rows[0]);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

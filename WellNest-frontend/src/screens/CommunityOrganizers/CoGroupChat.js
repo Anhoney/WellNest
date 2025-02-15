@@ -1,10 +1,8 @@
-//CoChatRoom.js
-//SocialEventsManagement.js
+// CoChatRoom.js
 import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
-  TextInput,
   TouchableOpacity,
   ImageBackground,
   FlatList,
@@ -25,23 +23,17 @@ import axios from "axios";
 
 const CoGroupChat = () => {
   const navigation = useNavigation();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [location, setLocation] = useState("");
-  const [activeTab, setActiveTab] = useState("events"); // State to manage active tab
   const [co_id, setCo_id] = useState(null);
-  const [events, setEvents] = useState([]);
-  const [eventPhoto, setEventPhoto] = useState(null);
   const [loading, setLoading] = useState(false);
   const [chatRooms, setChatRooms] = useState([]);
   const [coChatRooms, setCoChatRooms] = useState([]);
-  const [selectedFilter, setSelectedFilter] = useState("publicChat");
 
   useFocusEffect(
     React.useCallback(() => {
       const fetchUserIdAndEvents = async () => {
         setLoading(true);
         const co_id = await getUserIdFromToken();
-        console.log("co_id", co_id);
+
         if (co_id) {
           setCo_id(co_id);
         }
@@ -67,7 +59,6 @@ const CoGroupChat = () => {
           Authorization: `Bearer ${token}`, // Use your actual token
         },
       });
-      console.log("response.data", response.data);
 
       setChatRooms(response.data);
     } catch (error) {
@@ -92,8 +83,6 @@ const CoGroupChat = () => {
           },
         }
       );
-      console.log("response.data", response.data);
-
       setCoChatRooms(response.data);
     } catch (error) {
       console.log("Error fetching chat room", error);
@@ -128,7 +117,6 @@ const CoGroupChat = () => {
 
       <View style={styles.assessmentContainer}>
         <View style={styles.scrollView}>
-          {/* <ScrollView contentContainerStyle={styles.scrollView}> */}
           {loading ? (
             <ActivityIndicator size="large" color="#0000ff" />
           ) : (
@@ -148,7 +136,6 @@ const CoGroupChat = () => {
                     title={room.group_name}
                     group_photo={room.group_photo}
                     fetchChatRoom={fetchMyChatRoom}
-                    // onJoin={() => alert(`Joining ${room.group_name}`)}
                     onJoin={() =>
                       navigation.navigate("chatRoom", {
                         group_id: room.id,

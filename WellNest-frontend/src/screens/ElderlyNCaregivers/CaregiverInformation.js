@@ -1,4 +1,4 @@
-//CaregiverInformation.js
+// CaregiverInformation.js
 import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
@@ -12,11 +12,10 @@ import { Ionicons } from "@expo/vector-icons"; // Import icons from Expo
 import axios from "axios";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import styles from "../../components/styles";
-import NavigationBar from "../../components/NavigationBar"; // Import your custom navigation bar component
+import NavigationBar from "../../components/NavigationBar"; // Import custom navigation bar component
 import { useRoute } from "@react-navigation/native";
 import API_BASE_URL from "../../../config/config";
 import { Buffer } from "buffer";
-import { FontAwesome } from "@expo/vector-icons"; // Import FontAwesome for the heart icon
 import { getUserIdFromToken } from "../../../services/authService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -29,8 +28,6 @@ const CaregiverInformation = () => {
   const [profile_image, setProfile_image] = useState(null);
   const [title, setTitle] = useState("Caregiver Information");
 
-  console.log("CaregiverProfileScreen Caregiver ID:", caregiverId);
-
   useEffect(() => {
     fetchCaregiverProfile();
   }, [caregiverId]);
@@ -42,7 +39,6 @@ const CaregiverInformation = () => {
       return;
     }
     try {
-      console.log("frontend caregiver Id:", caregiverId);
       const response = await axios.get(
         `${API_BASE_URL}/get/caregiver/details/${caregiverId}`,
         {
@@ -69,7 +65,6 @@ const CaregiverInformation = () => {
       if (response.data.profile_image) {
         const data = response.data;
 
-        // setProfileImage(data.profile_image || null); // Set base64 profile image or null
         // Check if profile_image is a Buffer
         if (data.profile_image && data.profile_image.type === "Buffer") {
           const byteArray = data.profile_image.data; // Access the data property of the Buffer
@@ -77,10 +72,9 @@ const CaregiverInformation = () => {
           // Use Buffer to convert to Base64
           const base64String = Buffer.from(byteArray).toString("base64");
           const imageUri = `data:image/jpeg;base64,${base64String}`;
-          console.log("Profile Image URI:", imageUri);
+
           setProfile_image(imageUri);
         } else {
-          console.log("No valid profile image found.");
           setProfile_image(null);
         }
       }
@@ -99,10 +93,6 @@ const CaregiverInformation = () => {
   if (!caregiver) {
     return <Text style={styles.loadingText}>Loading...</Text>;
   }
-
-  //   const imageUri = caregiver.profile_image
-  //     ? `data:image/png;base64,${caregiver.profile_image}`
-  //     : "https://via.placeholder.com/150";
 
   return (
     <ImageBackground
@@ -137,12 +127,7 @@ const CaregiverInformation = () => {
       <View style={styles.uAcontainer}>
         <View style={styles.whiteUAcontainer}>
           <ScrollView
-            // style={styles.container}
-            contentContainerStyle={
-              styles.scrollViewContent
-              // alignItems: "center",
-              // justifyContent: "flex-start",
-            } // Move layout styles here
+            contentContainerStyle={styles.scrollViewContent} // Move layout styles here
           >
             <Text style={styles.aSectionTitle}>ID</Text>
             <View style={styles.displayUnderline} />
@@ -164,11 +149,6 @@ const CaregiverInformation = () => {
               {caregiver.address || "N/A"}
             </Text>
 
-            {/* <Text style={styles.aSectionTitle}>Core Qualifications</Text>
-            <View style={styles.displayUnderline} />
-            <Text style={styles.sectionContent}>
-              {caregiver.core_qualifications}
-            </Text> */}
             {caregiver.core_qualifications && (
               <>
                 <Text style={styles.aSectionTitle}>Core Qualifications</Text>
@@ -193,14 +173,6 @@ const CaregiverInformation = () => {
                 <Text style={styles.sectionContent}>{caregiver.email}</Text>
               </>
             )}
-
-            {/* <Text style={styles.aSectionTitle}>Education</Text>
-            <View style={styles.displayUnderline} />
-            <Text style={styles.sectionContent}>{caregiver.education}</Text>
-
-            <Text style={styles.aSectionTitle}>Email</Text>
-            <View style={styles.displayUnderline} />
-            <Text style={styles.sectionContent}>{caregiver.email}</Text> */}
           </ScrollView>
         </View>
       </View>

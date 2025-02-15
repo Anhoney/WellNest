@@ -1,4 +1,4 @@
-//NavigationBar.js
+// NavigationBar.js
 import React from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
@@ -7,7 +7,6 @@ import styles from "./styles"; // Assuming you have your styles.js setup
 const NavigationBar = ({ navigation, activePage }) => {
   const tabs = [
     { name: "CommunityOrganizerMainPage", label: "Home", icon: "home-outline" },
-    // { name: "Schedule", label: "Schedule", icon: "calendar-outline" },
     { name: "CoGroupChat", label: "Chat", icon: "chatbubble-ellipses-outline" },
     {
       name: "Notifications",

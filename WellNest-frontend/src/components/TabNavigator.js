@@ -1,3 +1,4 @@
+// TabNavigator.js
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 
@@ -42,8 +43,6 @@ const styles = StyleSheet.create({
     borderBottomColor: "#000",
   },
   tabText: {
-    // fontSize: 16,
-    // fontWeight: "bold",
     fontSize: 14, // Adjust the font size as necessary
     textAlign: "center",
   },

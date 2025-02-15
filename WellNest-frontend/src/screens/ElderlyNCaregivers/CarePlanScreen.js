@@ -1,14 +1,11 @@
-import React, { useEffect, useState, useCallback } from "react";
+// CarePlanScreen.js
+import React, { useState, useCallback } from "react";
 import {
   View,
   Text,
   Image,
-  TextInput,
-  Button,
   TouchableOpacity,
   FlatList,
-  StyleSheet,
-  ActivityIndicator,
   ImageBackground,
 } from "react-native";
 import axios from "axios";
@@ -82,12 +79,6 @@ const CarePlanScreen = () => {
       };
     }, [userId]) // Dependency array includes userId
   );
-  //   useEffect(() => {
-  //     if (userId) {
-  //       fetchCarePlans(userId);
-  //       fetchUserData(userId); // Pass userId to the function
-  //     }
-  //   }, [userId]); // Dependency array includes userId
 
   const fetchCarePlans = async () => {
     const token = await AsyncStorage.getItem("token");
@@ -98,7 +89,6 @@ const CarePlanScreen = () => {
     }
 
     try {
-      console.log("fetchCarePlan", userId);
       const response = await axios.get(
         `${API_BASE_URL}/careplan/${userId}`,
 
@@ -112,17 +102,6 @@ const CarePlanScreen = () => {
     }
   };
 
-  /*************  ✨ Codeium Command ⭐  *************/
-  /**
-   * Renders a care plan card with title and plan details.
-   * Provides an option to navigate to the edit screen for the given care plan item.
-   *
-   * @param {Object} item - The care plan item to render.
-   * @param {string} item.title - The title of the care plan.
-   * @param {string} item.plan - The details of the care plan.
-   */
-
-  /******  c472b9a7-9bc9-41cc-b3fd-da5a94f31e8b  *******/
   const renderCarePlan = ({ item }) => (
     <View style={styles.cpCard}>
       <Text style={styles.cpTitle}>{item.title}</Text>
@@ -170,15 +149,12 @@ const CarePlanScreen = () => {
         <Text style={[{ marginLeft: -35 }, styles.userName]}>
           {userData.name || "User"}
         </Text>
-        {/* <Text style={[styles.userAgeNGender, { marginTop: -15 }]}> */}
         <Text style={[{ marginBottom: -100 }, styles.userAgeNGender]}>
           Gender: {userData.gender || "N/A"}
         </Text>
         <Text style={[styles.userAgeNGender]}>
-          {/* <Text style={[styles.userAgeNGender, { marginTop: -15 }]}> */}
           Age: {userData.age || "N/A"} Years Old
         </Text>
-        {/* </View> */}
       </View>
 
       <View style={styles.cpContainer}>
@@ -187,7 +163,6 @@ const CarePlanScreen = () => {
           keyExtractor={(item) =>
             item.id ? item.id.toString() : Math.random().toString()
           } // Provide a fallback
-          //   keyExtractor={(item) => item.id.toString()}
           renderItem={renderCarePlan}
           ListEmptyComponent={renderEmptyComponent}
           contentContainerStyle={styles.cpContentContainer}
@@ -207,27 +182,3 @@ const CarePlanScreen = () => {
 };
 
 export default CarePlanScreen;
-
-// const styles = StyleSheet.create({
-//   container: { flex: 1, padding: 20 },
-//   card: {
-//     backgroundColor: "#f9f9f9",
-//     padding: 15,
-//     marginBottom: 10,
-//     borderRadius: 8,
-//   },
-//   title: { fontSize: 18, fontWeight: "bold" },
-//   edit: { color: "blue", marginTop: 10 },
-//   addButton: {
-//     backgroundColor: "#FFA500",
-//     position: "absolute",
-//     right: 20,
-//     bottom: 20,
-//     width: 50,
-//     height: 50,
-//     borderRadius: 25,
-//     justifyContent: "center",
-//     alignItems: "center",
-//   },
-//   addButtonText: { fontSize: 30, color: "white" },
-// });

@@ -1,3 +1,4 @@
+// VirtualBookingDetails.js
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -9,12 +10,9 @@ import {
   Image,
   Alert,
 } from "react-native";
-import { Picker } from "@react-native-picker/picker"; // New import
 import { Ionicons } from "@expo/vector-icons"; // Import icons from Expo
-import { FontAwesome } from "@expo/vector-icons"; // Import FontAwesome for the heart icon
 import { RadioButton } from "react-native-paper";
 import styles from "../../components/styles"; // Import your custom styles
-// import DoctorCard from "../../components/DoctorCard"; // Reuse doctor card component
 import API_BASE_URL from "../../../config/config";
 import axios from "axios";
 import NavigationBar from "../../components/NavigationBar";
@@ -25,17 +23,15 @@ const VirtualBookingDetails = ({ route, navigation }) => {
   const { doctorId, selectedService, selectedDate, selectedTime } =
     route.params; // Retrieve passed data
   const [doctor, setDoctor] = useState({});
-  const [medicalCoverage, setMedicalCoverage] = useState("No");
   const [symptoms, setSymptoms] = useState("");
   const [allergies, setAllergies] = useState("No");
   const [specificAllergies, setSpecificAllergies] = useState("");
-  const [reason, setReason] = useState("");
   const [whoWillSee, setWhoWillSee] = useState("Me");
   const [patientSeenBefore, setPatientSeenBefore] = useState("New Patient");
   const [note, setNote] = useState("");
   const [userId, setUserId] = useState(null);
   const [services, setServices] = useState([]);
-  // console.log("Services passed:", selectedService);
+
   const commonSymptoms = [
     "Allergies",
     "Back pain",
@@ -51,7 +47,6 @@ const VirtualBookingDetails = ({ route, navigation }) => {
     "Urinary Complaints",
   ];
 
-  // console.log("BookAppointmentDetailsScreen doctorId:", doctorId);
   const imageUri = doctor.profile_image
     ? `data:image/png;base64,${doctor.profile_image}`
     : "https://via.placeholder.com/150";
@@ -59,10 +54,9 @@ const VirtualBookingDetails = ({ route, navigation }) => {
   useEffect(() => {
     const fetchUserId = async () => {
       const userId = await getUserIdFromToken();
-      // console.log("userId:", userId);
+
       if (userId) {
         setUserId(userId);
-        // fetchProfile(userId);
       }
     };
 
@@ -73,7 +67,7 @@ const VirtualBookingDetails = ({ route, navigation }) => {
           alert("No token found. Please log in.");
           return;
         }
-        console.log("Authorization token:", token); // Debugging log
+
         const response = await axios.get(
           `${API_BASE_URL}/virtual/doctor/${doctorId}`
         );
@@ -129,7 +123,6 @@ const VirtualBookingDetails = ({ route, navigation }) => {
   };
   const fetchUserDetails = async (userId) => {
     try {
-      // console.log("fetchUserDetailsuserId:", userId);
       const token = await AsyncStorage.getItem("token");
       const response = await fetch(`${API_BASE_URL}/profile/${userId}`, {
         headers: {

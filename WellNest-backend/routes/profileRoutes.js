@@ -9,9 +9,9 @@ const {
 } = require("../controllers/profileController");
 const authenticateToken = require("../middleware/authMiddleware");
 
+// Route to get a user's profile by user ID
 router.get("/profile/:userId", authenticateToken, getHpProfile);
 
-// router.put("/hp-profile/:userId", authenticateToken, updateHpProfile);
 // PUT update profile data including image upload
 router.put(
   "/profile/:userId",
@@ -20,12 +20,7 @@ router.put(
   updateHpProfile
 );
 
+// Route to delete a user account
 router.delete("/deleteAccount/:userId", deleteAccount);
-// Route to update profile, apply `upload.single` here
-// router.post(
-//   "/profile/:userId",
-//   upload.single("profile_image"), // Apply `single` directly
-//   updateHpProfile
-// );
 
 module.exports = router;

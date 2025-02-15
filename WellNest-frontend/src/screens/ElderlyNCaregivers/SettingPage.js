@@ -1,4 +1,4 @@
-// import React from "react";
+// SettingPage.js
 import React, { useContext, useState, useEffect } from "react";
 import {
   View,
@@ -8,7 +8,6 @@ import {
   ImageBackground,
   Alert,
 } from "react-native";
-import * as ImagePicker from "expo-image-picker";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import styles from "../../components/styles"; // Import shared styles
 import NavigationBar from "../../components/NavigationBar"; // Import here
@@ -31,7 +30,7 @@ const SettingPage = () => {
 
   const fetchUserId = async () => {
     const userId = await getUserIdFromToken();
-    console.log("userId:", userId);
+
     if (userId) {
       setUserId(userId);
       fetchProfileData(userId);
@@ -40,19 +39,16 @@ const SettingPage = () => {
 
   // Fetch the profile data, including the profile image
   const fetchProfileData = async (userId) => {
-    console.log("setting Fetching profile data for user ID:", userId);
     if (!userId) {
       console.error("User ID is missing");
       return;
     }
     try {
-      console.log("Fetching profile data for user ID:", userId);
       const token = await AsyncStorage.getItem("token");
       if (!token) {
         alert("No token found. Please log in.");
         return;
       }
-      console.log("Authorization token:", token); // Debugging log
       const response = await axios.get(`${API_BASE_URL}/profile/${userId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -60,7 +56,6 @@ const SettingPage = () => {
       if (response.data) {
         const data = response.data;
         setUsername(data.username || data.full_name || "");
-        // setProfileImage(data.profile_image || null); // Set base64 profile image or null
         // Check if profile_image is a Buffer
         if (data.profile_image && data.profile_image.type === "Buffer") {
           const byteArray = data.profile_image.data; // Access the data property of the Buffer
@@ -68,10 +63,9 @@ const SettingPage = () => {
           // Use Buffer to convert to Base64
           const base64String = Buffer.from(byteArray).toString("base64");
           const imageUri = `data:image/jpeg;base64,${base64String}`;
-          // console.log("Profile Image URI:", imageUri);
+
           setProfile_image(imageUri);
         } else {
-          console.log("No valid profile image found.");
           setProfile_image(null);
         }
       }
@@ -89,10 +83,6 @@ const SettingPage = () => {
     }, [])
   );
 
-  // useEffect(() => {
-  //   fetchUserId();
-  // }, []);
-
   const handleSignOut = () => {
     Alert.alert(
       "Confirm Sign Out",
@@ -109,7 +99,6 @@ const SettingPage = () => {
               await logout(); // Log out function from AuthContext
               handleClearInterval();
               navigation.navigate("LoginPage");
-              // await logout(navigation); // Log out function from AuthContext
             } catch (error) {
               console.error("Error signing out:", error);
             }
@@ -168,20 +157,6 @@ const SettingPage = () => {
       { cancelable: false } // Prevent closing the alert by tapping outside
     );
   };
-  // Sign Out Function
-  // const handleSignOut = async () => {
-  //   try {
-  //     // Remove token from AsyncStorage
-  //     await AsyncStorage.removeItem("authToken");
-  //     // Navigate back to the login page
-  //     navigation.reset({
-  //       index: 0,
-  //       routes: [{ name: "LoginPage" }],
-  //     });
-  //   } catch (error) {
-  //     console.error("Error signing out:", error);
-  //   }
-  // };
 
   return (
     <ImageBackground

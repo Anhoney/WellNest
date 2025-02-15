@@ -1,10 +1,10 @@
+// AppointmentConfirmationScreen.js
 import React, { useState } from "react";
 import {
   View,
   Text,
   TouchableOpacity,
   Image,
-  StyleSheet,
   Alert,
   ImageBackground,
   ScrollView,
@@ -29,7 +29,7 @@ const AppointmentConfirmationScreen = ({ route, navigation }) => {
     note,
     userDetails, // Retrieved from the user profile
   } = route.params;
-  console.log("doctorId:", doctorId);
+
   const imageUri = doctor.profile_image
     ? `data:image/png;base64,${doctor.profile_image}`
     : "https://via.placeholder.com/150";
@@ -54,13 +54,10 @@ const AppointmentConfirmationScreen = ({ route, navigation }) => {
       whoWillSee: whoWillSee,
       patientSeenBefore: patientSeenBefore,
       app_sickness: reason,
-      //   app_description
-      //   app_address: doctor.location,
       note: note,
     };
 
     try {
-      console.log("bookingDetails:", bookingDetails);
       const response = await fetch(`${API_BASE_URL}/bookAppointment`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -80,19 +77,6 @@ const AppointmentConfirmationScreen = ({ route, navigation }) => {
         setAppointmentId(result.appointmentId);
         // Show success modal
         setModalVisible(true);
-        // Alert.alert(
-        //   "Success",
-        //   `Appointment scheduled successfully for:\n${selectedDate}, ${selectedTime}`,
-        //   [
-        //     {
-        //       text: "Close",
-        //       onPress: () => navigation.navigate("AppointmentHistory"),
-        //     },
-        //   ]
-        // );
-        // Store the appointment ID for navigation
-        // const appointmentId = result.appointmentId; // Get the appointment ID from the response
-        // console.log("Appointment ID:", appointmentId);
       } else {
         alert(result.error || "Failed to book appointment");
       }
@@ -104,7 +88,7 @@ const AppointmentConfirmationScreen = ({ route, navigation }) => {
 
   const handleCloseModal = () => {
     setModalVisible(false);
-    console.log("appointmentId:", appointmentId);
+
     if (appointmentId) {
       navigation.navigate("HistoryAppDetails", {
         appointmentId: appointmentId,
@@ -183,11 +167,6 @@ const AppointmentConfirmationScreen = ({ route, navigation }) => {
                 <Text style={styles.tableCell}>{note || "N/A"}</Text>
               </View>
             </View>
-            {/* <Text>Medical Coverage: {medicalCoverage}</Text>
-            <Text>Reason: {reason}</Text>
-            <Text>Customer Name: {userDetails.full_name}</Text>
-            <Text>Gender: {userDetails.gender}</Text>
-            <Text>Notes: {note}</Text> */}
             <TouchableOpacity
               style={styles.signOutButton}
               onPress={handleConfirmAppointment}

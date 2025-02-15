@@ -31,7 +31,6 @@ import HistoryAppDetails from "../src/screens/ElderlyNCaregivers/HistoryAppDetai
 import VirtualCategoryDoctorsScreen from "../src/screens/ElderlyNCaregivers/VirtualCategoryDoctorsScreen";
 import VirtualDoctorDetails from "../src/screens/ElderlyNCaregivers/VirtualDoctorDetails";
 import VirtualBookingDetails from "../src/screens/ElderlyNCaregivers/VirtualBookingDetails";
-// import VirtualConfirmationScreen from "../src/screens/ElderlyNCaregivers/VirtualConfirmationScreen";
 import VirtualDoctorProfileScreen from "../src/screens/ElderlyNCaregivers/VirtualDoctorProfileScreen";
 import {
   VirtualConfirmationScreen,
@@ -58,8 +57,6 @@ import GroupChat from "../src/screens/ElderlyNCaregivers/GroupChat";
 import HealthcareProviderMainPage from "../src/screens/HealthcareProvider/HealthcareProviderMainPage";
 import HpAppointmentManagementPage from "../src/screens/HealthcareProvider/HpAppointmentManagementPage";
 import HpAppointmentCreationPage from "../src/screens/HealthcareProvider/HpAppointmentCreationPage";
-import HpMyCreatedAppointments from "../src/screens/HealthcareProvider/HpMyCreatedAppointments";
-import HpAppointmentEditPage from "../src/screens/HealthcareProvider/HpAppointmentEditPage";
 import HpProfilePage from "../src/screens/HealthcareProvider/HpProfilePage";
 import HpEditProfilePage from "../src/screens/HealthcareProvider/HpEditProfilePage";
 import HpUpcomingAppointments from "../src/screens/HealthcareProvider/HpUpcomingAppointments";
@@ -164,16 +161,6 @@ const AppNavigator = () => (
         name="HpAppointmentCreationPage"
         component={HpAppointmentCreationPage}
         options={{ title: "AppointmentCreation" }}
-      />
-      <Stack.Screen
-        name="HpMyCreatedAppointments"
-        component={HpMyCreatedAppointments}
-        options={{ title: "MyCreatedAppointments" }}
-      />
-      <Stack.Screen
-        name="HpAppointmentEditPage"
-        component={HpAppointmentEditPage}
-        options={{ title: "AppointmentEditPage" }}
       />
       <Stack.Screen
         name="HpProfilePage"

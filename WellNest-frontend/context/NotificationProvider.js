@@ -1,4 +1,4 @@
-//NotificationProvider.js
+// NotificationProvider.js
 import React, {
   createContext,
   useState,
@@ -9,18 +9,15 @@ import React, {
 import axios from "axios";
 import API_BASE_URL from "../config/config";
 import { getUserIdFromToken } from "../services/authService";
-// import scheduleNotification from "../src/utils/notificationUtils";
-// import {
-//   scheduleNotification,
-//   requestNotificationPermissions,
-// } from "../src/utils/notificationUtils";
 
+// Create a context for notifications
 const NotificationContext = createContext();
 
+// NotificationProvider component that provides notification-related data and functions
 export const NotificationProvider = ({ children }) => {
-  const [unreadCount, setUnreadCount] = useState(0);
-  const [userId, setUserId] = useState(null);
-  const intervalRef = useRef(null);
+  const [unreadCount, setUnreadCount] = useState(0); // State to track unread notification count
+  const [userId, setUserId] = useState(null); // State to store the user ID
+  const intervalRef = useRef(null); // Ref to store the interval ID for fetching notifications periodically
 
   // Fetch notifications from the server
   const fetchNotifications = async () => {
@@ -30,11 +27,6 @@ export const NotificationProvider = ({ children }) => {
       const response = await axios.get(
         `${API_BASE_URL}/notifications/${userId}`
       );
-
-      // Example: Schedule notifications based on server response
-      // response.data.notifications.forEach((notification) => {
-      //   scheduleNotification(notification.time, notification.message);
-      // });
 
       // Update unread count
       fetchUnreadCount(userId);
@@ -46,16 +38,13 @@ export const NotificationProvider = ({ children }) => {
     }
   };
 
+  // Function to fetch the unread notification count
   const fetchUnreadCount = async (userId) => {
     try {
       const response = await axios.get(
         `${API_BASE_URL}/notifications/unread-count/${userId}`
       );
       setUnreadCount(response.data.unreadCount);
-      // console.log(
-      //   `Fetched unread count for userId ${userId}:`,
-      //   response.data.unreadCount
-      // ); // Debug log
     } catch (error) {
       console.error(
         "Error fetching unread count:",
@@ -64,6 +53,7 @@ export const NotificationProvider = ({ children }) => {
     }
   };
 
+  // Function to mark notifications as read
   const markAsRead = async (notificationIds) => {
     try {
       await axios.put(`${API_BASE_URL}/notifications/mark-as-read`, {
@@ -73,11 +63,6 @@ export const NotificationProvider = ({ children }) => {
       setUnreadCount((prevCount) =>
         Math.max(prevCount - notificationIds.length, 0)
       );
-
-      // Optionally re-fetch to confirm the unread count is accurate
-      if (userId) {
-        // fetchUnreadCount(userId);
-      }
     } catch (error) {
       console.error(
         "Error marking notifications as read:",
@@ -86,19 +71,19 @@ export const NotificationProvider = ({ children }) => {
     }
   };
 
+  // Function to initialize the notification fetching interval
   const initializeInterval = async () => {
     const fetchedUserId = await getUserIdFromToken();
     setUserId(fetchedUserId);
     if (fetchedUserId) {
       fetchNotifications();
-      console.log(fetchedUserId);
       fetchUnreadCount(fetchedUserId);
       intervalRef.current = setInterval(() => {
-        // console.log(fetchedUserId);
         fetchNotifications();
         fetchUnreadCount(fetchedUserId);
-      }, 3000);
-      // return () => clearInterval(interval);
+      }, 3000); // Fetch notifications every 3 seconds
+
+      // Cleanup function to clear the interval when component unmounts
       return () => {
         if (intervalRef.current) {
           clearInterval(intervalRef.current);
@@ -107,37 +92,20 @@ export const NotificationProvider = ({ children }) => {
     }
   };
 
+  // Function to manually clear the interval
   const handleClearInterval = () => {
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
     }
   };
 
-  // useEffect(() => {
-  //   const initialize = async () => {
-  //     const fetchedUserId = await getUserIdFromToken();
-  //     setUserId(fetchedUserId);
-  //     console.log("Fetched userId from token:", userId); // Debug log
-  //     if (fetchedUserId) {
-  //       console.log(fetchedUserId);
-  //       fetchUnreadCount(fetchedUserId);
-  //       // const interval = setInterval(() => {
-  //       //   console.log(fetchedUserId);
-  //       //   fetchUnreadCount(fetchedUserId);
-  //       // }, 3000);
-  //       // return () => clearInterval(interval);
-  //     }
-  //   };
-  //   initialize();
-  // }, []);
-
   return (
     <NotificationContext.Provider
       value={{
-        unreadCount,
-        markAsRead,
-        initializeInterval,
-        handleClearInterval,
+        unreadCount, // Number of unread notifications
+        markAsRead, // Function to mark notifications as read
+        initializeInterval, // Function to start fetching notifications periodically
+        handleClearInterval, // Function to stop fetching notifications
       }}
     >
       {children}
@@ -145,4 +113,5 @@ export const NotificationProvider = ({ children }) => {
   );
 };
 
+// Custom hook to use the NotificationContext
 export const useNotification = () => useContext(NotificationContext);

@@ -1,3 +1,4 @@
+// routes/collaboratorsRoutes.js
 const express = require("express");
 const router = express.Router();
 const {
@@ -40,12 +41,14 @@ router.get(
   getAllAcceptedCollaborations
 );
 
+// Route to get user details for collaboration
 router.get(
   "/user/details/:userToCollabId",
   authenticateToken,
   getUserDetailsForCollaboration
 );
 
+// Route to get caregiver information
 router.get(
   "/get/caregiver/details/:caregiverId",
   authenticateToken,

@@ -16,8 +16,10 @@ const {
 } = require("../controllers/medicationController");
 const authenticateToken = require("../middleware/authMiddleware");
 
+// Configure multer for handling file uploads (medicine images)
 const upload = multer({ dest: "uploads/" }); // Set the destination for uploaded files
-// router.delete("/appointments/:id", authenticateToken, deleteAppointment);
+
+// Route to create a new medication reminder
 router.post(
   "/medication",
   authenticateToken,
@@ -25,52 +27,44 @@ router.post(
   createReminder
 );
 
+// Route to update an existing medication reminder by medication ID
 router.put(
   "/user/medication/:medicationId",
   authenticateToken,
   upload.single("medicineImage"),
   updateReminder
 );
+
+// Route to get all medications for a specific user by user ID
 router.get("/get/medication/:userId", authenticateToken, getMedications);
-// routes/medicationRoutes.js
+
+// Route to fetch a single medication by medication ID
 router.get(
   "/getSingle/medication/:medicationId",
   authenticateToken,
   getMedicationById
 );
+
+// Route to delete a medication reminder by medication ID
 router.delete(
   "/delete/medication/:medicationId",
   authenticateToken,
   deleteReminder
 );
 
+// Route to update the status of a medication by medication ID
 router.patch("/update-status/:medicationId", updateMedicationStatus);
 
-//Alarm
-// Fetch all medications
+// Route to fetch medications based on their status (e.g., pending, completed)
 router.get("/get/medications", getMedicationsByStatus);
 
 // Update medication status
 router.put("/medications/:id/status", updateMedicationStatusCompleted);
 
+// Route to stop a medication alarm
 router.post("/stop-alarm", stopAlarm);
+
+// Route to snooze a medication alarm for a specified duration
 router.post("/snooze-alarm", snoozeAlarm);
-
-// router.get(
-//   "/medicalReports/:appointment_id",
-//   authenticateToken,
-//   getMedicalReport
-// );
-// router.delete("/medicalReports/delete/:appointment_id", deleteMedicalReport);
-// router.get(
-//   "/medicalReports/check/:hpva_id/:appointment_type",
-//   checkMedicalReportExists
-// );
-
-// router.get(
-//   "/user/medicalReports/:userId",
-//   authenticateToken,
-//   getUserMedicalReports
-// );
 
 module.exports = router;

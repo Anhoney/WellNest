@@ -1,11 +1,10 @@
+// MedicalReport.js
 import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
   FlatList,
-  StyleSheet,
   TouchableOpacity,
-  ScrollView,
   ImageBackground,
   Image,
 } from "react-native";
@@ -15,37 +14,20 @@ import API_BASE_URL from "../../../config/config";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { getUserIdFromToken } from "../../../services/authService";
 import NavigationBar from "../../components/NavigationBar";
-import {
-  useNavigation,
-  useRoute,
-  useFocusEffect,
-} from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 
 const MedicalReport = () => {
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
-  // const [userId, setUserId] = useState(null);
   const navigation = useNavigation();
   const route = useRoute();
   const { userId } = route.params;
-  // console.log(reports);
 
   useEffect(() => {
-    // const fetchUserId = async () => {
-    // const userId = await getUserIdFromToken();
-    // console.log("userId:", userId);
     if (userId) {
-      // setUserId(userId);
-      // fetchProfile(userId);
       fetchMedicalReports(userId);
     }
-    // };
-    // fetchUserId();
   }, []);
-
-  // useEffect(() => {
-  //   fetchMedicalReports();
-  // }, []);
 
   const fetchMedicalReports = async (userId) => {
     try {
@@ -66,7 +48,6 @@ const MedicalReport = () => {
         throw new Error("Failed to fetch medical reports");
       }
       const data = await response.json();
-      console.log(data);
       setReports(data);
     } catch (error) {
       console.error("Error fetching medical reports:", error);
@@ -74,20 +55,6 @@ const MedicalReport = () => {
       setLoading(false);
     }
   };
-
-  // const renderMedicineList = (medicines) => {
-  //   return medicines.map((medicine, index) => (
-  //     <View
-  //       key={`${medicine.medicine_id}-${index}`}
-  //       style={styles.medicineContainer}
-  //     >
-  //       {/* <View key={index} style={styles.medicineContainer}> */}
-  //       <Text style={styles.medicineText}>
-  //         {medicine.medicine_name} - {medicine.dosage} ({medicine.duration})
-  //       </Text>
-  //     </View>
-  //   ));
-  // };
 
   const renderMedicineList = (medicines) => {
     return medicines.map((medicine) => (
@@ -108,7 +75,6 @@ const MedicalReport = () => {
           ? item.hpva_date
           : item.app_date}
         {" | "}
-        {/* Appointment Time:{" "} */}
         {item.appointment_type.toLowerCase() === "virtual"
           ? item.hpva_time
           : item.app_time}
@@ -125,13 +91,6 @@ const MedicalReport = () => {
         Appointment Type: {item.appointment_type} Appointment
       </Text>
 
-      {/* <Text style={styles.medicineHeader}>Medicines:</Text>
-      {item.medicines && item.medicines.length > 0 ? (
-        renderMedicineList(item.medicines)
-      ) : (
-        <Text style={styles.noMedicines}>No medicines prescribed</Text>
-      )} */}
-
       <View style={styles.largeMedicineContainer}>
         <Text style={styles.medicineHeader}>Medicines:</Text>
         {item.medicines && item.medicines.length > 0 ? (
@@ -147,9 +106,6 @@ const MedicalReport = () => {
     return <Text>Loading...</Text>;
   }
 
-  // if (reports.length === 0) {
-  //   return <Text>No medical reports available.</Text>;
-  // }
   // If there are no reports, show the image and message
   if (reports.length === 0) {
     return (
@@ -199,7 +155,6 @@ const MedicalReport = () => {
       <View style={{ flex: 1, paddingBottom: 10 }}>
         <FlatList
           data={reports}
-          // keyExtractor={(item, index) => `${item.report_id}-${index}`} // Combine `report_id` and index for uniqueness
           keyExtractor={(item) => item.report_id.toString()}
           renderItem={renderReport}
           contentContainerStyle={styles.hpContainer}

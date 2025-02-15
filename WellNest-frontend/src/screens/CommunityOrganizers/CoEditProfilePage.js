@@ -1,4 +1,4 @@
-//HpEditProfilePage.js
+// HpEditProfilePage.js
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -35,15 +35,6 @@ const CoEditProfilePage = () => {
   const [address, setAddress] = useState("");
   const [emergency_contact, setEmergency_contact] = useState("");
   const [organizerDetails, setOrganizerDetails] = useState("");
-  const [education, setEducation] = useState("");
-  const [credentials, setCredentials] = useState("");
-  const [languages, setLanguages] = useState("");
-  const [services, setServices] = useState("");
-  const [business_hours, setBusiness_hours] = useState("");
-  const [business_days, setBusiness_days] = useState("");
-  const [hospital, setHospital] = useState("");
-  const [experience, setExperience] = useState("");
-  const [specialist, setSpecialist] = useState("");
   const [userId, setUserId] = useState(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const navigation = useNavigation();
@@ -84,7 +75,6 @@ const CoEditProfilePage = () => {
       });
 
       if (!result.canceled) {
-        // console.log("Image selected:", result.assets[0].uri);
         setProfile_image(result.assets[0].uri);
       } else {
         console.log("Image selection was cancelled.");
@@ -104,7 +94,6 @@ const CoEditProfilePage = () => {
   useEffect(() => {
     const fetchUserId = async () => {
       const userId = await getUserIdFromToken();
-      console.log("userId:", userId);
       if (userId) {
         setUserId(userId);
         fetchProfile(userId);
@@ -113,7 +102,6 @@ const CoEditProfilePage = () => {
     fetchUserId();
   }, []);
 
-  //   useEffect(() => {
   const fetchProfile = async (userId) => {
     setLoading(true); // Start loading
     console.log("fetchuserid", userId);
@@ -127,18 +115,14 @@ const CoEditProfilePage = () => {
       const response = await axios.get(`${API_BASE_URL}/profile/${userId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      // console.log(response);
 
       if (response.data) {
-        // console.log("Fetched profile data:", response.data);
-
         const data = response.data;
         // Batch state updates
         setUsername(data.username || "");
         setAge(data.age ? data.age.toString() : "");
         setGender(data.gender || "");
         setIdentification_card_number(data.identity_card || "");
-        // setDob(new Date(data.date_of_birth) || new Date());
         setDate_of_birth(
           data.date_of_birth ? new Date(data.date_of_birth) : today
         );
@@ -148,8 +132,6 @@ const CoEditProfilePage = () => {
         setEmergency_contact(data.emergency_contact || "");
         setOrganizerDetails(data.organizer_details || "");
 
-        // console.log("data", data);
-
         // Check if profile_image is a Buffer
         if (data.profile_image && data.profile_image.type === "Buffer") {
           const byteArray = data.profile_image.data; // Access the data property of the Buffer
@@ -157,10 +139,8 @@ const CoEditProfilePage = () => {
           // Use Buffer to convert to Base64
           const base64String = Buffer.from(byteArray).toString("base64");
           const imageUri = `data:image/jpeg;base64,${base64String}`;
-          // console.log("Profile Image URI:", imageUri);
           setProfile_image(imageUri);
         } else {
-          console.log("No valid profile image found.");
           setProfile_image(null);
         }
       }
@@ -170,11 +150,6 @@ const CoEditProfilePage = () => {
       setLoading(false); // End loading
     }
   };
-
-  // Debug log after setting the image URI
-  // console.log("Profile image URI after selection:", profile_image);
-  //     fetchProfile();
-  //   }, [userId]);
 
   const handleUpdate = async () => {
     if (!validateInputs()) {
@@ -188,7 +163,6 @@ const CoEditProfilePage = () => {
         return;
       }
 
-      console.log("handleupdateuserid", userId);
       const formData = new FormData();
       formData.append("username", username);
       formData.append("age", parseInt(age, 10));
@@ -197,27 +171,12 @@ const CoEditProfilePage = () => {
         "date_of_birth",
         date_of_birth.toISOString().split("T")[0]
       );
-      // console.log("Identification Card:", identification_card_number);
-      // formData.append("identity_card", identification_card_number.toString());
       formData.append("phone_number", phone_number.toString());
       formData.append("email", email);
       formData.append("address", address);
       formData.append("emergency_contact", emergency_contact.toString());
       formData.append("organizer_details", organizerDetails);
 
-      // // Add profile image if selected
-      // if (profileImage) {
-      //   const uri = profileImage;
-      //   const localUri = uri;
-      //   const filename = localUri.split("/").pop();
-      //   const type = `image/${filename.split(".").pop()}`;
-      //   // const file = {
-      //   //   uri: localUri,
-      //   //   name: filename,
-      //   //   type,
-      //   // };
-      //   // formData.append("profile_image", file);
-      //   formData.append("profile_image", { uri, name: filename, type });
       // Add profile image as binary data (send as a file)
       const normalizeFilePath = (uri) => {
         if (uri.startsWith("file://")) {
@@ -226,13 +185,7 @@ const CoEditProfilePage = () => {
         return uri;
       };
 
-      // console.log("profile_image before if statement:", profile_image);
       if (profile_image) {
-        // const uri = profile_image;
-        // const uri = profile_image.startsWith("file://")
-        //   ? profile_image
-        //   : `file://${profile_image}`; // Ensure correct URI format
-        // const localUri = uri;
         const uri = normalizeFilePath(profile_image);
         const filename = uri.split("/").pop();
         const type = `image/${filename.split(".").pop()}`;
@@ -242,7 +195,6 @@ const CoEditProfilePage = () => {
           name: filename,
           type: type,
         };
-        // console.log("Appending image to FormData:", file);
         formData.append("profile_image", file);
       } else {
         console.log("No profile image to upload.");
@@ -259,7 +211,7 @@ const CoEditProfilePage = () => {
         }
       );
 
-      //Handle response
+      // Handle response
       if (response.status === 200) {
         alert("Profile updated successfully!");
 
@@ -268,8 +220,6 @@ const CoEditProfilePage = () => {
           response.data
         );
 
-        // Optionally, fetch the updated profile image and display it again
-        // setProfileImage(response.data.profile_image); // Assuming the API returns the profile image URL
         setProfile_image(
           response.data.profile_image
             ? `${API_BASE_URL}${response.data.profile_image}`
@@ -318,14 +268,6 @@ const CoEditProfilePage = () => {
         <ActivityIndicator size="large" color="gray" />
       ) : (
         <ScrollView contentContainerStyle={styles.scrollView}>
-          {/* <TouchableOpacity onPress={pickImage} style={styles.imageContainer}>
-          {profileImage ? (
-            <Image source={{ uri: profileImage }} style={styles.profileImage} />
-          ) : (
-            <Text>Change Picture</Text>
-          )}
-        </TouchableOpacity> */}
-
           <View style={styles.container}>
             <Text style={styles.question}>Username</Text>
             <View style={styles.underline} />
@@ -390,23 +332,6 @@ const CoEditProfilePage = () => {
           {/* Date of Birth Picker */}
           <Text style={styles.question}>Date of Birth</Text>
           <View style={styles.underline} />
-          {/* <TouchableOpacity
-          onPress={() => setShowDatePicker(true)}
-          style={styles.datePickerButton}
-        >
-          <Text style={styles.datePickerText}>
-            {dob ? dob.toDateString() : "Select Date"}
-          </Text>
-        </TouchableOpacity>
-        {showDatePicker && (
-          <DateTimePicker
-            value={dob}
-            mode="date"
-            display="default"
-            maximumDate={new Date()}
-            onChange={handleDateChange}
-          />
-        )} */}
           <View style={styles.leftDateInput}>
             <View style={styles.dateInputContent}>
               <Ionicons
@@ -437,7 +362,6 @@ const CoEditProfilePage = () => {
               <TextInput
                 placeholder="Identification Card Number"
                 value={identification_card_number}
-                // onChangeText={setIdentification_card_number}
                 style={styles.input}
                 editable={false} // Make it non-editable
               />
@@ -482,13 +406,10 @@ const CoEditProfilePage = () => {
             <View style={styles.underline} />
             <View style={styles.inputContainer}>
               <TextInput
-                // value="Elderly"
                 value="Community Organizer"
                 editable={false}
                 style={styles.input}
               />
-
-              {/* <TextInput value={role} editable={false} style={styles.input} /> */}
             </View>
 
             <Text style={styles.question}>Emergency Contact</Text>

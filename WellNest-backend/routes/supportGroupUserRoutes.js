@@ -6,28 +6,24 @@ const {
   addSupportGroupUser,
   deleteSupportGroupUser,
   getAllSupportGroupUserByGroupId,
-  getAllSupportGroupByUserId,
 } = require("../controllers/supportGroupUserController");
 const authenticateToken = require("../middleware/authMiddleware");
 
+// Route to get all users in a specific support group by group ID
 router.get(
   "/support_group_user/:group_id",
   authenticateToken,
   getAllSupportGroupUserByGroupId
 );
 
+// Route to add a user to a support group
 router.post("/support_group_user/", authenticateToken, addSupportGroupUser);
 
+// Route to remove a user from a support group
 router.delete(
   "/support_group_user/",
   authenticateToken,
   deleteSupportGroupUser
 );
-
-// router.get(
-//   "/support_group_user/:user_id",
-//   authenticateToken,
-//   getAllSupportGroupByUserId
-// );
 
 module.exports = router;

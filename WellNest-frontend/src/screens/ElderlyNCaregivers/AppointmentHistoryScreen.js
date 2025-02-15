@@ -1,19 +1,18 @@
+// AppointmentHistoryScreen.js
 import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
   TouchableOpacity,
   FlatList,
-  StyleSheet,
   Alert,
   ImageBackground,
   Image,
 } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import API_BASE_URL from "../../../config/config";
 import { getUserIdFromToken } from "../../../services/authService";
 import NavigationBar from "../../components/NavigationBar";
-import styles from "../../components/styles"; // Import your custom styles
+import styles from "../../components/styles"; // Import custom styles
 import { Ionicons } from "@expo/vector-icons"; // Import icons from Expo
 import { useNavigation, useRoute } from "@react-navigation/native";
 
@@ -28,11 +27,8 @@ const AppointmentHistoryScreen = () => {
   useEffect(() => {
     const fetchUserId = async () => {
       const id = await getUserIdFromToken();
-      // console.log("userId:", userId);
       if (id) {
         setLoggedInUserId(id);
-        // setUserId(userId);
-        // fetchProfile(userId);
       }
     };
     fetchUserId();
@@ -46,7 +42,6 @@ const AppointmentHistoryScreen = () => {
   }, [userId]);
 
   const fetchAppointments = async (userId) => {
-    console.log("App history userId:", userId);
     if (!userId) {
       Alert.alert("Error", "No user found. Please log in.");
       return;
@@ -71,43 +66,19 @@ const AppointmentHistoryScreen = () => {
       }
 
       const result = await response.json(); // Try parsing the response as JSON
-      //   setAppointments(result.appointments);
-      console.log("Fetched appointments:", result); // Log the result for debugging
       setAppointments([...result.upcoming, ...result.past]); // Combine both upcoming and past appointments
-      //   const result = await response.json();
-      //   if (response.ok) {
-      //     setAppointments(result.appointments);
-      //   } else {
-      //     Alert.alert("Error", result.error || "Failed to fetch appointments.");
-      //   }
     } catch (error) {
       console.error("Error fetching appointments:", error);
-
-      // Check if the error is because of invalid JSON
-      //   if (error instanceof SyntaxError) {
-      //     Alert.alert(
-      //       "Error",
-      //       "The server returned an invalid response. Please try again later."
-      //     );
-      //   } else {
-      //     Alert.alert(
-      //       "Error",
-      //       error.message || "An error occurred while fetching appointments."
-      //     );
-      //   }
       Alert.alert(
         "Error",
         error.message || "An error occurred while fetching appointments."
       );
-      //   Alert.alert("Error", "An error occurred while fetching appointments.");
     } finally {
       setLoading(false);
     }
   };
 
   const cancelAppointment = async (appointmentId, isVirtual) => {
-    console.log("Cancel Appointment Params:", { appointmentId, isVirtual }); // Log params
-
     if (!userId) {
       Alert.alert("Error", "No user found. Please log in.");
       return;
@@ -135,19 +106,6 @@ const AppointmentHistoryScreen = () => {
       } else {
         Alert.alert("Error", result.error || "Failed to cancel appointment.");
       }
-      // Log the response for debugging
-      // const responseText = await response.text(); // Read as text to check the actual response
-      // console.log("Cancel Appointment Response:", responseText); // Log raw response
-
-      // // Now try to parse the response as JSON
-      // const result = JSON.parse(responseText);
-      // //   const result = await response.json();
-      // if (response.ok) {
-      //   Alert.alert("Success", "Appointment canceled successfully.");
-      //   fetchAppointments(); // Refresh the list
-      // } else {
-      //   Alert.alert("Error", result.error || "Failed to cancel appointment.");
-      // }
     } catch (error) {
       console.error("Error canceling appointment:", error);
       Alert.alert(
@@ -170,25 +128,6 @@ const AppointmentHistoryScreen = () => {
     // Compare adjusted date with the current date
     const now = new Date();
     const isUpcoming = appointmentDate > now && item.app_status !== "Completed";
-    // Combine appointment_date and appointment_time to create a full Date object
-    // const appointmentDateTime = new Date(
-    //   `${item.appointment_date.split("T")[0]}T${item.appointment_time}`
-    // );
-
-    // // Check if the appointment is in the future and not completed
-    // const isUpcoming =
-    //   appointmentDateTime > new Date() && item.app_status !== "Completed";
-
-    // // const isUpcoming =
-    //   new Date(item.appointment_date) >= new Date() &&
-    //   item.app_status !== "Completed";
-    console.log("item.appointment_time:", item.appointment_time);
-    console.log("item.appointment_date:", item.appointment_date);
-    console.log("Current DateTime:", new Date());
-    console.log("isUpcoming:", isUpcoming);
-    // let imageUri = item.profile_image
-    //   ? item.profile_image // Base64 string returned from the backend
-    //   : "https://via.placeholder.com/150";
 
     // Determine the status to display
     let displayStatus;
@@ -206,10 +145,10 @@ const AppointmentHistoryScreen = () => {
     // Function to format the date and time
     const formatDateTime = (dateString, timeString) => {
       const date = new Date(dateString);
-      console.log("date:", date);
+
       const options = { day: "2-digit", month: "2-digit", year: "numeric" };
       const formattedDate = date.toLocaleDateString("en-GB", options); // Format as DD-MM-YYYY
-      console.log("formattedDate:", formattedDate);
+
       const timeParts = timeString.split(":");
       let hours = parseInt(timeParts[0], 10);
       const minutes = timeParts[1];
@@ -218,7 +157,7 @@ const AppointmentHistoryScreen = () => {
       hours = hours ? hours : 12; // the hour '0' should be '12'
 
       const formattedTime = `${hours}:${minutes} ${ampm}`;
-      console.log("formattedTime:", formattedTime);
+
       return `${formattedDate}, ${formattedTime}`;
     };
 
@@ -232,8 +171,6 @@ const AppointmentHistoryScreen = () => {
         style={[styles.outterCard, isUpcoming ? styles.upcoming : styles.past]}
       >
         <TouchableOpacity
-          //   <TouchableOpacity
-          //     style={[styles.card, isUpcoming ? styles.upcoming : styles.past]}
           onPress={() =>
             navigation.navigate("HistoryAppDetails", {
               appointmentId: item.appointment_id,
@@ -248,7 +185,6 @@ const AppointmentHistoryScreen = () => {
               <Text style={styles.doctorDetails}>
                 {item.category || item.doctor_specialization} | {item.location}
               </Text>
-              {/* <Text style={styles.appointmentType}> */}
               <Text
                 style={[
                   styles.appointmentType,
@@ -265,16 +201,10 @@ const AppointmentHistoryScreen = () => {
                   ? "Physical Appointment"
                   : "Virtual Appointment"}{" "}
               </Text>
-              <Text style={styles.date}>
-                {/* {item.appointment_date}, {item.appointment_time} */}
-                {formattedDateTime}
-              </Text>
+              <Text style={styles.date}>{formattedDateTime}</Text>
               <View style={styles.statusContainer}>
                 <Text style={styles.doctorDetails}>Status: </Text>
-                <Text style={styles.status}>
-                  {displayStatus}
-                  {/* {isUpcoming ? "Upcoming" : "Completed"} */}
-                </Text>
+                <Text style={styles.status}>{displayStatus}</Text>
               </View>
             </View>
           </View>
@@ -329,12 +259,7 @@ const AppointmentHistoryScreen = () => {
         ) : (
           <FlatList
             data={appointments}
-            keyExtractor={
-              (item) => item.appointment_id
-              // ? item.appointment_id.toString()
-              // : Math.random().toString()
-            }
-            // keyExtractor={(item) => `${item.id}-${item.is_virtual}`}
+            keyExtractor={(item) => item.appointment_id}
             renderItem={renderAppointment}
             ListEmptyComponent={renderEmptyComponent}
           />
@@ -351,7 +276,6 @@ const AppointmentHistoryScreen = () => {
         activePage={loggedInUserId === userId ? "AppointmentHistory" : ""} // Set activePage based on userId match
         userId={loggedInUserId}
       />
-      {/* <NavigationBar navigation={navigation} activePage="AppointmentHistory" /> */}
     </ImageBackground>
   );
 };

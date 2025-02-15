@@ -1,11 +1,9 @@
-//CoElderlyCareAssessmentManagement.js
+// CoElderlyCareAssessmentManagement.js
 import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
-  TextInput,
   TouchableOpacity,
-  StyleSheet,
   ScrollView,
   ImageBackground,
   Alert,
@@ -30,8 +28,6 @@ import {
 } from "../../components/validationUtils"; // Import validation functions
 import API_BASE_URL from "../../../config/config";
 import { getUserIdFromToken } from "../../../services/authService";
-import * as ImagePicker from "expo-image-picker";
-import { Buffer } from "buffer";
 
 const CoElderlyCareAssessmentManagement = () => {
   const [assessments, setAssessments] = useState([]); // State for assessments

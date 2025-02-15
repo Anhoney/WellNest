@@ -1,5 +1,5 @@
-//AppointmentPage.js
-import React, { useState, useEffect, useCallback } from "react"; // <-- Add useState here
+// AppointmentPage.js
+import React, { useState, useCallback } from "react"; // <-- Add useState here
 import {
   View,
   Text,
@@ -19,86 +19,28 @@ import NavigationBar from "../../components/NavigationBar"; // Import your custo
 import API_BASE_URL from "../../../config/config";
 import axios from "axios";
 import { FontAwesome } from "@expo/vector-icons";
-import { Buffer } from "buffer";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getUserIdFromToken } from "../../../services/authService";
 
 const AppointmentPage = () => {
   const navigation = useNavigation();
   const [date, setDate] = useState(new Date());
-  const [open, setOpen] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState("relevance");
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [location, setLocation] = useState("");
   const [categories, setCategories] = useState([]);
-  const [doctors, setDoctors] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState("");
   const [favoriteDoctors, setFavoriteDoctors] = useState([]);
   const [favorites, setFavorites] = useState([]);
   const [selectedDoctor, setSelectedDoctor] = useState(null); // <-- Add this line
   const [selectedTime, setSelectedTime] = useState(null); // <-- Add this line for selected time
   const [userId, setUserId] = useState(null);
 
-  // const [isDatePickerOpen, setDatePickerOpen] = useState(false);
   // Polling function to keep data updated
   const pollData = useCallback(() => {
     fetchCategories();
     fetchFavoriteDoctors();
   }, []);
-
-  // Fetch categories from API
-  // useFocusEffect(
-  //   useCallback(() => {
-  //     const fetchUserId = async () => {
-  //       const userId = await getUserIdFromToken();
-  //       // console.log("userId:", userId);
-  //       if (userId) {
-  //         setUserId(userId);
-  //       }
-  //     };
-
-  //     const fetchCategories = async () => {
-  //       try {
-  //         const response = await axios.get(`${API_BASE_URL}/categories`);
-  //         setCategories(response.data);
-  //       } catch (error) {
-  //         console.error("Error fetching categories:", error);
-  //       }
-  //     };
-
-  //     const fetchFavoriteDoctors = async () => {
-  //       try {
-  //         const token = await AsyncStorage.getItem("token");
-  //         // console.log("Token:", token); // Log the token
-
-  //         if (!token) {
-  //           console.error("No token found");
-  //           return;
-  //         }
-
-  //         const response = await axios.get(`${API_BASE_URL}/getFavorites`, {
-  //           headers: { Authorization: `Bearer ${token}` },
-  //         });
-
-  //         // console.log("Favorite Doctors Response:", response.data); // Log the response from the backend
-
-  //         // Extract the IDs for easier management
-  //         const favoriteIds = response.data.map(
-  //           (doctor) => doctor.availability_id
-  //         );
-  //         setFavoriteDoctors(response.data || []);
-  //         setFavorites(favoriteIds);
-  //       } catch (error) {
-  //         console.error("Error fetching favorite doctors:", error);
-  //       }
-  //     };
-  //     fetchUserId();
-  //     fetchCategories();
-  //     fetchFavoriteDoctors();
-
-  //   }, [])
-  // );
 
   useFocusEffect(
     useCallback(() => {
@@ -115,7 +57,7 @@ const AppointmentPage = () => {
 
   const fetchUserId = async () => {
     const userId = await getUserIdFromToken();
-    // console.log("userId:", userId);
+
     if (userId) {
       setUserId(userId);
     }
@@ -133,7 +75,6 @@ const AppointmentPage = () => {
   const fetchFavoriteDoctors = async () => {
     try {
       const token = await AsyncStorage.getItem("token");
-      // console.log("Token:", token); // Log the token
 
       if (!token) {
         console.error("No token found");
@@ -143,8 +84,6 @@ const AppointmentPage = () => {
       const response = await axios.get(`${API_BASE_URL}/getFavorites`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-
-      // console.log("Favorite Doctors Response:", response.data); // Log the response from the backend
 
       // Extract the IDs for easier management
       const favoriteIds = response.data.map((doctor) => doctor.availability_id);
@@ -160,9 +99,6 @@ const AppointmentPage = () => {
     try {
       const token = await AsyncStorage.getItem("token");
 
-      console.log("Token:", token); // Log the token to ensure it's being retrieved correctly
-      console.log("Doctor ID:", doctorId); // Log the doctor ID being passed
-
       if (!token) {
         console.error("No token found");
         return;
@@ -173,8 +109,6 @@ const AppointmentPage = () => {
         { availabilityId: doctorId },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-
-      console.log("Toggle Favorite Response:", response.data); // Log the response from the backend
 
       if (response.data.success) {
         setFavorites((prevFavorites) => {
@@ -206,7 +140,6 @@ const AppointmentPage = () => {
           // Navigate to AppointmentDoctorDetails with the selected doctor and date
           navigation.navigate("DoctorDetails", {
             doctorId: item.availability_id, // Assuming item.id is the doctor's ID
-            // selectedDate: date.toISOString().split("T")[0], // Pass the selected date
           });
         }}
       >
@@ -253,16 +186,7 @@ const AppointmentPage = () => {
       date: formattedDate, // Format date as 'YYYY-MM-DD'
     };
 
-    // Log the parameters to ensure they are correct
-    console.log("Formatted Search Params:", searchParams);
-
     navigation.navigate("CategoryDoctors", { searchParams });
-    // const response = await axios.post(`${API_BASE_URL}/search`, {
-    //   searchQuery,
-    //   location,
-    //   date,
-    // });
-    // setDoctors(response.data); // Update the doctor list
   };
 
   const handleDoctorSelect = async (doctorId) => {
@@ -271,10 +195,6 @@ const AppointmentPage = () => {
       date.getTime() - date.getTimezoneOffset() * 60000
     );
     const formattedDate = adjustedDate.toISOString().split("T")[0]; // Format as 'YYYY-MM-DD'
-
-    // Log the doctor ID and date to verify the request
-    console.log("Fetching available times for Doctor ID:", doctorId);
-    console.log("For Date:", formattedDate);
 
     // Set the selected doctor
     setSelectedDoctor(doctorId);
@@ -294,34 +214,8 @@ const AppointmentPage = () => {
     setSelectedTime(time);
   };
 
-  // const handleTimeSelect = async (time) => {
-  //   // Set the selected time
-  //   setSelectedTime(time);
-  //   // Book the appointment
-  //   const response = await axios.post(`${API_BASE_URL}/book`, {
-  //     doctorId: selectedDoctor,
-  //     time,
-  //     date: date.toISOString().split("T")[0], // Sending date as 'YYYY-MM-DD'
-  //   });
-  //   navigation.navigate("AppointmentSuccess", { response });
-  // };
   const handleCategoryClick = async (category) => {
     navigation.navigate("CategoryDoctors", { category });
-    // setSelectedCategory(category); // Set selected category for UI feedback
-    // try {
-    //   const response = await axios.get(`${API_BASE_URL}/searchByCategory`, {
-    //     params: { category },
-    //   });
-    //   console.log("Selected category:", category);
-    //   setDoctors(response.data); // Update the doctors list
-    // } catch (error) {
-    //   console.error("Error fetching doctors:", error);
-    // }
-
-    // const response = await axios.get(`${API_BASE_URL}/searchByCategory`, {
-    //   params: { category },
-    // });
-    // setDoctors(response.data); // Update the doctor list
   };
 
   const handleBookAppointment = async () => {
@@ -329,19 +223,12 @@ const AppointmentPage = () => {
       alert("Please select both a doctor and a time.");
       return;
     }
-    console.log("Booking Appointment with Data:", {
-      doctorId: selectedDoctor,
-      date: date.toISOString().split("T")[0], // Sending date as 'YYYY-MM-DD'
-      time: selectedTime,
-    });
 
     const response = await axios.post(`${API_BASE_URL}/bookAppointment`, {
       doctorId: selectedDoctor,
       date: date.toISOString().split("T")[0], // Send date as 'YYYY-MM-DD'
       time: selectedTime,
     });
-
-    console.log("Appointment Response:", response.data); // Log the response to check success
 
     if (response.data.success) {
       alert("Appointment booked successfully!");
@@ -441,7 +328,6 @@ const AppointmentPage = () => {
           {/* Show the date picker on initial render */}
           <TouchableOpacity style={styles.dateInput} onPress={showDatePicker}>
             <View style={styles.dateInputContent}>
-              {/* <Text style={styles.dateText}>{date.toDateString()}</Text> */}
               <Ionicons
                 name="calendar-outline"
                 size={20}
@@ -460,7 +346,6 @@ const AppointmentPage = () => {
             onCancel={hideDatePicker}
             date={date}
             minimumDate={today} // Disallow future dates by setting maximum date to today
-            // onDateChange={(selectedDate) => setDate(selectedDate)}
           />
         </View>
 
@@ -518,10 +403,7 @@ const AppointmentPage = () => {
             data={favoriteDoctors}
             keyExtractor={(item) => item.availability_id.toString()}
             renderItem={renderFavoriteCard}
-            ListEmptyComponent={
-              <EmptyFavorites />
-              // <Text style={styles.noDataText}>No favorites yet</Text>
-            }
+            ListEmptyComponent={<EmptyFavorites />}
           />
         ) : (
           <ScrollView style={styles.specialtyContainer}>

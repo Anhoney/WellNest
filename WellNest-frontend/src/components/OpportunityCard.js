@@ -1,3 +1,4 @@
+// OpportunityCard.js
 import React from "react";
 import { View, Text, Image, StyleSheet } from "react-native";
 
@@ -13,7 +14,6 @@ const OpportunityCard = ({ image, title, location, date, price }) => {
   return (
     <View style={styles.card}>
       <Image source={imageSource} style={styles.image} resizeMode="cover" />
-      {/* <Image source={{ uri: image }} style={styles.image} /> */}
       <Text style={styles.title}>{title}</Text>
       <Text style={styles.details}>Location: {location}</Text>
       <Text style={styles.details}>Date: {date}</Text>

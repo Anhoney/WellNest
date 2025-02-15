@@ -1,15 +1,14 @@
-import React, { useContext, useEffect, useState } from "react";
+// HpProfilePage.js
+import React, { useContext, useState } from "react";
 import {
   View,
   Text,
   TouchableOpacity,
   Image,
-  StyleSheet,
   ImageBackground,
   ScrollView,
   Alert,
 } from "react-native";
-import * as ImagePicker from "expo-image-picker";
 import { Ionicons } from "@expo/vector-icons"; // For icons
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import HpNavigationBar from "../../components/HpNavigationBar"; // Import here
@@ -18,7 +17,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import API_BASE_URL from "../../../config/config";
 import { AuthContext } from "../../../context/AuthProvider";
 import axios from "axios";
-import jwt_decode from "jwt-decode";
 import { Buffer } from "buffer";
 import { getUserIdFromToken } from "../../../services/authService";
 import { useNotification } from "../../../context/NotificationProvider";
@@ -33,7 +31,6 @@ const HpProfilePage = () => {
 
   const fetchUserId = async () => {
     const userId = await getUserIdFromToken();
-    console.log("userId:", userId);
     if (userId) {
       setUserId(userId);
       fetchProfileData(userId);
@@ -47,24 +44,18 @@ const HpProfilePage = () => {
       return;
     }
     try {
-      console.log("Fetching profile data for user ID:", userId);
       const token = await AsyncStorage.getItem("token");
       if (!token) {
         alert("No token found. Please log in.");
         return;
       }
-      console.log("Authorization token:", token); // Debugging log
       const response = await axios.get(`${API_BASE_URL}/profile/${userId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      // const response = await fetch(`${API_BASE_URL}/profile/${userId}`);
-      // if (!response.ok) {
-      //   throw new Error("Failed to fetch profile data");
-      // }
       if (response.data) {
         const data = response.data;
         setUsername(data.username || data.full_name || "");
-        // setProfileImage(data.profile_image || null); // Set base64 profile image or null
+
         // Check if profile_image is a Buffer
         if (data.profile_image && data.profile_image.type === "Buffer") {
           const byteArray = data.profile_image.data; // Access the data property of the Buffer
@@ -72,10 +63,8 @@ const HpProfilePage = () => {
           // Use Buffer to convert to Base64
           const base64String = Buffer.from(byteArray).toString("base64");
           const imageUri = `data:image/jpeg;base64,${base64String}`;
-          // console.log("Profile Image URI:", imageUri);
           setProfile_image(imageUri);
         } else {
-          console.log("No valid profile image found.");
           setProfile_image(null);
         }
       }
@@ -88,14 +77,9 @@ const HpProfilePage = () => {
   // Refresh data when the screen comes into focus
   useFocusEffect(
     React.useCallback(() => {
-      console.log("Screen focused, refreshing data");
       fetchUserId();
     }, [])
   );
-
-  // useEffect(() => {
-  //   fetchUserId();
-  // }, []);
 
   // Confirm and handle Delete Account
   const handleDeleteAccount = async () => {
@@ -183,128 +167,6 @@ const HpProfilePage = () => {
     }
   };
 
-  // const handleDeleteAccount = async () => {
-  //   try {
-  //     const token = await AsyncStorage.getItem("token");
-  //     if (!token || !userId) {
-  //       Alert.alert("Error", "Unable to authenticate. Please log in.");
-  //       return;
-  //     }
-
-  //     // Fetch upcoming appointments before deleting the account
-  //     const appointmentResponse = await axios.get(
-  //       `${API_BASE_URL}/virtual/getUpcomingAppointment/${userId}`,
-  //       {
-  //         headers: { Authorization: `Bearer ${token}` },
-  //       }
-  //     );
-
-  //     if (appointmentResponse.data && appointmentResponse.data.length > 0) {
-  //       Alert.alert(
-  //         "Cannot Delete Account",
-  //         "You have upcoming appointments. Please complete or cancel them before deleting your account."
-  //       );
-  //       return;
-  //     }
-
-  //     Alert.alert(
-  //       "Confirm Delete Account",
-  //       "Are you sure you want to delete your account? This action cannot be undone.",
-  //       [
-  //         {
-  //           text: "Cancel", // User cancels
-  //           style: "cancel",
-  //         },
-  //         {
-  //           text: "Yes", // User confirms
-  //           onPress: async () => {
-  //             try {
-  //               const response = await axios.delete(
-  //                 `${API_BASE_URL}/deleteAccount/${userId}`,
-  //                 {
-  //                   headers: { Authorization: `Bearer ${token}` },
-  //                 }
-  //               );
-  //               if (response.status === 200) {
-  //                 Alert.alert(
-  //                   "Success",
-  //                   "Your account has been deleted successfully."
-  //                 );
-  //                 await logout(); // Log out and clear token
-  //                 handleClearInterval();
-  //                 navigation.reset({
-  //                   index: 0,
-  //                   routes: [{ name: "LoginPage" }],
-  //                 });
-  //               }
-  //             } catch (error) {
-  //               console.error("Error deleting account:", error);
-  //               Alert.alert(
-  //                 "Error",
-  //                 "Failed to delete account. Please try again."
-  //               );
-  //             }
-  //           },
-  //         },
-  //       ],
-  //       { cancelable: false } // Prevent closing the alert by tapping outside
-  //     );
-  //   } catch (error) {
-  //     console.error("Error fetching appointments or deleting account:", error);
-  //     Alert.alert("Error", "Failed to check appointments. Please try again.");
-  //   }
-  // };
-
-  // const handleDeleteAccount = () => {
-  //   Alert.alert(
-  //     "Confirm Delete Account",
-  //     "Are you sure you want to delete your account? This action cannot be undone.",
-  //     [
-  //       {
-  //         text: "Cancel", // User cancels
-  //         style: "cancel",
-  //       },
-  //       {
-  //         text: "Yes", // User confirms
-  //         onPress: async () => {
-  //           try {
-  //             const token = await AsyncStorage.getItem("token");
-  //             if (!token || !userId) {
-  //               Alert.alert("Error", "Unable to authenticate. Please log in.");
-  //               return;
-  //             }
-  //             const response = await axios.delete(
-  //               `${API_BASE_URL}/deleteAccount/${userId}`,
-  //               {
-  //                 headers: { Authorization: `Bearer ${token}` },
-  //               }
-  //             );
-  //             if (response.status === 200) {
-  //               Alert.alert(
-  //                 "Success",
-  //                 "Your account has been deleted successfully."
-  //               );
-  //               await logout(); // Log out and clear token
-  //               handleClearInterval();
-  //               navigation.reset({
-  //                 index: 0,
-  //                 routes: [{ name: "LoginPage" }],
-  //               });
-  //             }
-  //           } catch (error) {
-  //             console.error("Error deleting account:", error);
-  //             Alert.alert(
-  //               "Error",
-  //               "Failed to delete account. Please try again."
-  //             );
-  //           }
-  //         },
-  //       },
-  //     ],
-  //     { cancelable: false } // Prevent closing the alert by tapping outside
-  //   );
-  // };
-
   // Confirm and handle Sign Out
   const handleSignOut = () => {
     Alert.alert(
@@ -352,8 +214,6 @@ const HpProfilePage = () => {
       </View>
 
       <View style={styles.profileContainer}>
-        {/* Profile Image */}
-        {/* <TouchableOpacity onPress={pickImage}> */}
         <Image
           source={
             profile_image
@@ -362,7 +222,6 @@ const HpProfilePage = () => {
           }
           style={styles.profileImage}
         />
-        {/* </TouchableOpacity> */}
         <Text style={styles.userName}> {username} </Text>
         <Text style={styles.profileId}>ID: {userId}</Text>
         <TouchableOpacity

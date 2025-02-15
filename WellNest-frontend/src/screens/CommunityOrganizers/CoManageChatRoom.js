@@ -1,3 +1,4 @@
+// CoManageChatRoom.js
 import React, { useEffect, useState } from "react";
 import {
   ImageBackground,
@@ -8,7 +9,6 @@ import {
   StyleSheet,
   Alert,
   Modal,
-  Image,
 } from "react-native";
 import styles from "../../components/styles";
 import { Ionicons } from "@expo/vector-icons";
@@ -45,25 +45,19 @@ const CoManageChatRoom = ({ route }) => {
   }, [allUsers, existedUsers]);
 
   const filterUser = () => {
-    console.log("All Users", allUsers);
-    console.log("Existed Users", existedUsers);
-
     const filteredUsers = allUsers.filter(
       (allUser) =>
         !existedUsers.some((existedUser) => existedUser.user_id === allUser.id)
     );
 
     setNotExistedUsers(filteredUsers);
-    console.log("Not Existed User:", filteredUsers);
   };
 
   const handleAddUser = async () => {
     const userData = allUsers.find((user) => user.id === selectedUser);
     try {
       const now = new Date();
-
       const token = await AsyncStorage.getItem("token");
-
       const url = `${API_BASE_URL}/support_group_user/`;
 
       const config = {
@@ -96,9 +90,7 @@ const CoManageChatRoom = ({ route }) => {
   const fetchExistedUser = async () => {
     try {
       const token = await AsyncStorage.getItem("token");
-
       const url = `${API_BASE_URL}/support_group_user/${group_id}`;
-
       const config = {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -106,8 +98,6 @@ const CoManageChatRoom = ({ route }) => {
       };
 
       const response = await axios.get(url, config);
-
-      // console.log(response.data);
 
       setExistedUsers(response.data);
     } catch (error) {
@@ -154,8 +144,6 @@ const CoManageChatRoom = ({ route }) => {
 
       const response = await axios.get(url, config);
 
-      // console.log(response.data);
-
       setAllUsers(response.data);
     } catch (error) {
       console.error("Error add user:", error.message);
@@ -198,14 +186,6 @@ const CoManageChatRoom = ({ route }) => {
       Alert.alert("Error", "Failed to delete user. Try again later.");
     }
   };
-
-  // const renderItem = ({ item }) => (
-  //     <View style={localstyles.userContainer}>
-  //         <Text style={localstyles.userName}>{item.full_name}</Text>
-  //         <Text style={localstyles.userEmail}>{item.email}</Text>
-  //         <Text style={localstyles.userPhoneNo}>{item.phone_no}</Text>
-  //     </View>
-  // );
 
   const renderItem = ({ item }) => (
     <View style={localstyles.userContainer}>

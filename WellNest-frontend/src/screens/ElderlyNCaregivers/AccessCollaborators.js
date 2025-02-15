@@ -1,4 +1,4 @@
-//AccessCollaborators.js
+// AccessCollaborators.js
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -6,8 +6,6 @@ import {
   ImageBackground,
   TouchableOpacity,
   TextInput,
-  FlatList,
-  StyleSheet,
   Image,
   ScrollView,
   Modal,
@@ -28,7 +26,6 @@ import Icon from "react-native-vector-icons/FontAwesome";
 const AccessCollaborators = ({ navigation }) => {
   const [relationship, setRelationship] = useState("Family");
   const [collabUserId, setCollabUserId] = useState("");
-  const [username, setUsername] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
   const [requestModalVisible, setRequestModalVisible] = useState(false);
 
@@ -70,7 +67,6 @@ const AccessCollaborators = ({ navigation }) => {
         Alert.alert("Error", "An error occurred while sending the request.");
       }
       console.error("Error sending request:", error);
-      //   console.error("Error sending request:", error);
     } finally {
       setModalVisible(false); // Close the modal after registration
     }
@@ -104,14 +100,6 @@ const AccessCollaborators = ({ navigation }) => {
             value={collabUserId}
             onChangeText={setCollabUserId}
           />
-          {/* <Text style={styles.label}>Username</Text>
-          <TextInput
-            style={styles.hpInput}
-            placeholder="Username"
-            value={username}
-            onChangeText={setUsername}
-            multiline
-          /> */}
           <Text style={styles.label}>Relationship</Text>
           <RadioButton.Group
             onValueChange={setRelationship}

@@ -1,53 +1,36 @@
-//HpAppointmentCreationPage.js
+// HpCreateOrEditVApp.js
 import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
   TextInput,
   TouchableOpacity,
-  StyleSheet,
   ScrollView,
   ImageBackground,
   Alert,
-  //   CheckBox,
 } from "react-native";
-// import CheckBox from "@react-native-community/checkbox";
-// import { CheckBox } from "expo-checkbox";
-// import CustomCheckBox from "../../components/CustomCheckBox";
-// import { CheckBox } from "react-native-elements";
 import { CheckBox } from "@rneui/themed";
 import { Ionicons } from "@expo/vector-icons"; // Import icons from Expo
 import styles from "../../components/styles"; // Import shared styles
 import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
 import { RadioButton } from "react-native-paper"; // For the radio button
-import HpNavigationBar from "../../components/HpNavigationBar"; // Import your custom navigation bar component
+import HpNavigationBar from "../../components/HpNavigationBar";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import {
-  validateFields,
-  getInputStyle,
-} from "../../components/validationUtils"; // Import validation functions
 import API_BASE_URL from "../../../config/config";
 import { getUserIdFromToken } from "../../../services/authService";
 
 const HpCreateOrEditVApp = () => {
   const [description, setDescription] = useState("");
-  //   const [servicesProvide, setServicesProvide] = useState({
-  //     videoConsultation: { selected: false, price: "" },
-  //     textConsultation: { selected: false, price: "" },
-  //   });
   const [servicesProvide, setServicesProvide] = useState([
     { service: "VideoConsultation", selected: false, price: "" },
     { service: "TextConsultation", selected: false, price: "" },
   ]);
-  const [location, setLocation] = useState("");
-  const [hospitalAdds, setHospitalAdds] = useState("");
   const [availableDays, setAvailableDays] = useState("Everyday");
   const [availableTimes, setAvailableTimes] = useState([]);
   const [newTime, setNewTime] = useState(new Date());
   const [showPicker, setShowPicker] = useState(false);
-  const [errors, setErrors] = useState({}); // State to track validation errors
   const navigation = useNavigation();
   const [category, setCategory] = useState("Cardiology"); // New state for category
   const [otherCategory, setOtherCategory] = useState(""); // For custom category
@@ -66,7 +49,6 @@ const HpCreateOrEditVApp = () => {
         const fetchedUserId = await getUserIdFromToken();
         if (fetchedUserId) {
           setUserId(fetchedUserId);
-          console.log(fetchedUserId);
           // Fetch appointments for the user
           const token = await AsyncStorage.getItem("token");
           if (!token) {
@@ -87,8 +69,6 @@ const HpCreateOrEditVApp = () => {
             setExistingAppointment(appointment); // Store the existing appointment
             setAppointmentId(appointment.id);
             setDescription(appointment.description || "");
-            // setLocation(appointment.location || "");
-            // setHospitalAdds(appointment.hospital_address || "");
             setAvailableDays(appointment.available_days || "Everyday");
             setCategory(appointment.category || "Cardiology");
             setAvailableTimes(
@@ -100,8 +80,6 @@ const HpCreateOrEditVApp = () => {
             setBankName(appointment.bank_name || "");
             setAccountNumber(appointment.account_number || "");
 
-            // Set servicesProvide based on existing appointment
-            // const services = JSON.parse(appointment.services_provide);
             // Handle servicesProvide parsing safely
             let services = [];
             try {
@@ -109,9 +87,8 @@ const HpCreateOrEditVApp = () => {
               if (typeof appointment.services_provide === "string") {
                 services = JSON.parse(appointment.services_provide);
               } else {
-                services = appointment.services_provide; // Assume it's already an object/array
+                services = appointment.services_provide;
               }
-              // services = JSON.parse(appointment.services_provide || "[]");
             } catch (parseError) {
               console.warn("Failed to parse services_provide:", parseError);
               services = [];
@@ -129,8 +106,6 @@ const HpCreateOrEditVApp = () => {
           } else {
             console.log("No appointments found for this user.");
           }
-          // console.log("AppointmentId:", appointment.account_number);
-          console.log("Fetched appointment data:", appointments);
         } else {
           throw new Error("Failed to fetch userId.");
         }
@@ -161,10 +136,6 @@ const HpCreateOrEditVApp = () => {
   };
 
   const handleServiceChange = (index, field, value) => {
-    // setServicesProvide((prev) => ({
-    //   ...prev,
-    //   [service]: { ...prev[service], [field]: value },
-    // }));
     setServicesProvide((prev) => {
       const updatedServices = [...prev];
       updatedServices[index] = { ...updatedServices[index], [field]: value };
@@ -319,7 +290,6 @@ const HpCreateOrEditVApp = () => {
                     placeholder={`Price for ${service.service
                       .replace(/([A-Z])/g, " $1")
                       .trim()} (RM per hour)`}
-                    // placeholderTextColor="#000"
                     keyboardType="numeric"
                     value={service.price}
                     onChangeText={(text) =>
@@ -342,7 +312,7 @@ const HpCreateOrEditVApp = () => {
                 value="Everyday"
                 mode="android"
                 position="leading"
-                color="#FFA500" // Replace with your desired color
+                color="#FFA500"
                 labelStyle={styles.hpradioLabel}
               />
             </View>
@@ -486,9 +456,6 @@ const HpCreateOrEditVApp = () => {
                 is24Hour={false}
                 display="default"
                 onChange={(event, selectedDate) => {
-                  // if (event.type === "set") {
-                  //   setNewTime(selectedDate || newTime);
-                  // }
                   if (selectedDate) {
                     setNewTime(selectedDate); // Always update with the selected time
                   }

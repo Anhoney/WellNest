@@ -1,4 +1,4 @@
-//VolunteerOpportunitiesScreen.js
+// VolunteerOpportunitiesScreen.js
 import React, { useState } from "react";
 import {
   View,
@@ -14,17 +14,14 @@ import OpportunityCard from "../../components/OpportunityCard";
 import styles from "../../components/styles"; // Assume you have a styles.js file for consistent styling
 import { Ionicons } from "@expo/vector-icons";
 import NavigationBar from "../../components/NavigationBar";
-import TabNavigator from "../../components/TabNavigator"; // New component for handling tabs
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getUserIdFromToken } from "../../../services/authService";
 import API_BASE_URL from "../../../config/config";
-import Icon from "react-native-vector-icons/FontAwesome";
 
 const VolunteerOpportunitiesScreen = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [location, setLocation] = useState("");
   const [date, setDate] = useState(new Date());
   const [activeTab, setActiveTab] = useState("opportunities");
   const navigation = useNavigation();
@@ -33,17 +30,6 @@ const VolunteerOpportunitiesScreen = () => {
   const [userId, setUserId] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // const handleTabChange = (tab) => setActiveTab(tab);
-
-  // useFocusEffect(
-  //   React.useCallback(() => {
-  //     const fetchUserId = async () => {
-  //       const id = await getUserIdFromToken();
-  //       setUserId(id);
-  //     };
-  //     fetchUserId();
-  //   }, [])
-  // );
   useFocusEffect(
     React.useCallback(() => {
       const fetchUserId = async () => {
@@ -93,13 +79,7 @@ const VolunteerOpportunitiesScreen = () => {
       setLoading(false);
     }
   };
-  // useFocusEffect(
-  //   React.useCallback(() => {
-  //     if (userId) {
-  //       fetchOpportunities(); // Fetch opportunities when userId is available
-  //     }
-  //   }, [userId, activeTab])
-  // );
+
   const archiveOpportunity = async (opportunityId) => {
     try {
       setLoading(true);
@@ -134,6 +114,7 @@ const VolunteerOpportunitiesScreen = () => {
       setLoading(false);
     }
   };
+
   const unarchiveOpportunity = async (opportunityId) => {
     try {
       setLoading(true);
@@ -170,9 +151,6 @@ const VolunteerOpportunitiesScreen = () => {
   };
 
   const handleSearch = (query) => {
-    console.log("Search:", searchQuery);
-    // Implement search functionality here
-    // setSearchQuery(query);
     fetchOpportunities(searchQuery);
   };
 
@@ -205,23 +183,6 @@ const VolunteerOpportunitiesScreen = () => {
       price: "FREE",
     },
   ];
-
-  // const renderOpportunities = () => (
-  //   <FlatList
-  //     data={opportunityData}
-  //     renderItem={({ item }) => (
-  //       <OpportunityCard
-  //         image="https://via.placeholder.com/150"
-  //         title={item.title}
-  //         location={item.location}
-  //         date={item.date}
-  //         price={item.price}
-  //       />
-  //     )}
-  //     keyExtractor={(item, index) => index.toString()}
-  //     contentContainerStyle={styles.scrollView}
-  //   />
-  // );
 
   const renderUpcomingOpportunities = () => (
     <Text style={styles.sectionTitle}>No upcoming opportunities yet!</Text>
@@ -331,10 +292,6 @@ const VolunteerOpportunitiesScreen = () => {
                 activeTab === "opportunities" && styles.seActiveTab,
               ]}
               onPress={() => handleTabChange("opportunities")}
-              // onPress={() => {
-              //   setActiveTab("opportunities");
-              //   fetchOpportunities();
-              // }}
             >
               <Text style={styles.seTabText}>Opportunities</Text>
             </TouchableOpacity>
@@ -344,10 +301,6 @@ const VolunteerOpportunitiesScreen = () => {
                 styles.voTabButton,
                 activeTab === "upcoming" && styles.seActiveTab,
               ]}
-              // onPress={() => {
-              //   setActiveTab("upcoming");
-              //   fetchOpportunities(); // Fetch registered opportunities when switching tabs
-              // }}
               onPress={() => handleTabChange("upcoming")}
             >
               <Text style={styles.seTabText}>Upcoming {"\n"}Opportunities</Text>
@@ -357,10 +310,6 @@ const VolunteerOpportunitiesScreen = () => {
                 styles.voTabButton,
                 activeTab === "past" && styles.seActiveTab,
               ]}
-              // onPress={() => {
-              //   setActiveTab("past");
-              //   fetchOpportunities();
-              // }}
               onPress={() => handleTabChange("past")}
             >
               <Text style={styles.seTabText}>Past {"\n"}Opportunities</Text>
@@ -369,7 +318,6 @@ const VolunteerOpportunitiesScreen = () => {
         </View>
 
         <View style={styles.oEventsScrollView}>
-          {/* <ScrollView contentContainerStyle={styles.scrollView}> */}
           {loading ? (
             <ActivityIndicator size="large" color="#0000ff" />
           ) : (
@@ -381,7 +329,6 @@ const VolunteerOpportunitiesScreen = () => {
                   </Text>
                   <View style={styles.displayUnderline}></View>
                   <FlatList
-                    // data={opportunities}
                     data={opportunities.sort(
                       (a, b) => new Date(b.created_at) - new Date(a.created_at)
                     )} // Sort by created_at in descending order
@@ -435,7 +382,6 @@ const VolunteerOpportunitiesScreen = () => {
                       .sort(
                         (a, b) => new Date(a.joined_at) - new Date(b.joined_at)
                       )} // Sort by joined_at in ascending order
-                    // data={opportunities}
                     keyExtractor={(item) => item.id.toString()}
                     contentContainerStyle={styles.listContainer}
                     ListEmptyComponent={renderEmptyComponent}
@@ -476,7 +422,6 @@ const VolunteerOpportunitiesScreen = () => {
                   <View style={styles.displayUnderline}></View>
                   <FlatList
                     data={opportunities}
-                    // data={opportunities.filter((opportunity) => opportunity.status === "Past")}
                     keyExtractor={(item) => item.id.toString()}
                     contentContainerStyle={styles.listContainer}
                     ListEmptyComponent={renderEmptyComponent}
@@ -513,25 +458,6 @@ const VolunteerOpportunitiesScreen = () => {
             </>
           )}
         </View>
-
-        {/* <View style={styles.volunteerContainer}>
-          <TabNavigator activeTab={activeTab} onTabChange={handleTabChange} />
-     
-          <FlatList
-            data={activeTab === "opportunities" ? opportunityData : []} // Example data for rendering opportunities
-            renderItem={({ item }) => (
-              <OpportunityCard
-                image={item.image}
-                title={item.title}
-                location={item.location}
-                date={item.date}
-                price={item.price}
-              />
-            )}
-            keyExtractor={(item, index) => index.toString()}
-            contentContainerStyle={styles.scrollView}
-          />
-        </View> */}
       </View>
       <NavigationBar navigation={navigation} activePage="Home" />
     </ImageBackground>

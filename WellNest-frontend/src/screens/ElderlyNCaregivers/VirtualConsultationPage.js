@@ -1,4 +1,4 @@
-//VirtualConsultationPage.js
+// VirtualConsultationPage.js
 import React, { useState, useCallback } from "react"; // <-- Add useState here
 import {
   View,
@@ -7,7 +7,6 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
-  StyleSheet,
   Image,
   FlatList,
 } from "react-native";
@@ -26,27 +25,21 @@ import { FontAwesome } from "@expo/vector-icons";
 const VirtualConsultationPage = () => {
   const navigation = useNavigation();
   const [date, setDate] = useState(new Date());
-  const [open, setOpen] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState("relevance");
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [location, setLocation] = useState("");
   const [categories, setCategories] = useState([]);
-  const [doctors, setDoctors] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState("");
   const [favoriteDoctors, setFavoriteDoctors] = useState([]);
   const [favorites, setFavorites] = useState([]);
-  const [selectedDoctor, setSelectedDoctor] = useState(null); // <-- Add this line
-  const [selectedTime, setSelectedTime] = useState(null); // <-- Add this line for selected time
+  const [selectedDoctor, setSelectedDoctor] = useState(null);
   const [userId, setUserId] = useState(null);
-  // const [isDatePickerOpen, setDatePickerOpen] = useState(false);
 
   // Fetch categories from API
   useFocusEffect(
     useCallback(() => {
       const fetchUserId = async () => {
         const userId = await getUserIdFromToken();
-        // console.log("userId:", userId);
         if (userId) {
           setUserId(userId);
         }
@@ -64,7 +57,6 @@ const VirtualConsultationPage = () => {
       const fetchFavoriteDoctors = async () => {
         try {
           const token = await AsyncStorage.getItem("token");
-          // console.log("Token:", token); // Log the token
 
           if (!token) {
             console.error("No token found");
@@ -77,8 +69,6 @@ const VirtualConsultationPage = () => {
               headers: { Authorization: `Bearer ${token}` },
             }
           );
-
-          // console.log("Favorite Doctors Response:", response.data); // Log the response from the backend
 
           // Extract the IDs for easier management
           const favoriteIds = response.data.map(
@@ -101,9 +91,6 @@ const VirtualConsultationPage = () => {
     try {
       const token = await AsyncStorage.getItem("token");
 
-      console.log("Token:", token); // Log the token to ensure it's being retrieved correctly
-      console.log("Doctor ID:", availabilityId); // Log the doctor ID being passed
-
       if (!token) {
         console.error("No token found");
         return;
@@ -114,8 +101,6 @@ const VirtualConsultationPage = () => {
         { availabilityId: availabilityId },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-
-      console.log("Toggle Favorite Response:", response.data); // Log the response from the backend
 
       if (response.data.success) {
         setFavorites((prevFavorites) => {
@@ -161,7 +146,6 @@ const VirtualConsultationPage = () => {
           // Navigate to AppointmentDoctorDetails with the selected doctor and date
           navigation.navigate("VirtualDoctorDetails", {
             doctorId: item.virtual_availability_id, // Assuming item.id is the doctor's ID
-            // selectedDate: date.toISOString().split("T")[0], // Pass the selected date
           });
         }}
       >
@@ -179,7 +163,6 @@ const VirtualConsultationPage = () => {
             ) : (
               <Text style={styles.doctorCategory}>No services available</Text>
             )}
-            {/* <Text style={styles.doctorCategory}>{item.location}</Text> */}
             <Text style={styles.doctorRating}>⭐ {item.rating || "N/A"}</Text>
           </View>
           <TouchableOpacity
@@ -204,29 +187,13 @@ const VirtualConsultationPage = () => {
     );
     const formattedDate = adjustedDate.toISOString().split("T")[0]; // Format as 'YYYY-MM-DD'
 
-    // Log the search parameters before making the API call
-    console.log("Search Params:", {
-      searchQuery,
-      location,
-      date: formattedDate, // Format date as 'YYYY-MM-DD'
-    });
-
     const searchParams = {
       searchQuery,
       location,
       date: formattedDate, // Format date as 'YYYY-MM-DD'
     };
 
-    // Log the parameters to ensure they are correct
-    console.log("Formatted Search Params:", searchParams);
-
     navigation.navigate("VirtualCategoryDoctors", { searchParams });
-    // const response = await axios.post(`${API_BASE_URL}/search`, {
-    //   searchQuery,
-    //   location,
-    //   date,
-    // });
-    // setDoctors(response.data); // Update the doctor list
   };
 
   const handleDoctorSelect = async (doctorId) => {
@@ -235,10 +202,6 @@ const VirtualConsultationPage = () => {
       date.getTime() - date.getTimezoneOffset() * 60000
     );
     const formattedDate = adjustedDate.toISOString().split("T")[0]; // Format as 'YYYY-MM-DD'
-
-    // Log the doctor ID and date to verify the request
-    console.log("Fetching available times for Doctor ID:", doctorId);
-    console.log("For Date:", formattedDate);
 
     // Set the selected doctor
     setSelectedDoctor(doctorId);
@@ -326,7 +289,6 @@ const VirtualConsultationPage = () => {
           {/* Show the date picker on initial render */}
           <TouchableOpacity style={styles.dateInput} onPress={showDatePicker}>
             <View style={styles.dateInputContent}>
-              {/* <Text style={styles.dateText}>{date.toDateString()}</Text> */}
               <Ionicons
                 name="calendar-outline"
                 size={20}
@@ -398,41 +360,12 @@ const VirtualConsultationPage = () => {
         {/* White Underline */}
         <View style={styles.singleUnderline}></View>
 
-        {/* ScrollView for relevant or favorite specialists */}
-        {/* <ScrollView style={styles.specialtyContainer}>
-          {selectedFilter === "relevance"
-            ? [
-                "Cardiology",
-                "Dermatology",
-                "General Medicine",
-                "Gynecology",
-                "Odontology",
-                "Oncology",
-                "Ophthalmology",
-                "Orthopedics",
-              ].map((specialty, index) => (
-                <TouchableOpacity key={index} style={styles.specialtyButton}>
-                  <Text style={styles.specialtyText}>{specialty}</Text>
-                </TouchableOpacity>
-              ))
-            : ["Saved Specialist 1", "Saved Specialist 2"].map(
-                (specialist, index) => (
-                  <TouchableOpacity key={index} style={styles.specialtyButton}>
-                    <Text style={styles.specialtyText}>{specialist}</Text>
-                  </TouchableOpacity>
-                )
-              )}
-        </ScrollView>
-      </View> */}
         {selectedFilter === "favourite" ? (
           <FlatList
             data={favoriteDoctors}
             keyExtractor={(item) => item.virtual_availability_id.toString()}
             renderItem={renderFavoriteCard}
-            ListEmptyComponent={
-              <EmptyFavorites />
-              // <Text style={styles.noDataText}>No favorites yet</Text>
-            }
+            ListEmptyComponent={<EmptyFavorites />}
           />
         ) : (
           <ScrollView style={styles.specialtyContainer}>

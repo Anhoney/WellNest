@@ -1,12 +1,10 @@
-//SocialEventDetails,js
+// SocialEventDetails,js
 import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
-  Button,
   Image,
   ScrollView,
-  StyleSheet,
   TouchableOpacity,
   ImageBackground,
   Alert,
@@ -45,11 +43,9 @@ const SocialEventDetails = () => {
       const fetchUserIdAndEvents = async () => {
         setLoading(true);
         const userId = await getUserIdFromToken();
-        console.log("userId", userId);
         if (userId) {
           setUserId(userId);
           await checkUserRegistration(userId, eventId);
-          //   await fetchEvents(co_id);
         }
         setLoading(false);
       };
@@ -67,7 +63,7 @@ const SocialEventDetails = () => {
       }
       const response = await fetch(`${API_BASE_URL}/single/event/${eventId}`, {
         headers: {
-          Authorization: `Bearer ${token}`, // Use your actual token
+          Authorization: `Bearer ${token}`,
         },
       });
       const data = await response.json();
@@ -135,11 +131,6 @@ const SocialEventDetails = () => {
           ],
           { cancelable: false }
         );
-        // );
-        // setIsRegistered(false); // Update registration status
-        // navigation.navigate("VolunteerOpportunitiesScreen", {
-        //   activeTab: "upcoming", // Navigate back to the upcoming tab
-        // });
       } else {
         Alert.alert("Error", "Failed to cancel registration.");
       }
@@ -179,10 +170,6 @@ const SocialEventDetails = () => {
       if (response.status === 201) {
         setModalVisible(false); // Close the confirmation modal
         setSuccessModalVisible(true); // Show success modal
-        // Alert.alert(
-        //   "Success",
-        //   "You have successfully registered for the event."
-        // );
       } else {
         Alert.alert("Error", "Failed to register for the event.");
       }
@@ -198,11 +185,6 @@ const SocialEventDetails = () => {
         console.error("Failed to register for the event:", error);
         Alert.alert("Error", "Failed to register for the event.");
       }
-      //   if (error.response && error.response.data.error) {
-      //     Alert.alert("Error", error.response.data.error); // Show the error message from the backend
-      //   } else {
-      //     Alert.alert("Error", "Failed to register for the event.");
-      //   }
     } finally {
       setModalVisible(false); // Close the modal after registration
     }
@@ -315,9 +297,6 @@ const SocialEventDetails = () => {
             </Text>
           </View>
 
-          {/* <TouchableOpacity style={styles.eventButton} onPress={handleRegister}>
-            <Text style={styles.eventButtonText}>Register</Text>
-          </TouchableOpacity> */}
           {isRegistered ? (
             <TouchableOpacity
               style={styles.eventButton}
@@ -426,10 +405,6 @@ const SocialEventDetails = () => {
             <View style={styles.modalButtons}>
               <TouchableOpacity
                 style={styles.modalConfirmButton}
-                // onPress={() => {
-                //   handleDelete();
-                //   setDeleteModalVisible(false);
-                // }}
                 onPress={confirmCancellation}
               >
                 <Text style={styles.modalConfirmButtonText}>Confirm</Text>

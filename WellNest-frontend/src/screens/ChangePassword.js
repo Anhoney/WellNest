@@ -1,10 +1,10 @@
+// ChangePassword.js
 import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
   TextInput,
   TouchableOpacity,
-  StyleSheet,
   Alert,
   ImageBackground,
 } from "react-native";
@@ -88,11 +88,6 @@ const ChangePassword = () => {
     debugUserId();
   }, []);
 
-  //   // Toggle password visibility
-  //   const togglePasswordVisibility = () => {
-  //     setPasswordVisible(!isPasswordVisible);
-  //   };
-
   return (
     <ImageBackground
       source={require("../../assets/PlainGrey.png")}
@@ -109,7 +104,6 @@ const ChangePassword = () => {
       </View>
 
       <View style={styles.changePwdContainer}>
-        {/* <Text style={styles.title}>Change Password</Text> */}
         <View style={styles.inputContainer}>
           <TextInput
             placeholder="Old Password"
@@ -164,37 +158,5 @@ const ChangePassword = () => {
     </ImageBackground>
   );
 };
-
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     padding: 20,
-//     justifyContent: "center",
-//     backgroundColor: "#fff",
-//   },
-//   title: {
-//     fontSize: 24,
-//     fontWeight: "bold",
-//     marginBottom: 20,
-//     textAlign: "center",
-//   },
-//   input: {
-//     borderWidth: 1,
-//     borderColor: "#ccc",
-//     borderRadius: 5,
-//     padding: 10,
-//     marginBottom: 20,
-//   },
-//   button: {
-//     backgroundColor: "#007BFF",
-//     padding: 15,
-//     borderRadius: 5,
-//   },
-//   buttonText: {
-//     color: "#fff",
-//     textAlign: "center",
-//     fontSize: 16,
-//   },
-// });
 
 export default ChangePassword;

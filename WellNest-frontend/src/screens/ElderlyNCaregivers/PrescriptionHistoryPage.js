@@ -1,3 +1,4 @@
+// PrescriptionHistoryPage.js
 import React, { useEffect, useState } from "react";
 import {
   View,
@@ -6,7 +7,6 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
-  StyleSheet,
   ImageBackground,
 } from "react-native";
 import axios from "axios";
@@ -19,13 +19,6 @@ import API_BASE_URL from "../../../config/config";
 const PrescriptionHistoryPage = () => {
   const [prescriptions, setPrescriptions] = useState([]);
   const navigation = useNavigation();
-
-  useEffect(() => {
-    // Fetch prescription data
-    // axios.get('http://<YOUR_BACKEND_URL>/prescriptions/history')
-    //   .then(response => setPrescriptions(response.data))
-    //   .catch(error => console.error('Error fetching prescriptions:', error));
-  }, []);
 
   const navigateToDetails = (id) => {
     navigation.navigate("PrescriptionDetails", { prescriptionId: id });
@@ -152,66 +145,5 @@ const PrescriptionHistoryPage = () => {
     </ImageBackground>
   );
 };
-
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     padding: 20,
-//     backgroundColor: '#F0F0F0',
-//   },
-//   title: {
-//     fontSize: 24,
-//     fontWeight: 'bold',
-//     textAlign: 'center',
-//   },
-//   searchContainer: {
-//     flexDirection: 'row',
-//     alignItems: 'center',
-//     marginVertical: 10,
-//   },
-//   searchInput: {
-//     flex: 1,
-//     backgroundColor: '#FFF',
-//     padding: 10,
-//     borderRadius: 10,
-//     elevation: 2,
-//   },
-//   sectionTitle: {
-//     fontSize: 18,
-//     fontWeight: 'bold',
-//     marginVertical: 10,
-//   },
-//   prescriptionCard: {
-//     flexDirection: 'row',
-//     backgroundColor: '#FFF',
-//     padding: 15,
-//     borderRadius: 10,
-//     marginVertical: 5,
-//     elevation: 3,
-//   },
-//   doctorImage: {
-//     width: 70,
-//     height: 70,
-//     borderRadius: 35,
-//     marginRight: 10,
-//   },
-//   infoContainer: {
-//     flex: 1,
-//   },
-//   doctorName: {
-//     fontWeight: 'bold',
-//     fontSize: 16,
-//   },
-//   doctorSpecialty: {
-//     color: '#666',
-//   },
-//   date: {
-//     color: '#77b300',
-//     fontWeight: 'bold',
-//   },
-//   type: {
-//     color: '#777',
-//   },
-// });
 
 export default PrescriptionHistoryPage;

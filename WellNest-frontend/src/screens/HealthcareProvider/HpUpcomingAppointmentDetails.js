@@ -1,17 +1,15 @@
-// HpUpcomingAppointment.js
+// HpUpcomingAppointmentDetails.js
 import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
   TouchableOpacity,
-  FlatList,
   Alert,
   ScrollView,
   ImageBackground,
   Image,
   Modal,
 } from "react-native";
-import { FontAwesome } from "@expo/vector-icons";
 import axios from "axios";
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
@@ -29,15 +27,11 @@ const HpUpcomingAppointmentDetails = ({ route }) => {
   const navigation = useNavigation();
   const [modalVisible, setModalVisible] = useState(false); // Modal visibility state
 
-  console.log("hp_app_id:", hp_app_id);
-
   useEffect(() => {
     const fetchUserId = async () => {
       const userId = await getUserIdFromToken();
-      // console.log("userId:", userId);
       if (userId) {
         setUserId(userId);
-        // fetchProfile(userId);
       }
     };
 
@@ -45,10 +39,7 @@ const HpUpcomingAppointmentDetails = ({ route }) => {
   }, []);
 
   useEffect(() => {
-    // Ensure appointments are fetched only when userId is set
-    // if (userId) {
     fetchAppointments();
-    // }
   }, [userId]);
 
   const fetchAppointments = async () => {
@@ -65,7 +56,6 @@ const HpUpcomingAppointmentDetails = ({ route }) => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      //   console.log("Fetched appointment details:", response.data); // Log the response
       setAppointments(response.data);
     } catch (error) {
       console.error("Error fetching appointments:", error);
@@ -114,73 +104,10 @@ const HpUpcomingAppointmentDetails = ({ route }) => {
     }
   };
 
-  // In your render method, log the created_at value
-  //   console.log("Created At:", appointments.created_at);
-  // Format the created_at date to a more human-readable format
-  //   const formatCreatedAt = (dateString) => {
-  //     return format(new Date(dateString), "MMMM d, yyyy, h:mm a");
-  //   };
-  //   const handleDelete = async (id) => {
-  //     try {
-  //       const token = await AsyncStorage.getItem("token");
-  //       if (!token) {
-  //         alert("No token found. Please log in.");
-  //         return;
-  //       }
-
-  //       await axios.delete(`${API_BASE_URL}/appointments/${id}`, {
-  //         headers: { Authorization: `Bearer ${token}` },
-  //       });
-  //       Alert.alert("Deleted", "Appointment deleted successfully");
-  //       fetchAppointments(userId);
-  //     } catch (error) {
-  //       console.error("Error deleting appointment:", error);
-  //       Alert.alert("Error", "Failed to delete appointment");
-  //     }
-  //   };
-
-  //   const renderAppointment = ({ item }) => (
-  //     <View style={styles.hpAppointmentContainer}>
-  //       <View style={styles.appointmentHeader}>
-  //         <Text style={styles.createdByText}>Created by: </Text>
-  //         <TouchableOpacity onPress={() => handleDelete(item.id)}>
-  //           <FontAwesome name="trash" size={20} color="black" />
-  //         </TouchableOpacity>
-  //       </View>
-  //       <Text style={styles.appointmentDate}>
-  //         {new Date(item.created_at).toLocaleDateString("en-GB", {
-  //           day: "2-digit",
-  //           month: "long",
-  //           year: "numeric",
-  //           hour: "2-digit",
-  //           minute: "2-digit",
-  //           hour12: true,
-  //         })}
-  //       </Text>
-  //       <Text style={styles.category}>
-  //         Category: {item.category || "N/A"} {/* Display category */}
-  //       </Text>
-  //       <View style={styles.hpAbuttonContainer}>
-  //         <TouchableOpacity
-  //           style={styles.hpAbutton}
-  //           onPress={() => handleEdit(item.id)}
-  //           // onPress={() => navigation.navigate("HpAppointmentEditPage")}
-  //         >
-  //           <Text style={styles.hpAbuttonText}>Edit creation</Text>
-  //         </TouchableOpacity>
-  //         <TouchableOpacity style={styles.hpAbutton}>
-  //           <Text style={styles.hpAbuttonText}>Preview</Text>
-  //         </TouchableOpacity>
-  //       </View>
-  //     </View>
-  //   );
-  //   const handleEdit = (appointmentId) => {
-  //     navigation.navigate("HpAppointmentEditPage", { appointmentId });
-  //   };
   const imageUri = appointments.profile_image
     ? `data:image/png;base64${appointments.profile_image}`
     : "https://via.placeholder.com/150";
-  //   console.log("Image URI:", imageUri);
+
   return (
     <ImageBackground
       source={require("../../../assets/PlainGrey.png")}
@@ -269,7 +196,6 @@ const HpUpcomingAppointmentDetails = ({ route }) => {
               <View style={styles.tableRow}>
                 <Text style={styles.tableCell}>Appointment Created At:</Text>
                 <Text style={styles.tableCell}>
-                  {/* {formatCreatedAt(appointments.created_at)} */}
                   {appointments.created_at
                     ? formatCreatedAt(appointments.created_at)
                     : "N/A"}
@@ -282,7 +208,6 @@ const HpUpcomingAppointmentDetails = ({ route }) => {
       <View>
         <TouchableOpacity
           style={styles.deleteButton}
-          // onPress={deleteAppointment}
           onPress={() => setModalVisible(true)} // Show modal
         >
           <Text style={styles.deleteButtonText}>Delete Appointment</Text>

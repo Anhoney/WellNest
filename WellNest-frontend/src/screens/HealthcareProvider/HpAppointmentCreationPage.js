@@ -1,11 +1,10 @@
-//HpAppointmentCreationPage.js
+// HpAppointmentCreationPage.js
 import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
   TextInput,
   TouchableOpacity,
-  StyleSheet,
   ScrollView,
   ImageBackground,
   Alert,
@@ -15,7 +14,7 @@ import styles from "../../components/styles"; // Import shared styles
 import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
 import { RadioButton } from "react-native-paper"; // For the radio button
-import HpNavigationBar from "../../components/HpNavigationBar"; // Import your custom navigation bar component
+import HpNavigationBar from "../../components/HpNavigationBar";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import {
@@ -35,7 +34,7 @@ const HpAppointmentCreationPage = () => {
   const [showPicker, setShowPicker] = useState(false);
   const [errors, setErrors] = useState({}); // State to track validation errors
   const navigation = useNavigation();
-  const [category, setCategory] = useState("Cardiology"); // New state for category
+  const [category, setCategory] = useState("Cardiology");
   const [otherCategory, setOtherCategory] = useState(""); // For custom category
   const [loading, setLoading] = useState(true); // Loading state
   const [userId, setUserId] = useState(null);
@@ -49,7 +48,6 @@ const HpAppointmentCreationPage = () => {
         const fetchedUserId = await getUserIdFromToken();
         if (fetchedUserId) {
           setUserId(fetchedUserId);
-          console.log(fetchedUserId);
           // Fetch appointments for the user
           const token = await AsyncStorage.getItem("token");
           if (!token) {
@@ -62,7 +60,6 @@ const HpAppointmentCreationPage = () => {
               headers: { Authorization: `Bearer ${token}` },
             }
           );
-          console.log(`${API_BASE_URL}/appointments/user/${fetchedUserId}`);
           const appointment = response.data;
 
           // Set existing appointment if found
@@ -80,8 +77,6 @@ const HpAppointmentCreationPage = () => {
                 : []
             );
           }
-          console.log("AppointmentId:", appointmentId);
-          console.log("Fetched appointment data:", appointment);
         } else {
           throw new Error("Failed to fetch userId.");
         }
@@ -89,69 +84,12 @@ const HpAppointmentCreationPage = () => {
         console.error("Error initializing data:", error);
         alert("Failed to load appointment data. Please try again later.");
       } finally {
-        setLoading(false); // Ensure loading state is updated
+        setLoading(false);
       }
     };
 
     initializeData();
   }, []);
-
-  // const fetchUserId = async () => {
-  //   const userId = await getUserIdFromToken();
-  //   // console.log("userId:", userId);
-  //   if (userId) {
-  //     setUserId(userId);
-  //     fetchProfileData(userId);
-  //   }
-  // };
-  // // Function to fetch appointments for a specific user
-  // const fetchAppointments = async (userId) => {
-  //   try {
-  //     const token = await AsyncStorage.getItem("token");
-  //     console.log("Token:", token); // Log the token to verify it's correct
-  //     console.log("userId:", userId);
-  //     // setLoading(true);
-  //     // setError(null);
-  //     const response = await axios.get(
-  //       `${API_BASE_URL}/api/appointments/user/${userId}`,
-  //       {
-  //         headers: { Authorization: `Bearer ${token}` },
-  //       }
-  //     );
-  //     console.log("Appointments:", response.data);
-  //     const appointment = response.data;
-  //     console.log(response.data);
-  //     console.log("Fetched appointment:", appointment); // Log the entire appointment object
-  //     setDescription(appointment.description);
-  //     setLocation(appointment.location);
-  //     setAvailableDays(appointment.available_days);
-  //     console.log("Available days:", appointment.available_days);
-  //     setCategory(appointment.category);
-  //     // Safely set availableTimes only if it's an array
-  //     setAvailableTimes(
-  //       Array.isArray(appointment.available_times)
-  //         ? appointment.available_times
-  //         : []
-  //     );
-  //     // setAppointments(response.data);
-  //   } catch (err) {
-  //     console.error("Error fetching appointments:", err);
-  //     setError("Failed to fetch appointments");
-  //   }
-  //   // finally {
-  //   //   setLoading(false);
-  //   // }
-  // };
-
-  // useEffect(() => {
-  //   fetchUserId();
-  //   fetchAppointments(userId);
-  // }, [userId]);
-  // useEffect(() => {
-  //   if (userId) {
-  //     fetchAppointments(userId);
-  //   }
-  // }, [userId]);
 
   const handleAddTime = () => {
     const timeString = newTime.toLocaleTimeString([], {
@@ -253,7 +191,7 @@ const HpAppointmentCreationPage = () => {
             headers: { Authorization: `Bearer ${token}` },
           }
         );
-        // console.log(response);
+
         if (response.status === 200) {
           alert("Appointment created successfully!");
           navigation.goBack(); // Navigate back to previous page after submission
@@ -267,8 +205,6 @@ const HpAppointmentCreationPage = () => {
         console.error("Error creating appointment:", error);
         alert("Failed to create appointment.");
       }
-      // console.error("Error creating appointment:", error);
-      // alert("Failed to create appointment.");
     }
   };
 
@@ -339,10 +275,6 @@ const HpAppointmentCreationPage = () => {
       </View>
 
       <ScrollView contentContainerStyle={styles.hpContainer}>
-        {/* <View style={styles.header}>
-          <Text style={styles.headerText}>Appointments Creation</Text>
-        </View> */}
-
         <Text style={styles.sectionTitle}>
           {"\n"}Appointments Details{"\n"}
         </Text>
@@ -350,10 +282,6 @@ const HpAppointmentCreationPage = () => {
         <View style={styles.formContainer}>
           <Text style={styles.label}>Descriptions</Text>
           <TextInput
-            // style={styles.hpInput}
-            // value={description}
-            // onChangeText={setDescription}
-            // multiline
             style={getInputStyle(!errors.description)}
             placeholder={"Enter Description"}
             value={description}
@@ -366,9 +294,6 @@ const HpAppointmentCreationPage = () => {
 
           <Text style={styles.label}>Hospital Name / Location</Text>
           <TextInput
-            // style={styles.hpInput}
-            // value={location}
-            // onChangeText={setLocation}
             style={getInputStyle(!errors.location)}
             placeholder={"Enter Hospital Name / Location"}
             value={location}
@@ -380,10 +305,6 @@ const HpAppointmentCreationPage = () => {
 
           <Text style={styles.label}>Hospital Address</Text>
           <TextInput
-            // style={styles.hpInput}
-            // value={description}
-            // onChangeText={setDescription}
-            // multiline
             style={getInputStyle(!errors.hospitalAdds)}
             placeholder={"Enter Hospital Address"}
             value={hospitalAdds}
@@ -405,7 +326,7 @@ const HpAppointmentCreationPage = () => {
                 value="Everyday"
                 mode="android"
                 position="leading"
-                color="#FFA500" // Replace with your desired color
+                color="#FFA500"
                 labelStyle={styles.hpradioLabel}
               />
             </View>

@@ -81,7 +81,6 @@ const CoAddAssessmentScreen = () => {
             : null
         );
         setQuestions(response.data.questions);
-        // setSelectedFile(response.data.photo.uri.split("/").pop());
 
         // Fetch results
         const resultsResponse = await axios.get(
@@ -120,8 +119,6 @@ const CoAddAssessmentScreen = () => {
       console.log("ImagePicker result:", result);
       if (!result.canceled) {
         setPhoto(result.assets[0].uri);
-        // setSelectedFile(result.assets[0].fileName);
-        // setSelectedFile(result.assets[0].uri.split("/").pop());
         setSelectedFile(result);
       } else {
         console.log("Image selection was cancelled.");
@@ -182,35 +179,7 @@ const CoAddAssessmentScreen = () => {
     setScores(newScores);
   };
 
-  //   const handleSubmit = () => {
-  //     // Validate and submit the questions
-  //     if (
-  //       questions.some(
-  //         (q) => !q.question || q.answers.some((a) => !a.text || a.mark === "")
-  //       )
-  //     ) {
-  //       Alert.alert(
-  //         "Error",
-  //         "Please fill in all questions and answers with marks."
-  //       );
-  //       return;
-  //     }
-
-  //     // Here you can handle the submission of questions to the backend
-  //     console.log("Questions submitted:", questions);
-  //     Alert.alert("Success", "Assessment questions created successfully!");
-  //     navigation.goBack(); // Navigate back after submission
-  //   };
   const handleSubmit = async () => {
-    // if (
-    //   !title ||
-    //   questions.some(
-    //     (q) => q.question && q.answers.some((a) => !a.text || a.mark === "")
-    //   )
-    // ) {
-    //   Alert.alert("Error", "Please fill in all required fields.");
-    //   return;
-    // }
     // Check if title and photo are provided
     if (!title) {
       Alert.alert("Error", "Please provide a title.");
@@ -243,14 +212,8 @@ const CoAddAssessmentScreen = () => {
       Alert.alert("Error", "Please provide at least two valid score entries.");
       return;
     }
-    // Check if there are at least two scores
-    // if (scores.length < 2) {
-    //   Alert.alert("Error", "Please provide at least two score entries.");
-    //   return;
-    // }
 
     try {
-      console.log("UserId Assessment:", userId);
       const token = await AsyncStorage.getItem("token");
 
       if (!token) {
@@ -273,7 +236,7 @@ const CoAddAssessmentScreen = () => {
             headers: { Authorization: `Bearer ${token}` },
           }
         );
-        // Alert.alert("Success", "Assessment updated successfully!");
+
         // Update scores
         await axios.put(
           `${API_BASE_URL}/assessments/${route.params.assessmentId}/results`,
@@ -294,17 +257,6 @@ const CoAddAssessmentScreen = () => {
         );
         Alert.alert("Success", response.data.message);
       }
-
-      // Submit scores
-      //   if (route.params && route.params.assessmentId) {
-      //     await axios.post(
-      //       `${API_BASE_URL}/assessments/${route.params.assessmentId}/results`,
-      //       { scores },
-      //       {
-      //         headers: { Authorization: `Bearer ${token}` },
-      //       }
-      //     );
-      //   }
       navigation.goBack();
     } catch (error) {
       console.error("Error submitting assessment:", error);
@@ -400,16 +352,6 @@ const CoAddAssessmentScreen = () => {
 
           <Text style={styles.label}>Photo or Icon</Text>
           <TouchableOpacity style={styles.mrinput} onPress={handlePhotoUpload}>
-            {/* <Text>📤 Upload Photo</Text> */}
-            {/* {photo ? (
-              //   <Image
-              //     source={{ uri: photo }}
-              //     style={styles.uploadedPhotoPreview}
-              //   />
-              <Text>{selectedFile}</Text>
-            ) : (
-              <Text>📤 Upload Photo</Text>
-            )} */}
             {photo ? (
               <Text>Change Photo</Text>
             ) : selectedFile &&
@@ -419,12 +361,6 @@ const CoAddAssessmentScreen = () => {
             ) : (
               <Text>📤 Upload Photo</Text>
             )}
-
-            {/* {selectedFile ? (
-              <Text>{selectedFile}</Text> // Display the filename if uploaded
-            ) : (
-              <Text>📤 Upload Photo</Text> // Default text if no file is selected
-            )} */}
           </TouchableOpacity>
 
           <Text style={styles.label}>Create Questions</Text>
@@ -461,13 +397,11 @@ const CoAddAssessmentScreen = () => {
                     style={styles.hpInput}
                     placeholder="Marks"
                     keyboardType="numeric"
-                    // value={answer.mark ? answer.mark.toString() : ""}
                     value={
                       answer.mark !== null && answer.mark !== undefined
                         ? answer.mark.toString()
                         : ""
                     }
-                    // value={answer.mark}
                     onChangeText={(text) =>
                       handleMarkChange(text, questionIndex, answerIndex)
                     }

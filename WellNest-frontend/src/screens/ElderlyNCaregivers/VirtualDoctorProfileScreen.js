@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useCallback } from "react";
+// VirtualDoctorProfileScreen.js
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -25,8 +26,6 @@ const VirtualDoctorProfileScreen = () => {
   const [loading, setLoading] = useState(true);
   const [selectedService, setSelectedService] = useState(null);
   const [services, setServices] = useState([]);
-
-  console.log("DoctorProfileScreen Doctor ID:", doctorId);
 
   useEffect(() => {
     const fetchDoctorProfile = async () => {
@@ -154,14 +153,7 @@ const VirtualDoctorProfileScreen = () => {
       </View>
       <View style={styles.uAcontainer}>
         <View style={styles.whiteUAcontainer}>
-          <ScrollView
-            // style={styles.container}
-            contentContainerStyle={
-              styles.scrollViewContent
-              // alignItems: "center",
-              // justifyContent: "flex-start",
-            } // Move layout styles here
-          >
+          <ScrollView contentContainerStyle={styles.scrollViewContent}>
             <Text style={styles.aSectionTitle}>Summary</Text>
             <View style={styles.displayUnderline} />
             <Text style={styles.sectionContent}>{doctor.summary}</Text>

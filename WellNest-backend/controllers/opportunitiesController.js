@@ -1,9 +1,5 @@
 // opportunitiesController.js
 const pool = require("../config/db");
-const { format } = require("date-fns"); // Install via `npm install date-fns`
-// const {
-//   triggerNotification,
-// } = require("../controllers/notificationController"); // Import the triggerNotification function
 const { notifyUser } = require("./notificationController");
 const multer = require("multer");
 const fs = require("fs");
@@ -21,13 +17,11 @@ const storage = multer.diskStorage({
     cb(null, "uploads/"); // Ensure this folder exists in your project
   },
   filename: function (req, file, cb) {
-    //   cb(null, `${Date.now()}_${file.originalname}`);
-    // },
     cb(null, Date.now() + path.extname(file.originalname)); // Generate unique filename
   },
 });
 
-// const upload = multer({ storage: storage });
+// Create a Multer instance for handling file uploads
 const upload = multer({
   storage: storage,
   limits: { fileSize: 5 * 1024 * 1024 }, // Limit file size to 5MB
@@ -42,10 +36,11 @@ const upload = multer({
       return cb(null, true);
     }
     console.error("File type not allowed:", file.mimetype);
-    cb(new Error("Only image files are allowed!"), false);
+    cb(new Error("Only image files are allowed!"), false); // Reject files that do not match the allowed types
   },
 }); // Define upload but do not call .single here
 
+// Create a new opportunity
 const createOpportunity = async (req, res) => {
   const {
     title,
@@ -59,14 +54,12 @@ const createOpportunity = async (req, res) => {
     capacity,
     opportunity_status,
   } = req.body;
-  console.log("Request Body:", req.body);
-  // const photo = req.file ? req.file.buffer : null; // Handling binary image data
+
   const { co_id } = req.params;
-  console.log("co_id", co_id);
 
   // For binary data storage
   const photo = req.file ? req.file.path : null;
-  console.log(photo);
+
   let photoData = null;
   if (photo) {
     try {
@@ -78,9 +71,10 @@ const createOpportunity = async (req, res) => {
     }
   }
   try {
+    // Insert the new opportunity into the database
     const query = await pool.query(
       `
-       INSERT INTO co_available_opportunities (
+      INSERT INTO co_available_opportunities (
       co_id, title, fees, location, opportunity_date, opportunity_time, notes, 
       terms_and_conditions, photo, registration_due, capacity, opportunity_status
     ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
@@ -94,7 +88,6 @@ const createOpportunity = async (req, res) => {
         time,
         notes || null,
         terms_and_conditions,
-        // photo,
         photoData,
         registration_due || null,
         capacity || null,
@@ -103,7 +96,6 @@ const createOpportunity = async (req, res) => {
     );
 
     res.status(201).json({ message: "Opportunity created successfully!" });
-    // res.status(200).json(result.rows[0]);
   } catch (error) {
     console.error("Error creating opportunity:", error);
     res.status(500).json({ error: "Failed to create opportunity" });
@@ -113,8 +105,9 @@ const createOpportunity = async (req, res) => {
 // Function to get appointment details by hp_app_id
 const getOpportunity = async (req, res) => {
   const { opportunity_id } = req.params;
-  console.log("getOpportunityId", opportunity_id);
+
   try {
+    // Query to fetch the opportunity details
     const query = `
         SELECT 
           o.id, 
@@ -159,7 +152,6 @@ const getOpportunity = async (req, res) => {
 // Update an existing opportunity
 const updateOpportunity = async (req, res) => {
   const { opportunity_id } = req.params;
-  console.log("updateOpportunityId", opportunity_id);
   const {
     title,
     fees,
@@ -172,10 +164,10 @@ const updateOpportunity = async (req, res) => {
     capacity,
     opportunity_status,
   } = req.body;
-  console.log("Update request Body:", req.body);
+
   // For binary data storage
   const photo = req.file ? req.file.path : null;
-  console.log(photo);
+
   let photoData = null;
   if (photo) {
     try {
@@ -188,6 +180,7 @@ const updateOpportunity = async (req, res) => {
   }
 
   try {
+    // Update the opportunity details in the database
     const query = `
         UPDATE co_available_opportunities
         SET 
@@ -204,7 +197,6 @@ const updateOpportunity = async (req, res) => {
       time,
       notes || null,
       terms_and_conditions,
-      // photo,
       photoData || null,
       registration_due || null,
       capacity || null,
@@ -228,6 +220,7 @@ const deleteOpportunity = async (req, res) => {
   const { opportunity_id } = req.params;
 
   try {
+    // Query to delete the opportunity
     const query = `DELETE FROM co_available_opportunities WHERE id = $1`;
     const result = await pool.query(query, [opportunity_id]);
 
@@ -242,11 +235,13 @@ const deleteOpportunity = async (req, res) => {
   }
 };
 
+// Get opportunities created by a specific user (community organizer)
 const getOpportunitiesByUserId = async (req, res) => {
   const { co_id } = req.params; // Extract user ID from the route params
   const { search } = req.query; // Get the search query from the request
-  console.log("getOpportunitiesByUserId", co_id);
+
   try {
+    // Query to fetch opportunities for the user
     const query = `
       SELECT 
         id, co_id, title, fees, location, 
@@ -272,7 +267,7 @@ const getOpportunitiesByUserId = async (req, res) => {
     if (result.rows.length === 0) {
       return res.status(200).json({ opportunities: [] });
     }
-    // console.log("result.rows", result.rows);
+
     res.status(200).json({ opportunities: result.rows });
   } catch (error) {
     console.error("Error fetching opportunitys by user ID:", error);
@@ -280,11 +275,13 @@ const getOpportunitiesByUserId = async (req, res) => {
   }
 };
 
+// Add a participant to an opportunity
 const addParticipantToOpportunity = async (req, res) => {
   const { opportunity_id } = req.params;
   const { user_id } = req.body; // Assuming user_id is passed in the body
 
   try {
+    // Insert participant into the opportunity
     const query = `INSERT INTO opportunity_participants (opportunity_id, user_id) VALUES ($1, $2) RETURNING *`;
     const result = await pool.query(query, [opportunity_id, user_id]);
     res.status(201).json({
@@ -304,11 +301,12 @@ const addParticipantToOpportunity = async (req, res) => {
   }
 };
 
+// Get participants for a specific opportunity
 const getOpportunityParticipants = async (req, res) => {
   const { opportunity_id } = req.params;
-  console.log("Fetching participants for opportunity_id:", opportunity_id); // Log the opportunity_id
 
   try {
+    // Query to fetch participants for the opportunity
     const query = `
       SELECT 
         op.id AS participant_id,
@@ -324,12 +322,6 @@ const getOpportunityParticipants = async (req, res) => {
     `;
     const result = await pool.query(query, [opportunity_id]);
 
-    console.log("Query result:", result.rows); // Log the result of the query
-
-    if (result.rows.length === 0) {
-      console.log("No participants found for this opportunity."); // Log if no participants found
-    }
-
     res.status(200).json({ participants: result.rows });
   } catch (error) {
     console.error("Error fetching participants:", error);
@@ -337,10 +329,12 @@ const getOpportunityParticipants = async (req, res) => {
   }
 };
 
+// Get the count of participants for a specific opportunity
 const getParticipantCount = async (req, res) => {
   const { opportunity_id } = req.params;
-  console.log("getParticipantCount", opportunity_id);
+
   try {
+    // Query to count participants for the opportunity
     const query = `SELECT COUNT(*) FROM opportunity_participants WHERE opportunity_id = $1`;
     const result = await pool.query(query, [opportunity_id]);
     res.status(200).json({ count: result.rows[0].count });
@@ -350,13 +344,13 @@ const getParticipantCount = async (req, res) => {
   }
 };
 
-//Elderly
+// Elderly
+// Get opportunities for the elderly site
 const getOpportunitiesElderlySite = async (req, res) => {
-  // const { co_id } = req.params; // Extract user ID from the route params
   const { search } = req.query; // Get the search query from the request
 
   try {
-    // Base query
+    // Base query to fetch opportunities
     let query = `
       SELECT
         e.id, e.co_id, e.title, e.fees, e.location,
@@ -372,7 +366,7 @@ const getOpportunitiesElderlySite = async (req, res) => {
       FROM co_available_opportunities e
       LEFT JOIN opportunity_participants ep ON e.id = ep.opportunity_id
       WHERE 
-         e.registration_due >= CURRENT_DATE
+        e.registration_due >= CURRENT_DATE
         AND e.opportunity_status = 'Active'
     `;
 
@@ -403,6 +397,7 @@ const getOpportunitiesElderlySite = async (req, res) => {
   }
 };
 
+// Get registered opportunities for a specific user
 const getRegisteredOpportunitiesByUserId = async (req, res) => {
   const { user_id } = req.params; // Extract user ID from the route params
   const { search } = req.query;
@@ -433,10 +428,10 @@ const getRegisteredOpportunitiesByUserId = async (req, res) => {
     const result = await pool.query(query, params);
 
     if (result.rows.length === 0) {
-      return res.status(200).json({ opportunities: [] });
+      return res.status(200).json({ opportunities: [] }); // Return empty array if no registered opportunities found
     }
 
-    res.status(200).json({ opportunities: result.rows });
+    res.status(200).json({ opportunities: result.rows }); // Return the registered opportunities as JSON
   } catch (error) {
     console.error("Error fetching registered opportunities by user ID:", error);
     res
@@ -445,6 +440,7 @@ const getRegisteredOpportunitiesByUserId = async (req, res) => {
   }
 };
 
+// Get past opportunities for a specific user
 const getPastOpportunitiesByUserId = async (req, res) => {
   const { user_id } = req.params;
   const { search } = req.query;
@@ -467,7 +463,7 @@ const getPastOpportunitiesByUserId = async (req, res) => {
       WHERE ep.user_id = $1 AND ep.status = 'Past'
     `;
 
-    const params = [user_id];
+    const params = [user_id]; // Prepare parameters for the query
     if (search) {
       query += " AND e.title ILIKE $2"; // Add search condition
       params.push(`%${search}%`); // Add search term to params
@@ -476,7 +472,7 @@ const getPastOpportunitiesByUserId = async (req, res) => {
     const result = await pool.query(query, params);
 
     if (result.rows.length === 0) {
-      return res.status(200).json({ opportunities: [] });
+      return res.status(200).json({ opportunities: [] }); // Return empty array if no past opportunities found
     }
 
     res.status(200).json({ opportunities: result.rows });
@@ -485,6 +481,8 @@ const getPastOpportunitiesByUserId = async (req, res) => {
     res.status(500).json({ error: "Failed to fetch past opportunities." });
   }
 };
+
+// Archive an opportunity for a participant
 const archiveOpportunity = async (req, res) => {
   const { opportunity_id, user_id } = req.params;
 
@@ -507,6 +505,7 @@ const archiveOpportunity = async (req, res) => {
   }
 };
 
+// Unarchive an opportunity for a participant
 const unarchiveOpportunity = async (req, res) => {
   const { opportunity_id, user_id } = req.params;
 
@@ -529,6 +528,7 @@ const unarchiveOpportunity = async (req, res) => {
   }
 };
 
+// Check if a user is registered for an opportunity
 const checkOpportunityRegistration = async (req, res) => {
   const { user_id, opportunity_id } = req.params; // Extract user ID and opportunity ID from the route params
 
@@ -550,6 +550,7 @@ const checkOpportunityRegistration = async (req, res) => {
   }
 };
 
+// Delete a participant from an opportunity
 const deleteParticipant = async (req, res) => {
   const { opportunity_id, user_id } = req.params; // Extract the participant ID from the route params
 

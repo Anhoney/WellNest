@@ -1,9 +1,6 @@
 // eventsController.js
 const pool = require("../config/db");
 const { format } = require("date-fns"); // Install via `npm install date-fns`
-// const {
-//   triggerNotification,
-// } = require("../controllers/notificationController"); // Import the triggerNotification function
 const { notifyUser } = require("./notificationController");
 const multer = require("multer");
 const fs = require("fs");
@@ -21,13 +18,11 @@ const storage = multer.diskStorage({
     cb(null, "uploads/"); // Ensure this folder exists in your project
   },
   filename: function (req, file, cb) {
-    //   cb(null, `${Date.now()}_${file.originalname}`);
-    // },
     cb(null, Date.now() + path.extname(file.originalname)); // Generate unique filename
   },
 });
 
-// const upload = multer({ storage: storage });
+// Create a Multer instance
 const upload = multer({
   storage: storage,
   limits: { fileSize: 5 * 1024 * 1024 }, // Limit file size to 5MB
@@ -59,14 +54,13 @@ const createEvent = async (req, res) => {
     capacity,
     event_status,
   } = req.body;
-  console.log("Request Body:", req.body);
+
   // const photo = req.file ? req.file.buffer : null; // Handling binary image data
   const { co_id } = req.params;
-  console.log("co_id", co_id);
 
   // For binary data storage
   const photo = req.file ? req.file.path : null;
-  console.log(photo);
+
   let photoData = null;
   if (photo) {
     try {
@@ -94,7 +88,6 @@ const createEvent = async (req, res) => {
         time,
         notes || null,
         terms_and_conditions,
-        // photo,
         photoData,
         registration_due || null,
         capacity || null,
@@ -103,7 +96,6 @@ const createEvent = async (req, res) => {
     );
 
     res.status(201).json({ message: "Event created successfully!" });
-    // res.status(200).json(result.rows[0]);
   } catch (error) {
     console.error("Error creating event:", error);
     res.status(500).json({ error: "Failed to create event" });
@@ -113,7 +105,7 @@ const createEvent = async (req, res) => {
 // Function to get appointment details by hp_app_id
 const getEvent = async (req, res) => {
   const { event_id } = req.params;
-  console.log("getEventId", event_id);
+
   try {
     const query = `
         SELECT 
@@ -159,7 +151,7 @@ const getEvent = async (req, res) => {
 // Update an existing event
 const updateEvent = async (req, res) => {
   const { event_id } = req.params;
-  console.log("updateEventId", event_id);
+
   const {
     title,
     fees,
@@ -171,12 +163,11 @@ const updateEvent = async (req, res) => {
     registration_due,
     capacity,
     event_status,
-    // photo,// Base64 or binary data if sent
   } = req.body;
   console.log("Update request Body:", req.body);
   // For binary data storage
   const photo = req.file ? req.file.path : null;
-  console.log(photo);
+
   let photoData = null;
   if (photo) {
     try {
@@ -205,9 +196,7 @@ const updateEvent = async (req, res) => {
       time,
       notes || null,
       terms_and_conditions,
-      // photo,
       photoData || null,
-      // ..(photoData ? [photoData] : []),
       registration_due || null,
       capacity || null,
       event_status || null,
@@ -244,6 +233,7 @@ const deleteEvent = async (req, res) => {
   }
 };
 
+// Get events created by a specific user (community organizer)
 const getEventsByUserId = async (req, res) => {
   const { co_id } = req.params; // Extract user ID from the route params
   const { search } = req.query; // Get the search query from the request
@@ -282,6 +272,7 @@ const getEventsByUserId = async (req, res) => {
   }
 };
 
+// Add a participant to an event
 const addParticipantToEvent = async (req, res) => {
   const { event_id } = req.params;
   const { user_id } = req.body; // Assuming user_id is passed in the body
@@ -306,9 +297,9 @@ const addParticipantToEvent = async (req, res) => {
   }
 };
 
+// Get participants for a specific event
 const getEventParticipants = async (req, res) => {
   const { event_id } = req.params;
-  console.log("Fetching participants for event_id:", event_id); // Log the event_id
 
   try {
     const query = `
@@ -326,8 +317,6 @@ const getEventParticipants = async (req, res) => {
     `;
     const result = await pool.query(query, [event_id]);
 
-    console.log("Query result:", result.rows); // Log the result of the query
-
     if (result.rows.length === 0) {
       console.log("No participants found for this event."); // Log if no participants found
     }
@@ -339,6 +328,7 @@ const getEventParticipants = async (req, res) => {
   }
 };
 
+// Get the count of participants for a specific event
 const getParticipantCount = async (req, res) => {
   const { event_id } = req.params;
 
@@ -353,8 +343,8 @@ const getParticipantCount = async (req, res) => {
 };
 
 //Elderly site
+// Get all events from community organizers
 const getEventsElderlySite = async (req, res) => {
-  // const { co_id } = req.params; // Extract user ID from the route params
   const { search } = req.query; // Get the search query from the request
 
   try {
@@ -410,27 +400,12 @@ const getEventsElderlySite = async (req, res) => {
   }
 };
 
+// Get registered events for a specific user
 const getRegisteredEventsByUserId = async (req, res) => {
   const { user_id } = req.params; // Extract user ID from the route params
-  const { search } = req.query;
+  const { search } = req.query; // Get the search query from the request
 
   try {
-    // const query = `
-    //   SELECT
-    //     e.id, e.co_id, e.title, e.fees, e.location,
-    //     e.event_date, e.event_time, e.notes,
-    //     e.terms_and_conditions,
-    //     CASE
-    //       WHEN e.photo IS NOT NULL
-    //       THEN CONCAT('data:image/png;base64,', ENCODE(e.photo, 'base64'))
-    //       ELSE NULL
-    //     END AS photo,
-    //     e.registration_due, e.created_at,
-    //     e.capacity, e.event_status, ep.joined_at
-    //   FROM event_participants ep
-    //   JOIN co_available_events e ON ep.event_id = e.id
-    //   WHERE ep.user_id = $1 AND e.event_status = 'Active' AND ep.status = 'Ongoing'
-    // `;
     let query = `
     SELECT 
       e.id, e.co_id, e.title, e.fees, e.location, 
@@ -447,7 +422,7 @@ const getRegisteredEventsByUserId = async (req, res) => {
     JOIN co_available_events e ON ep.event_id = e.id
     WHERE ep.user_id = $1 AND e.event_status = 'Active' AND ep.status = 'Ongoing'
   `;
-    const params = [user_id];
+    const params = [user_id]; // Prepare parameters for the query
     if (search) {
       query += " AND e.title ILIKE $2"; // Add search condition
       params.push(`%${search}%`); // Add search term to params
@@ -460,19 +435,13 @@ const getRegisteredEventsByUserId = async (req, res) => {
     }
 
     res.status(200).json({ events: result.rows });
-    // const result = await pool.query(query, [user_id]);
-
-    // if (result.rows.length === 0) {
-    //   return res.status(200).json({ events: [] });
-    // }
-
-    // res.status(200).json({ events: result.rows });
   } catch (error) {
     console.error("Error fetching registered events by user ID:", error);
     res.status(500).json({ error: "Failed to fetch registered events." });
   }
 };
 
+// Get past events for a specific user
 const getPastEventsByUserId = async (req, res) => {
   const { user_id } = req.params;
   const { search } = req.query;
@@ -494,22 +463,6 @@ const getPastEventsByUserId = async (req, res) => {
       JOIN co_available_events e ON ep.event_id = e.id
       WHERE ep.user_id = $1 AND ep.status = 'Past'
     `;
-    // const query = `
-    //   SELECT
-    //     e.id, e.co_id, e.title, e.fees, e.location,
-    //     e.event_date, e.event_time, e.notes,
-    //     e.terms_and_conditions,
-    //     CASE
-    //       WHEN e.photo IS NOT NULL
-    //       THEN CONCAT('data:image/png;base64,', ENCODE(e.photo, 'base64'))
-    //       ELSE NULL
-    //     END AS photo,
-    //     e.registration_due, e.created_at,
-    //     e.capacity, e.event_status
-    //   FROM event_participants ep
-    //   JOIN co_available_events e ON ep.event_id = e.id
-    //   WHERE ep.user_id = $1 AND ep.status = 'Past'
-    // `;
     const params = [user_id];
     if (search) {
       query += " AND e.title ILIKE $2"; // Add search condition
@@ -523,19 +476,13 @@ const getPastEventsByUserId = async (req, res) => {
     }
 
     res.status(200).json({ events: result.rows });
-    // const result = await pool.query(query, [user_id]);
-
-    // if (result.rows.length === 0) {
-    //   return res.status(200).json({ events: [] });
-    // }
-    // console.log(result.rows);
-    // res.status(200).json({ events: result.rows });
   } catch (error) {
     console.error("Error fetching past events by user ID:", error);
     res.status(500).json({ error: "Failed to fetch past events." });
   }
 };
 
+// Archive an event for a participant
 const archiveEvent = async (req, res) => {
   const { event_id, user_id } = req.params;
 
@@ -558,6 +505,7 @@ const archiveEvent = async (req, res) => {
   }
 };
 
+// Unarchive an event for a participant
 const unarchiveEvent = async (req, res) => {
   const { event_id, user_id } = req.params;
 
@@ -580,6 +528,7 @@ const unarchiveEvent = async (req, res) => {
   }
 };
 
+// Check if a user is registered for an event
 const checkEventRegistration = async (req, res) => {
   const { user_id, event_id } = req.params; // Extract user ID and opportunity ID from the route params
 
@@ -601,6 +550,7 @@ const checkEventRegistration = async (req, res) => {
   }
 };
 
+// Delete a participant from an event
 const deleteParticipant = async (req, res) => {
   const { event_id, user_id } = req.params; // Extract the participant ID from the route params
 

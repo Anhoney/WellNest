@@ -1,3 +1,4 @@
+// CoCreateChatRoom.js
 import React, { useEffect, useState } from "react";
 import {
   ImageBackground,
@@ -28,9 +29,6 @@ const CoCreateChatRoom = ({ route }) => {
   useEffect(() => {
     const fetchUserId = async () => {
       const userId = await getUserIdFromToken();
-      if (userId) {
-        console.log(userId);
-      }
     };
     fetchUserId();
   }, []);
@@ -50,7 +48,6 @@ const CoCreateChatRoom = ({ route }) => {
       aspect: [4, 3],
       quality: 1,
     });
-    console.log("ImagePicker result:", result);
 
     if (result.canceled) {
       console.log("User canceled the image picker.");
@@ -87,8 +84,6 @@ const CoCreateChatRoom = ({ route }) => {
             type: selectedFile.mimeType || "image/jpeg",
           });
         }
-        console.log(uri);
-        console.log(fileName);
       } else {
         console.log("No photo to upload.");
       }
@@ -106,7 +101,6 @@ const CoCreateChatRoom = ({ route }) => {
 
       fetchAllChatRoom();
       Alert.alert("Success", response.data.message);
-      // Alert.alert("Success", "Add Support Group successfully");
       navigation.goBack();
     } catch (error) {
       console.error("Error saving support group:", error.message);
@@ -157,17 +151,6 @@ const CoCreateChatRoom = ({ route }) => {
           <Text style={styles.signOutButtonText}>Done</Text>
         </TouchableOpacity>
       </ScrollView>
-
-      {/* <View style={styles.center_container}>
-                <Text style={styles.label}>Group Name</Text>
-                <TextInput
-                    style={styles.input}
-                    placeholder="Group Name"
-                    value={groupName}
-                    onChangeText={setGroupName}
-                    placeholderTextColor="#888"
-                />
-            </View> */}
     </ImageBackground>
   );
 };

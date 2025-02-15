@@ -3,17 +3,11 @@ import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
-  TextInput,
-  Button,
   TouchableOpacity,
-  StyleSheet,
   Alert,
-  Platform,
   ImageBackground,
-  Image,
   ScrollView,
 } from "react-native";
-import * as ImagePicker from "expo-image-picker";
 import { Ionicons } from "@expo/vector-icons";
 import styles from "../../components/styles";
 import {
@@ -22,17 +16,10 @@ import {
   useFocusEffect,
 } from "@react-navigation/native";
 import axios from "axios";
-import { RadioButton } from "react-native-paper"; // For the radio button
 import CoNavigationBar from "../../components/CoNavigationBar"; // Import your custom navigation bar component
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import DateTimePickerModal from "react-native-modal-datetime-picker"; // Ensure this is imported
-import {
-  validateFields,
-  getInputStyle,
-} from "../../components/validationUtils"; // Import validation functions
 import API_BASE_URL from "../../../config/config";
 import { getUserIdFromToken } from "../../../services/authService";
-import { Buffer } from "buffer";
 
 const TestAssessment = () => {
   const [questions, setQuestions] = useState([]);
@@ -91,29 +78,22 @@ const TestAssessment = () => {
       return;
     }
 
-    // Here you can handle the submission of selected answers
-    // For example, you can send the selected answers to the backend
     try {
       const token = await AsyncStorage.getItem("token");
       const response = await axios.post(
-        `${API_BASE_URL}/assessments/${assessmentId}/submit`, // Adjust the endpoint as needed
+        `${API_BASE_URL}/assessments/${assessmentId}/submit`,
         { answers: selectedAnswers },
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      //   if (response.data) {
-      //     setTotalMarks(response.data.totalMarks);
-      //     setResultText(response.data.resultText);
-      //     Alert.alert("Success", "Your answers have been submitted!");
-      //   }
 
       if (response.data) {
         const { totalMarks, resultText } = response.data;
 
         // Save the assessment results
         await axios.post(
-          `${API_BASE_URL}/assessments/${assessmentId}/results/save`, // Adjust the endpoint as needed
+          `${API_BASE_URL}/assessments/${assessmentId}/results/save`,
           { userId, totalMarks, overallResult: resultText },
           {
             headers: { Authorization: `Bearer ${token}` },
@@ -123,11 +103,7 @@ const TestAssessment = () => {
         setTotalMarks(totalMarks);
         setResultText(response.data.resultText);
         Alert.alert("Success", "Your answers have been submitted!");
-        // navigation.goBack();
       }
-
-      //   Alert.alert("Success", "Your answers have been submitted!");
-      //   navigation.goBack(); // Navigate back after submission
     } catch (error) {
       console.error("Error submitting answers:", error);
       Alert.alert("Error", "Unable to submit your answers at this time.");
@@ -153,7 +129,6 @@ const TestAssessment = () => {
         <View style={styles.singleUnderline}></View>
         {questions.map((question, index) => (
           <View key={question.question_id} style={styles.eQuestionContainer}>
-            {/* <Text style={styles.eQuestionText}>{question.question_text}</Text> */}
             <Text style={styles.eQuestionText}>
               {index + 1}. {question.question_text}{" "}
               {/* Display question number */}

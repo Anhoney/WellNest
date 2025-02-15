@@ -1,12 +1,10 @@
-//VolunteerOpportunityDetails,js
-import React, { useEffect, useState } from "react";
+// VolunteerOpportunityDetails,js
+import React, { useState } from "react";
 import {
   View,
   Text,
-  Button,
   Image,
   ScrollView,
-  StyleSheet,
   TouchableOpacity,
   ImageBackground,
   Alert,
@@ -45,10 +43,9 @@ const VolunteerOpportunityDetails = () => {
       const fetchUserIdAndOpportunities = async () => {
         setLoading(true);
         const userId = await getUserIdFromToken();
-        console.log("userId", userId);
+
         if (userId) {
           setUserId(userId);
-          //   await fetchOpportunities(co_id);
           await fetchOpportunityDetails();
           await checkUserRegistration(userId, opportunityId); // Check if user is registered
           setLoading(false);
@@ -72,7 +69,7 @@ const VolunteerOpportunityDetails = () => {
         `${API_BASE_URL}/single/opportunity/${opportunityId}`,
         {
           headers: {
-            Authorization: `Bearer ${token}`, // Use your actual token
+            Authorization: `Bearer ${token}`,
           },
         }
       );
@@ -104,37 +101,6 @@ const VolunteerOpportunityDetails = () => {
       console.error("Failed to check user registration:", error);
     }
   };
-
-  //   const handleCancelRegistration = async () => {
-  //     try {
-  //       const token = await AsyncStorage.getItem("token");
-  //       if (!token) {
-  //         alert("No token found. Please log in.");
-  //         return;
-  //       }
-  //       const response = await axios.delete(
-  //         `${API_BASE_URL}/opportunities/${opportunityId}/participants/${userId}`, // Adjust the endpoint as needed
-  //         {
-  //           headers: {
-  //             Authorization: `Bearer ${token}`,
-  //           },
-  //         }
-  //       );
-
-  //       if (response.status === 200) {
-  //         Alert.alert(
-  //           "Success",
-  //           "You have successfully canceled your registration."
-  //         );
-  //         setIsRegistered(false); // Update registration status
-  //       } else {
-  //         Alert.alert("Error", "Failed to cancel registration.");
-  //       }
-  //     } catch (error) {
-  //       console.error("Failed to cancel registration:", error);
-  //       Alert.alert("Error", "Failed to cancel registration.");
-  //     }
-  //   };
 
   const handleCancelRegistration = () => {
     setDeleteModalVisible(true); // Show the confirmation modal for cancellation
@@ -173,11 +139,6 @@ const VolunteerOpportunityDetails = () => {
           ],
           { cancelable: false }
         );
-        // );
-        // setIsRegistered(false); // Update registration status
-        // navigation.navigate("VolunteerOpportunitiesScreen", {
-        //   activeTab: "upcoming", // Navigate back to the upcoming tab
-        // });
       } else {
         Alert.alert("Error", "Failed to cancel registration.");
       }
@@ -218,10 +179,6 @@ const VolunteerOpportunityDetails = () => {
         setModalVisible(false); // Close the confirmation modal
         setSuccessModalVisible(true); // Show success modal
         setIsRegistered(true); // Update registration status
-        // Alert.alert(
-        //   "Success",
-        //   "You have successfully registered for the opportunity."
-        // );
       } else {
         Alert.alert("Error", "Failed to register for the opportunity.");
       }
@@ -237,11 +194,6 @@ const VolunteerOpportunityDetails = () => {
         console.error("Failed to register for the opportunity:", error);
         Alert.alert("Error", "Failed to register for the opportunity.");
       }
-      //   if (error.response && error.response.data.error) {
-      //     Alert.alert("Error", error.response.data.error); // Show the error message from the backend
-      //   } else {
-      //     Alert.alert("Error", "Failed to register for the opportunity.");
-      //   }
     } finally {
       setModalVisible(false); // Close the modal after registration
     }
@@ -358,9 +310,6 @@ const VolunteerOpportunityDetails = () => {
             </Text>
           </View>
 
-          {/* <TouchableOpacity style={styles.eventButton} onPress={handleRegister}>
-            <Text style={styles.eventButtonText}>Register</Text>
-          </TouchableOpacity> */}
           {isRegistered ? (
             <TouchableOpacity
               style={styles.eventButton}
@@ -472,10 +421,6 @@ const VolunteerOpportunityDetails = () => {
             <View style={styles.modalButtons}>
               <TouchableOpacity
                 style={styles.modalConfirmButton}
-                // onPress={() => {
-                //   handleDelete();
-                //   setDeleteModalVisible(false);
-                // }}
                 onPress={confirmCancellation}
               >
                 <Text style={styles.modalConfirmButtonText}>Confirm</Text>

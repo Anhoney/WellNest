@@ -4,7 +4,6 @@ import {
   Text,
   TouchableOpacity,
   Image,
-  StyleSheet,
   ImageBackground,
   ScrollView,
   Alert,
@@ -33,7 +32,6 @@ const CoProfilePage = () => {
 
   const fetchUserId = async () => {
     const userId = await getUserIdFromToken();
-    console.log("userId:", userId);
     if (userId) {
       setUserId(userId);
       fetchProfileData(userId);
@@ -57,14 +55,10 @@ const CoProfilePage = () => {
       const response = await axios.get(`${API_BASE_URL}/profile/${userId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      // const response = await fetch(`${API_BASE_URL}/profile/${userId}`);
-      // if (!response.ok) {
-      //   throw new Error("Failed to fetch profile data");
-      // }
+
       if (response.data) {
         const data = response.data;
         setUsername(data.username || data.full_name || "");
-        // setProfileImage(data.profile_image || null); // Set base64 profile image or null
         // Check if profile_image is a Buffer
         if (data.profile_image && data.profile_image.type === "Buffer") {
           const byteArray = data.profile_image.data; // Access the data property of the Buffer
@@ -72,7 +66,6 @@ const CoProfilePage = () => {
           // Use Buffer to convert to Base64
           const base64String = Buffer.from(byteArray).toString("base64");
           const imageUri = `data:image/jpeg;base64,${base64String}`;
-          // console.log("Profile Image URI:", imageUri);
           setProfile_image(imageUri);
         } else {
           console.log("No valid profile image found.");
@@ -92,10 +85,6 @@ const CoProfilePage = () => {
       fetchUserId();
     }, [])
   );
-
-  //   useEffect(() => {
-  //     fetchUserId();
-  //   }, []);
 
   // Confirm and handle Delete Account
   const handleDeleteAccount = () => {
@@ -192,7 +181,6 @@ const CoProfilePage = () => {
 
       <View style={styles.profileContainer}>
         {/* Profile Image */}
-        {/* <TouchableOpacity onPress={pickImage}> */}
         <Image
           source={
             profile_image
@@ -201,7 +189,6 @@ const CoProfilePage = () => {
           }
           style={styles.profileImage}
         />
-        {/* </TouchableOpacity> */}
         <Text style={styles.userName}> {username} </Text>
         <Text style={styles.profileId}>ID: {userId}</Text>
         <TouchableOpacity

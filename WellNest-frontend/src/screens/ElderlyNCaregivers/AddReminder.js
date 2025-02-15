@@ -1,4 +1,4 @@
-//AddReminder.js
+// AddReminder.js
 import React, { useState, useEffect } from "react";
 import {
   ImageBackground,
@@ -62,10 +62,6 @@ const AddReminder = ({ route, navigation }) => {
   }
 
   async function createCalendar() {
-    // const defaultCalendarSource =
-    //   Platform.OS === 'ios'
-    //     ? await getDefaultCalendarSource()
-    //     : { isLocalAccount: true, name: 'Expo Calendar' };
     const defaultCalendarSource = await getDefaultCalendarSource();
     const newCalendarID = await Calendar.createCalendarAsync({
       title: "Expo Calendar",
@@ -158,8 +154,6 @@ const AddReminder = ({ route, navigation }) => {
         ownerAccount: "personal",
         accessLevel: Calendar.CalendarAccessLevel.OWNER,
       });
-
-      console.log("Created new Expo Calendar with ID:", calendarId);
     }
 
     const now = new Date();
@@ -189,8 +183,6 @@ const AddReminder = ({ route, navigation }) => {
           timeZone: "GMT",
           alarms: [{ relativeOffset: 0 }],
         });
-
-        console.log("Event Id", eventId);
       }
     }
   }
@@ -217,14 +209,6 @@ const AddReminder = ({ route, navigation }) => {
     false,
     false,
   ]);
-  // const formatTimeTo12Hour = (time) => {
-  //   const [hours, minutes] = time.split(":").map(Number);
-  //   const ampm = hours >= 12 ? "PM" : "AM";
-  //   const formattedHours = hours % 12 || 12; // Convert 0 to 12 for 12-hour format
-  //   return `${String(formattedHours).padStart(2, "0")}:${String(
-  //     minutes
-  //   ).padStart(2, "0")} ${ampm}`;
-  // };
 
   const formatTimeTo12Hour = (time) => {
     if (!time || typeof time !== "string") {
@@ -241,7 +225,6 @@ const AddReminder = ({ route, navigation }) => {
 
   useEffect(() => {
     const fetchMedicationData = async () => {
-      console.log("medicationId", medicationId);
       if (medicationId) {
         try {
           const token = await AsyncStorage.getItem("token");
@@ -253,17 +236,12 @@ const AddReminder = ({ route, navigation }) => {
               },
             }
           );
-          // console.log("Fetched medication data:", response.data);
+
           const data = response.data;
           // Populate the form fields with the fetched data
           setPillName(data.pill_name);
           setAmount(String(data.amount));
           setDuration(String(data.duration));
-          // setTime(data.time);
-          // setTime(data.time ? formatTimeTo12Hour(data.time) : getCurrentTime()); // Safely format or set current time
-          // //setFrequency(data.frequency || "One time per day"); // Set frequency if available
-          //setNotificationTimes(data.notificationTimes || [""]);
-          //setTime(formatTimeTo12Hour(data.time)); // Format the time
           setRepeatOption(data.repeat_option);
           setFoodRelation(data.food_relation);
           setCurrentImage(data.medicine_image); // Store the current image URI
@@ -330,7 +308,6 @@ const AddReminder = ({ route, navigation }) => {
       aspect: [4, 3],
       quality: 1,
     });
-    console.log("ImagePicker result:", result);
 
     if (result.canceled) {
       console.log("User canceled the image picker.");
@@ -411,8 +388,6 @@ const AddReminder = ({ route, navigation }) => {
       formData.append("userId", userId);
       formData.append("notificationTimes", JSON.stringify(notificationTimes)); // Send notification times as JSON
       formData.append("frequency", notificationFrequency);
-      console.log("Selected File:", selectedFile);
-      console.log("Current Image:", currentImage);
 
       if (
         selectedFile &&
@@ -441,14 +416,6 @@ const AddReminder = ({ route, navigation }) => {
         : `${API_BASE_URL}/medication`; // Insert API endpoint for new reminder
 
       const method = edit ? "PUT" : "POST";
-      console.log("medicationId edit to backend", medicationId);
-      // await axios.post(`${API_BASE_URL}/medication`, formData, {
-      //   headers: {
-      //     "Content-Type": "multipart/form-data",
-      //     Authorization: `Bearer ${token}`,
-      //   },
-      // });
-      console.log("Form Data Entries:");
       for (let pair of formData.entries()) {
         console.log(`${pair[0]}: ${pair[1]}`);
       }
@@ -464,7 +431,6 @@ const AddReminder = ({ route, navigation }) => {
       });
       Alert.alert("Success", "Medication reminder set successfully!");
       await onCreateTriggerNotification();
-      // await setReminder();
       navigation.goBack();
     } catch (error) {
       console.error("Error saving medication:", error.message);
@@ -485,8 +451,7 @@ const AddReminder = ({ route, navigation }) => {
           Authorization: `Bearer ${token}`,
         },
       });
-      // await setReminder();
-      // await onCreateTriggerNotification();
+
       Alert.alert("Success", "Medication reminder deleted successfully!");
       navigation.goBack();
     } catch (error) {
@@ -621,94 +586,6 @@ const AddReminder = ({ route, navigation }) => {
             </View>
           ))}
 
-          {/* <View style={styles.mrrow}>
-            <Ionicons name="repeat" size={18} color="#000" />
-            <Text style={styles.mrlabel}>Notification Frequency</Text>
-          </View>
-          <View style={styles.mrfoodButtons}>
-            {["One time per day", "Twice per day", "Three times per day"].map(
-              (option) => (
-                <TouchableOpacity
-                  key={option}
-                  style={[
-                    styles.mrfoodButton,
-                    notificationFrequency === option &&
-                      styles.mrfoodButtonActive,
-                  ]}
-                  onPress={() => handleFrequencyChange(option)}
-                >
-                  <Text>{option}</Text>
-                </TouchableOpacity>
-              )
-            )}
-          </View>
-          <View style={{ marginVertical: 8 }} /> */}
-          {/* Render input fields for notification times */}
-          {/* {notificationTimes.map((time, index) => (
-            <View key={index}>
-              <View style={styles.mrrow}>
-                <Ionicons name="time" size={18} color="#000" />
-                <Text style={styles.mrlabel}>
-                  Notification Time {index + 1}
-                </Text>
-              </View>
-              <TouchableOpacity
-                style={styles.mrinput}
-                onPress={() => setTimePickerVisibility(true)}
-              >
-                <Text>{time || "Select Time"}</Text>
-              </TouchableOpacity>
-              <DateTimePickerModal
-                isVisible={isTimePickerVisible}
-                mode="time"
-                date={new Date()} // Ensures the default time is the current real-world time
-                onConfirm={(selectedTime) => {
-                  // handleTimeChange(index, formatTimeTo12Hour(selectedTime));
-                  handleTimeChange(index, selectedTime);
-                  setTimePickerVisibility(false);
-                }}
-                onCancel={() => setTimePickerVisibility(false)}
-              />
-            </View>
-          ))} */}
-
-          {/* <View style={styles.mrrow}>
-            <Ionicons name="time" size={18} color="#000" />
-            <Text style={styles.mrlabel}>Notification Time</Text>
-          </View>
-          <TouchableOpacity
-            style={styles.mrinput}
-            onPress={() => setTimePickerVisibility(true)}
-          >
-            <Text>{time}</Text>
-          </TouchableOpacity>
-          <DateTimePickerModal
-            isVisible={isTimePickerVisible}
-            mode="time"
-            date={new Date()} // Ensures the default time is the current real-world time
-            onConfirm={handleTimeConfirm}
-            onCancel={() => setTimePickerVisibility(false)}
-          /> */}
-
-          {/* <View style={styles.mrrow}>
-            <Ionicons name="repeat" size={18} color="#000" />
-            <Text style={styles.mrlabel}>Repeat</Text>
-          </View>
-          <View style={styles.mrfoodButtons}>
-            {["Everyday", "One-time only"].map((option) => (
-              <TouchableOpacity
-                key={option}
-                style={[
-                  styles.mrfoodButton,
-                  repeatOption === option && styles.mrfoodButtonActive,
-                ]}
-                onPress={() => setRepeatOption(option)}
-              >
-                <Text>{option}</Text>
-              </TouchableOpacity>
-            ))}
-          </View> */}
-
           {/* Space between Repeat and Food & Pills */}
           <View style={{ marginVertical: 8 }} />
 
@@ -748,12 +625,6 @@ const AddReminder = ({ route, navigation }) => {
             style={styles.mrinput}
             onPress={handleFileSelection}
           >
-            {/* <Text>
-            {selectedFile && selectedFile.assets && selectedFile.assets[0]
-              ? selectedFile.assets[0].fileName
-              : "Choose Medicine Image"}
-            
-          </Text> */}
             <Text>
               {selectedFile && selectedFile.assets && selectedFile.assets[0]
                 ? selectedFile.assets[0].fileName
@@ -770,17 +641,6 @@ const AddReminder = ({ route, navigation }) => {
           </TouchableOpacity>
 
           {/* Show Delete Button if in Edit Mode */}
-          {/* {edit && (
-            <TouchableOpacity
-              style={[
-                styles.signOutButton,
-                { backgroundColor: "red", marginTop: 10 },
-              ]}
-              onPress={handleDelete}
-            >
-              <Text style={styles.signOutButtonText}>Delete</Text>
-            </TouchableOpacity>
-          )} */}
           {edit && (
             <>
               <TouchableOpacity

@@ -1,4 +1,4 @@
-//HpEditProfilePage.js
+// HpEditProfilePage.js
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -19,7 +19,7 @@ import { RadioButton } from "react-native-paper";
 import styles from "../../components/styles";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import API_BASE_URL from "../../../config/config";
-import { Buffer } from "buffer"; // Import Buffer if you're using React Native
+import { Buffer } from "buffer";
 import { getUserIdFromToken } from "../../../services/authService";
 
 const HpEditProfilePage = () => {
@@ -84,7 +84,6 @@ const HpEditProfilePage = () => {
       });
 
       if (!result.canceled) {
-        // console.log("Image selected:", result.assets[0].uri);
         setProfile_image(result.assets[0].uri);
       } else {
         console.log("Image selection was cancelled.");
@@ -104,7 +103,6 @@ const HpEditProfilePage = () => {
   useEffect(() => {
     const fetchUserId = async () => {
       const userId = await getUserIdFromToken();
-      console.log("userId:", userId);
       if (userId) {
         setUserId(userId);
         fetchProfile(userId);
@@ -113,32 +111,25 @@ const HpEditProfilePage = () => {
     fetchUserId();
   }, []);
 
-  //   useEffect(() => {
   const fetchProfile = async (userId) => {
     setLoading(true); // Start loading
-    console.log("fetchuserid", userId);
     try {
       const token = await AsyncStorage.getItem("token");
       if (!token) {
         alert("No token found. Please log in.");
         return;
       }
-      console.log("Authorization token:", token); // Debugging log
       const response = await axios.get(`${API_BASE_URL}/profile/${userId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      // console.log(response);
 
       if (response.data) {
-        // console.log("Fetched profile data:", response.data);
-
         const data = response.data;
         // Batch state updates
         setUsername(data.username || "");
         setAge(data.age ? data.age.toString() : "");
         setGender(data.gender || "");
         setIdentification_card_number(data.identity_card || "");
-        // setDob(new Date(data.date_of_birth) || new Date());
         setDate_of_birth(
           data.date_of_birth ? new Date(data.date_of_birth) : today
         );
@@ -156,7 +147,6 @@ const HpEditProfilePage = () => {
         setHospital(data.hospital || "");
         setExperience(data.experience || "");
         setSpecialist(data.specialist || "");
-        // console.log("data", data);
 
         // Check if profile_image is a Buffer
         if (data.profile_image && data.profile_image.type === "Buffer") {
@@ -165,10 +155,8 @@ const HpEditProfilePage = () => {
           // Use Buffer to convert to Base64
           const base64String = Buffer.from(byteArray).toString("base64");
           const imageUri = `data:image/jpeg;base64,${base64String}`;
-          // console.log("Profile Image URI:", imageUri);
           setProfile_image(imageUri);
         } else {
-          console.log("No valid profile image found.");
           setProfile_image(null);
         }
       }
@@ -178,11 +166,6 @@ const HpEditProfilePage = () => {
       setLoading(false); // End loading
     }
   };
-
-  // Debug log after setting the image URI
-  // console.log("Profile image URI after selection:", profile_image);
-  //     fetchProfile();
-  //   }, [userId]);
 
   const handleUpdate = async () => {
     if (!validateInputs()) {
@@ -196,7 +179,6 @@ const HpEditProfilePage = () => {
         return;
       }
 
-      console.log("handleupdateuserid", userId);
       const formData = new FormData();
       formData.append("username", username);
       formData.append("age", parseInt(age, 10));
@@ -205,8 +187,6 @@ const HpEditProfilePage = () => {
         "date_of_birth",
         date_of_birth.toISOString().split("T")[0]
       );
-      // console.log("Identification Card:", identification_card_number);
-      // formData.append("identity_card", identification_card_number.toString());
       formData.append("phone_number", phone_number.toString());
       formData.append("email", email);
       formData.append("address", address);
@@ -222,19 +202,6 @@ const HpEditProfilePage = () => {
       formData.append("specialist", specialist);
       formData.append("hospital", hospital);
 
-      // // Add profile image if selected
-      // if (profileImage) {
-      //   const uri = profileImage;
-      //   const localUri = uri;
-      //   const filename = localUri.split("/").pop();
-      //   const type = `image/${filename.split(".").pop()}`;
-      //   // const file = {
-      //   //   uri: localUri,
-      //   //   name: filename,
-      //   //   type,
-      //   // };
-      //   // formData.append("profile_image", file);
-      //   formData.append("profile_image", { uri, name: filename, type });
       // Add profile image as binary data (send as a file)
       const normalizeFilePath = (uri) => {
         if (uri.startsWith("file://")) {
@@ -243,14 +210,7 @@ const HpEditProfilePage = () => {
         return uri;
       };
 
-      // console.log("profile_image before if statement:", profile_image);
       if (profile_image) {
-        // const uri = profile_image;
-        // const uri = profile_image.startsWith("file://")
-        //   ? profile_image
-        //   : `file://${profile_image}`; // Ensure correct URI format
-        // const localUri = uri;
-        // console.log("Profile Image URI:", profile_image);
         const uri = normalizeFilePath(profile_image);
         const filename = uri.split("/").pop();
         const type = `image/${filename.split(".").pop()}`;
@@ -260,7 +220,7 @@ const HpEditProfilePage = () => {
           name: filename,
           type: type,
         };
-        // console.log("Appending image to FormData:", file);
+
         formData.append("profile_image", file);
       } else {
         console.log("No profile image to upload.");
@@ -277,24 +237,16 @@ const HpEditProfilePage = () => {
         }
       );
 
-      //Handle response
+      // Handle response
       if (response.status === 200) {
         alert("Profile updated successfully!");
 
-        console.log(
-          "Server response data after profile update:",
-          response.data
-        );
-
-        // Optionally, fetch the updated profile image and display it again
-        // setProfileImage(response.data.profile_image); // Assuming the API returns the profile image URL
         setProfile_image(
           response.data.profile_image
             ? `${API_BASE_URL}${response.data.profile_image}`
             : profile_image
         ); // Set new image
       }
-      // alert("Profile updated successfully!");
     } catch (error) {
       console.log("Profile update error:", error);
       console.log("Headers sent:", { Authorization: `Bearer ${token}` });
@@ -336,14 +288,6 @@ const HpEditProfilePage = () => {
         <ActivityIndicator size="large" color="gray" />
       ) : (
         <ScrollView contentContainerStyle={styles.scrollView}>
-          {/* <TouchableOpacity onPress={pickImage} style={styles.imageContainer}>
-          {profileImage ? (
-            <Image source={{ uri: profileImage }} style={styles.profileImage} />
-          ) : (
-            <Text>Change Picture</Text>
-          )}
-        </TouchableOpacity> */}
-
           <View style={styles.container}>
             <Text style={styles.question}>Username</Text>
             <View style={styles.underline} />
@@ -408,23 +352,6 @@ const HpEditProfilePage = () => {
           {/* Date of Birth Picker */}
           <Text style={styles.question}>Date of Birth</Text>
           <View style={styles.underline} />
-          {/* <TouchableOpacity
-          onPress={() => setShowDatePicker(true)}
-          style={styles.datePickerButton}
-        >
-          <Text style={styles.datePickerText}>
-            {dob ? dob.toDateString() : "Select Date"}
-          </Text>
-        </TouchableOpacity>
-        {showDatePicker && (
-          <DateTimePicker
-            value={dob}
-            mode="date"
-            display="default"
-            maximumDate={new Date()}
-            onChange={handleDateChange}
-          />
-        )} */}
           <View style={styles.leftDateInput}>
             <View style={styles.dateInputContent}>
               <Ionicons
@@ -447,15 +374,12 @@ const HpEditProfilePage = () => {
           </View>
 
           <View style={styles.container}>
-            {/* Other fields */}
             <Text style={styles.question}>Identification Card Number</Text>
             <View style={styles.underline} />
             <View style={styles.inputContainer}>
-              {/* Other Fields */}
               <TextInput
                 placeholder="Identification Card Number"
                 value={identification_card_number}
-                // onChangeText={setIdentification_card_number}
                 style={styles.input}
                 editable={false} // Make it non-editable
               />
@@ -464,7 +388,6 @@ const HpEditProfilePage = () => {
             <Text style={styles.question}>Phone Number</Text>
             <View style={styles.underline} />
             <View style={styles.inputContainer}>
-              {/* Other Fields */}
               <TextInput
                 placeholder="Phone Number"
                 value={phone_number}
@@ -578,18 +501,6 @@ const HpEditProfilePage = () => {
               />
             </View>
           </View>
-
-          {/* <Text style={styles.question}>Business Days</Text>
-            <View style={styles.underline} />
-            <View style={styles.inputContainer}>
-              <TextInput
-                placeholder="Business days"
-                value={business_days}
-                onChangeText={setBusiness_days}
-                style={styles.input}
-                multiline
-              />
-            </View> */}
 
           <Text style={styles.question}>Business Days</Text>
           <View style={styles.underline} />

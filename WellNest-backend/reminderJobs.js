@@ -1,12 +1,10 @@
-//reminderJobs.js
+// reminderJobs.js
 const schedule = require("node-schedule");
 const db = require("./config/db");
 const { notifyUser } = require("./controllers/notificationController");
 const { checkAlarms } = require("./controllers/medicationController");
 const cron = require("node-cron");
 
-// Schedule the alarm check every minute
-// cron.schedule("* * * * *", checkAlarms); // Runs every minute
 // Helper function to format the date
 const formatDate = (date) => {
   const options = {

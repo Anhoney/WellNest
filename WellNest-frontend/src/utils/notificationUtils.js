@@ -1,4 +1,4 @@
-//notificationUtils.js
+// notificationUtils.js
 import * as Notifications from "expo-notifications";
 
 // Configure Notifications

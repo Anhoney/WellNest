@@ -1,13 +1,10 @@
-//LoginPage.js
-import React, { useContext, useState, useEffect } from "react";
+// LoginPage.js
+import React, { useContext, useState } from "react";
 import {
   View,
   Text,
   ImageBackground,
-  Image,
   TextInput,
-  Button,
-  StyleSheet,
   TouchableOpacity,
 } from "react-native";
 import styles from "../components/styles"; // Import shared styles
@@ -15,7 +12,6 @@ import { Ionicons } from "@expo/vector-icons"; // Import icons from Expo
 import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
 import { AuthContext } from "../../context/AuthProvider";
-import { NotificationContext } from "../../context/NotificationProvider";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import API_BASE_URL from "../../config/config";
 import { useNotification } from "../../context/NotificationProvider";
@@ -28,25 +24,13 @@ const LoginPage = () => {
   const { login } = useContext(AuthContext);
   const { initializeInterval } = useNotification();
   const handleLogin = async () => {
-    console.log("Handle Login");
     setphoneNo("");
     setPassword("");
-    // Handle login logic here, e.g., send to backend for validation
-    //console.log('Logging in with IC:', phoneNo, 'Password:', password);
-    // You can add your login authentication logic here
-    // If login is successful, call the handleLogin function
-    // if (username === 'test' && password === 'password') {  // Replace with actual logic
-    //   handleLogin();
-    // } else {
-    //   alert('Invalid credentials');
-    // }
     try {
       const response = await axios.post(`${API_BASE_URL}/auth/login`, {
         phoneNo,
         password,
       });
-
-      console.log(response.data);
 
       const { token, role, full_name, userId } = response.data;
 
@@ -54,7 +38,6 @@ const LoginPage = () => {
         await login(token); // Use login function from AuthProvider to set token
         // Save the token and userId using AsyncStorage
         await AsyncStorage.setItem("token", token);
-        // await AsyncStorage.setItem("userId", userId.toString());
 
         // Save `userId` and `full_name` in AsyncStorage
         if (userId) {
@@ -67,7 +50,6 @@ const LoginPage = () => {
         if (full_name) {
           await AsyncStorage.setItem("full_name", full_name);
         }
-        console.log("Login successful. Stored userId:", userId);
         initializeInterval();
 
         // Navigate based on role
@@ -92,22 +74,12 @@ const LoginPage = () => {
     }
   };
 
-  // useEffect(() => {
-  //   const debugAsyncStorage = async () => {
-  //     const storedUserId = await AsyncStorage.getItem("userId");
-  //     console.log("Debug Stored userId after login:", storedUserId);
-  //   };
-  //   debugAsyncStorage();
-  // }, []);
-
   // Toggle password visibility
   const togglePasswordVisibility = () => {
     setPasswordVisible(!isPasswordVisible);
   };
 
   return (
-    // <TouchableWithoutFeedback onPress={Keyboard.dismiss}> {/* Dismiss keyboard on touch outside */}
-    // <View style={{ flex: 1 }}> {/* Wrap in a single View */}
     <ImageBackground
       source={require("../../assets/LoadingBackground.png")}
       style={styles.background}
@@ -162,14 +134,6 @@ const LoginPage = () => {
           </TouchableOpacity>
         </View>
 
-        {/* <View style={{ alignItems: "flex-start", width: "90%" }}> */}
-        {/* Forgot Password */}
-        {/* <TouchableOpacity
-            onPress={() => navigation.navigate("ForgotPassword")}
-          >
-            <Text style={styles.forgotPassword}>Forgot password?</Text>
-          </TouchableOpacity>
-        </View> */}
         <View style={[{ marginBottom: 50 }]}></View>
         {/* Login Button */}
         <TouchableOpacity
@@ -189,8 +153,6 @@ const LoginPage = () => {
         </TouchableOpacity>
       </View>
     </ImageBackground>
-    // </View>
-    // </TouchableWithoutFeedback>
   );
 };
 

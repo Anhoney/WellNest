@@ -1,21 +1,17 @@
-import React, { useState, useEffect } from "react";
+// ElderlyAssessmentPage.js
+import React, { useState } from "react";
 import {
   View,
   Text,
-  Button,
-  TextInput,
-  StyleSheet,
   TouchableOpacity,
   ScrollView,
   Image,
-  TabBarIOS,
   ImageBackground,
   ActivityIndicator,
 } from "react-native";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import axios from "axios";
 import { Ionicons } from "@expo/vector-icons";
-import Icon from "react-native-vector-icons/FontAwesome";
 import API_BASE_URL from "../../../config/config";
 import NavigationBar from "../../components/NavigationBar";
 import styles from "../../components/styles";
@@ -25,7 +21,7 @@ import { getUserIdFromToken } from "../../../services/authService";
 const EmptyAssessment = () => (
   <View style={[{ marginTop: 100 }, styles.emptyFavoritesContainer]}>
     <Image
-      source={require("../../../assets/NothingDog.png")} // Replace with your empty state image
+      source={require("../../../assets/NothingDog.png")} // Replace with empty state image
       style={styles.emptyFavoritesImage}
     />
     <Text style={styles.noDataText}>No assessments available.</Text>
@@ -71,7 +67,6 @@ const ElderlyAssessmentPage = () => {
           }
 
           setUserId(decodedToken); // Set userId for future references if needed
-          console.log("Fetching user data for user ID:", decodedToken);
 
           const response = await axios.get(
             `${API_BASE_URL}/profile/${decodedToken}`,
@@ -205,8 +200,6 @@ const ElderlyAssessmentPage = () => {
   };
 
   const handleSearch = () => {
-    console.log("Search:", searchQuery);
-    // Implement search functionality here
     fetchEvents(co_id, searchQuery);
   };
 
@@ -225,19 +218,7 @@ const ElderlyAssessmentPage = () => {
         <Text style={styles.title}>Assessment</Text>
       </View>
       <View style={[{ marginTop: 15 }]}></View>
-      {/* <View style={styles.userInfo}> */}
-      {/* <View style={styles.assessmentScoreContainer}> */}
-      {/* <Text style={[styles.label]}> Scores Range</Text>
-            <Text style={[styles.label, { marginLeft: 110 }]}>Results</Text> */}
-      {/* <Text style={styles.userName}>{userData.name || "User"}</Text>
 
-        <Text style={styles.userAgeNGender}>
-          Gender: {userData.gender || "N/A"}
-        </Text>
-        <Text style={styles.userAgeNGender}>
-          Age: {userData.age || "N/A"} Years
-        </Text> */}
-      {/* </View> */}
       <View style={[{ marginLeft: -10 }, styles.userInfo]}>
         <Text style={[{ marginLeft: -35 }, styles.userName]}>
           {userData.name || "User"}
@@ -252,18 +233,6 @@ const ElderlyAssessmentPage = () => {
         </Text>
       </View>
 
-      {/* <View style={styles.coSearchContainer}>
-        <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
-          <Icon name="search" size={20} color="white" />
-        </TouchableOpacity>
-        <TextInput
-          style={styles.searchInput}
-          // {styles.searchInput}
-          placeholder="Search Event ..."
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-        />
-      </View> */}
       <View style={[{ marginTop: -30 }]}></View>
       <View style={styles.assessmentContainer}>
         <View style={styles.tabs}>
@@ -293,9 +262,6 @@ const ElderlyAssessmentPage = () => {
           <ScrollView>{renderAssessments()}</ScrollView>
         ) : (
           <ScrollView>{renderHistory()}</ScrollView>
-          // <View style={styles.historyContainer}>
-          //   <Text>History Results go here</Text>
-          // </View>
         )}
       </View>
       <NavigationBar navigation={navigation} activePage="" />
@@ -312,35 +278,5 @@ const AssessmentItem = ({ title, imageSrc, onPress }) => (
     </TouchableOpacity>
   </View>
 );
-
-// const styles = StyleSheet.create({
-//   container: { flex: 1, backgroundColor: "#f2f2f2" },
-//   header: { padding: 20, alignItems: "center", backgroundColor: "#fff" },
-//   title: { fontSize: 20, fontWeight: "bold" },
-//   userInfo: { padding: 20, alignItems: "center" },
-//   userName: { fontSize: 22, fontWeight: "bold" },
-//   tabs: { flexDirection: "row", justifyContent: "center", marginVertical: 10 },
-//   tab: { padding: 10, borderBottomWidth: 2, borderBottomColor: "transparent" },
-//   activeTab: { borderBottomColor: "#000" },
-//   tabText: { fontSize: 16 },
-//   assessmentList: { paddingHorizontal: 20, paddingVertical: 10 },
-//   assessmentItem: {
-//     backgroundColor: "#fff",
-//     borderRadius: 10,
-//     padding: 15,
-//     marginBottom: 15,
-//     alignItems: "center",
-//   },
-//   assessmentImage: { width: 50, height: 50, marginBottom: 10 },
-//   assessmentTitle: { fontSize: 16, marginBottom: 10, textAlign: "center" },
-//   startButton: {
-//     backgroundColor: "#FFA500",
-//     borderRadius: 5,
-//     paddingHorizontal: 20,
-//     paddingVertical: 8,
-//   },
-//   startButtonText: { color: "#fff", fontWeight: "bold" },
-//   historyContainer: { padding: 20 },
-// });
 
 export default ElderlyAssessmentPage;

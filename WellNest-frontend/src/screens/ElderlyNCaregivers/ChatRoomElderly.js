@@ -1,4 +1,4 @@
-//ChatRoomElderly.js
+// ChatRoomElderly.js
 import React, { useEffect, useState } from "react";
 import {
   ImageBackground,
@@ -17,7 +17,6 @@ import axios from "axios";
 import API_BASE_URL from "../../../config/config";
 import { getUserIdFromToken } from "../../../services/authService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import AntDesign from "@expo/vector-icons/AntDesign";
 
 const ChatRoomElderly = ({ route }) => {
   const { group_id, group_name } = route.params;
@@ -25,8 +24,6 @@ const ChatRoomElderly = ({ route }) => {
   const [userId, setUserId] = useState("");
   const [newMessage, setNewMessage] = useState("");
   const navigation = useNavigation();
-
-  console.log(group_id, group_name);
 
   useEffect(() => {
     const fetchUserId = async () => {
@@ -43,15 +40,12 @@ const ChatRoomElderly = ({ route }) => {
     try {
       const token = await AsyncStorage.getItem("token");
       const now = new Date();
-
       const url = `${API_BASE_URL}/support_group_message/`;
-
       const config = {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       };
-
       const data = {
         group_id: group_id,
         user_id: userId,
@@ -59,13 +53,10 @@ const ChatRoomElderly = ({ route }) => {
         message_date: now.toLocaleDateString("en-CA"),
         message_time: now.toLocaleTimeString("en-GB", { hour12: false }),
       };
-
       const response = await axios.post(url, data, config);
 
       setNewMessage("");
       fetchAllGroupMessage();
-
-      // Alert.alert("Success", response.data.message);
     } catch (error) {
       console.error("Error send message:", error.message);
       Alert.alert("Error", "Failed to send message. Try again later");
@@ -104,10 +95,6 @@ const ChatRoomElderly = ({ route }) => {
           </Text>
         )}
         {/* Display the full name above the message container */}
-        {/* <Text style={localstyles.fullNameText}>
-          {item.full_name} 
-        </Text> */}
-
         <Text
           style={[
             localstyles.fullNameText,
@@ -127,7 +114,6 @@ const ChatRoomElderly = ({ route }) => {
               : localstyles.messageContainerLeft,
           ]}
         >
-          {/* <Text style={localstyles.messageText}>{item.message}</Text> */}
           <Text
             style={[
               localstyles.messageText,
@@ -161,7 +147,6 @@ const ChatRoomElderly = ({ route }) => {
         >
           <Ionicons name="chevron-back" size={24} color="#000" />
         </TouchableOpacity>
-        {/* <Text style={styles.hpTitle}>{group_name}</Text> */}
         <View style={{ flex: 1, alignItems: "center" }}>
           <Text style={styles.hpTitle}>{group_name}</Text>
         </View>
@@ -173,7 +158,6 @@ const ChatRoomElderly = ({ route }) => {
             })
           }
           style={{ marginLeft: "auto" }} // Align to right
-          //   style={styles.plusButton}
         >
           <Ionicons name="people" size={24} color="#000" />
         </TouchableOpacity>

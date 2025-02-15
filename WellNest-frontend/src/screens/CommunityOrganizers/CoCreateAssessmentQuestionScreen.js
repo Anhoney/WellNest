@@ -16,7 +16,6 @@ import CoNavigationBar from "../../components/CoNavigationBar"; // Import your c
 
 const CoCreateAssessmentQuestionScreen = ({ route, navigation }) => {
   const { title, pattern, choices } = route.params; // Get title, pattern, and choices from previous screen
-  // const [questions, setQuestions] = useState([{ question: "", answers: [""] }]); // Initialize with one question
   const [questions, setQuestions] = useState([
     { question: "", answers: [{ text: "", mark: 0 }] },
   ]);
@@ -43,18 +42,6 @@ const CoCreateAssessmentQuestionScreen = ({ route, navigation }) => {
     setQuestions(newQuestions);
   };
 
-  // const handleSubmit = () => {
-  //   // Validate and submit the questions
-  //   if (questions.some((q) => !q.question || q.answers.some((a) => !a))) {
-  //     Alert.alert("Error", "Please fill in all questions and answers.");
-  //     return;
-  //   }
-
-  //   // Here you can handle the submission of questions to the backend
-  //   console.log("Questions submitted:", questions);
-  //   Alert.alert("Success", "Assessment questions created successfully!");
-  //   navigation.goBack(); // Navigate back after submission
-  // };
   const handleSubmit = async () => {
     if (
       !title ||

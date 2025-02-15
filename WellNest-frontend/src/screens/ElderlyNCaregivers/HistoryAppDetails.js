@@ -4,8 +4,6 @@ import {
   View,
   Text,
   Image,
-  StyleSheet,
-  Modal,
   TouchableOpacity,
   ImageBackground,
   ScrollView,
@@ -23,15 +21,12 @@ const HistoryAppDetails = ({ route, navigation }) => {
   const [loading, setLoading] = useState(true);
   const [services, setServices] = useState([]);
   const [userId, setUserId] = useState(null);
-  console.log("HistoryAppDetailsappointmentId:", appointmentId);
 
   useEffect(() => {
     const fetchUserId = async () => {
       const userId = await getUserIdFromToken();
-      // console.log("userId:", userId);
       if (userId) {
         setUserId(userId);
-        // fetchProfile(userId);
       }
     };
     fetchUserId();
@@ -59,16 +54,7 @@ const HistoryAppDetails = ({ route, navigation }) => {
         const result = await response.json();
         if (response.ok) {
           setAppointmentDetails(result);
-          // Parse the services_provide JSON string
-          // let parsedServices = [];
-          // try {
-          //   parsedServices = JSON.parse(result.services_provide) || [];
-          // } catch (error) {
-          //   console.error("Error parsing services_provide:", error);
-          //   parsedServices = [];
-          // }
 
-          // setServices(parsedServices);
           // Parse services_provide only for virtual appointments
           if (appointmentId.startsWith("virtual_")) {
             let parsedServices = [];
@@ -110,7 +96,6 @@ const HistoryAppDetails = ({ route, navigation }) => {
 
     const formattedTime = `${hours}:${minutes} ${ampm}`;
 
-    // return `${formattedDate}, ${formattedTime}`;
     return { formattedDate, formattedTime };
   };
 
@@ -126,11 +111,6 @@ const HistoryAppDetails = ({ route, navigation }) => {
     ? `data:image/png;base64,${appointmentDetails.profile_image}`
     : "https://via.placeholder.com/150";
 
-  // Format the date and time for display
-  //   const formattedDateTime = formatDateTime(
-  //     appointmentDetails.appointment_date,
-  //     appointmentDetails.appointment_time
-  //   );
   // Format the date and time for display
   const { formattedDate, formattedTime } = formatDateTime(
     appointmentDetails.appointment_date,
@@ -172,12 +152,6 @@ const HistoryAppDetails = ({ route, navigation }) => {
               {appointmentDetails.category}
             </Text>
 
-            {/* <Text style={styles.description}>
-              Location: {appointmentDetails.location}
-            </Text> */}
-            {/* <Text style={styles.doctorRating}>
-              ⭐ {appointmentDetails.rating || "N/A"}
-            </Text> */}
             {isVirtual && (
               <>
                 <Text style={styles.serviceText}>Services Provided :</Text>
@@ -237,12 +211,6 @@ const HistoryAppDetails = ({ route, navigation }) => {
             <Text style={styles.aLabel}>Patient Details</Text>
             <View style={styles.displayUnderline} />
             <View style={styles.tableContainer}>
-              {/* <View style={styles.tableRow}>
-                <Text style={styles.tableCell}>Medical Coverage:</Text>
-                <Text style={styles.tableCell}>
-                  {appointmentDetails.medical_coverage}
-                </Text>
-              </View> */}
               {!isVirtual && (
                 <>
                   <View style={styles.tableRow}>
@@ -327,7 +295,6 @@ const HistoryAppDetails = ({ route, navigation }) => {
               </View>
             </View>
 
-            {/* </View> */}
             <TouchableOpacity
               style={styles.signOutButton}
               onPress={() => navigation.navigate("MainPage")}

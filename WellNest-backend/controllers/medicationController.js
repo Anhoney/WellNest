@@ -5,6 +5,7 @@ const { notifyUser, createNotification } = require("./notificationController"); 
 const { format } = require("date-fns");
 const cron = require("node-cron");
 
+// Create a medication reminder
 const createReminder = async (req, res) => {
   const {
     pillName,
@@ -19,15 +20,10 @@ const createReminder = async (req, res) => {
   } = req.body; // Include repeatOption and userId
   console.log("Request Body:", req.body);
   let medicineImage = null;
-  console.log("pill name", pillName);
-  // Check if a file was uploaded
+
+  // Check if a file was uploaded and set the image URL
   if (req.file) {
     medicineImage = `${API_BASE_URL}/uploads/${req.file.filename}`;
-    // req.file.path; // Store the file path
-    console.log(
-      "Uploaded file path:",
-      `${API_BASE_URL}/uploads/${req.file.filename}`
-    );
   }
 
   try {
@@ -54,17 +50,17 @@ const createReminder = async (req, res) => {
   }
 };
 
+// Fetch all medications for a specific user
 const getMedications = async (req, res) => {
   const { userId } = req.params;
 
   try {
+    // Query to fetch medications for the user
     const result = await pool.query(
       `SELECT * FROM medications WHERE u_id = $1 ORDER BY created_at DESC`,
       [userId]
     );
-    // `SELECT id, pill_name, amount, duration, time, food_relation, repeat_option, medicine_image, created_at, u_id
-    //    FROM medications WHERE u_id = $1 ORDER BY created_at DESC`,
-    //   [userId]
+
     res.status(200).json(result.rows);
   } catch (error) {
     console.error("Error fetching medications:", error.message);
@@ -72,6 +68,7 @@ const getMedications = async (req, res) => {
   }
 };
 
+// Update an existing medication reminder
 const updateReminder = async (req, res) => {
   const {
     pillName,
@@ -82,18 +79,17 @@ const updateReminder = async (req, res) => {
     userId,
     notificationTimes,
     frequency,
-    // medicationId,
-  } = req.body;
+  } = req.body; // Extract updated medication details from the request body
   const { medicationId } = req.params;
   let medicineImage = null;
-  console.log("medicationId", medicationId);
+
+  // Check if a new file was uploaded
   if (req.file) {
     medicineImage = `${API_BASE_URL}/uploads/${req.file.filename}`;
   }
-  console.log("Headers:", req.headers);
-  console.log("Body:", req.body);
-  console.log("Files:", req.files); // If using file uploads
+
   try {
+    // Update the medication reminder in the database
     const result = await pool.query(
       `UPDATE medications SET pill_name = $1, amount = $2, duration = $3,  food_relation = $4, repeat_option = $5, medicine_image = $6, notification_times = $7, frequency = $8
        WHERE id = $9 AND u_id = $10 RETURNING *`,
@@ -101,7 +97,6 @@ const updateReminder = async (req, res) => {
         pillName,
         amount,
         duration,
-        // time,
         foodRelation,
         repeatOption,
         medicineImage,
@@ -118,11 +113,12 @@ const updateReminder = async (req, res) => {
   }
 };
 
-// New function to fetch medication by ID
+// Fetch a specific medication by ID
 const getMedicationById = async (req, res) => {
   const { medicationId } = req.params;
 
   try {
+    // Query to fetch the medication details
     const result = await pool.query(`SELECT * FROM medications WHERE id = $1`, [
       medicationId,
     ]);
@@ -138,10 +134,12 @@ const getMedicationById = async (req, res) => {
   }
 };
 
+// Delete a medication reminder
 const deleteReminder = async (req, res) => {
   const { medicationId } = req.params;
 
   try {
+    // Query to delete the medication reminder
     const result = await pool.query(
       `DELETE FROM medications WHERE id = $1 RETURNING *`,
       [medicationId]
@@ -163,11 +161,13 @@ const deleteReminder = async (req, res) => {
   }
 };
 
+// Update the status of a medication reminder
 const updateMedicationStatus = async (req, res) => {
   const { medicationId } = req.params;
   const { status } = req.body;
 
   try {
+    // Update the medication status in the database
     const result = await pool.query(
       `UPDATE medications SET status = $1 WHERE id = $2 RETURNING *`,
       [status, medicationId]
@@ -184,6 +184,7 @@ const updateMedicationStatus = async (req, res) => {
   }
 };
 
+// Fetch all medications that are not completed
 const getMedicationsByStatus = async (req, res) => {
   try {
     const result = await pool.query(
@@ -196,9 +197,11 @@ const getMedicationsByStatus = async (req, res) => {
   }
 };
 
+// Mark a medication as completed
 const updateMedicationStatusCompleted = async (req, res) => {
   const { id } = req.params;
   try {
+    // Update the medication status to 'Completed'
     await pool.query(
       "UPDATE public.medications SET status = 'Completed' WHERE id = $1;",
       [id]
@@ -216,6 +219,7 @@ const updateMedicationStatusCompleted = async (req, res) => {
 const checkAlarms = async () => {
   const currentTime = format(new Date(), "HH:mm"); // Get current time in 'HH:mm' format
   try {
+    // Query to find medications that need to trigger an alarm
     const result = await pool.query(
       `SELECT * FROM medications WHERE time = $1 AND status != 'Completed'`,
       [currentTime]
@@ -242,14 +246,12 @@ const checkAlarms = async () => {
   }
 };
 
-// Schedule the job to check alarms every minute (or adjust as needed)
-// cron.schedule("* * * * *", checkAlarms); // Runs every minute
-
 // Stop Alarm
 const stopAlarm = async (req, res) => {
   const { medicationId } = req.body; // Take medicationId from request body
 
   try {
+    // Update the medication status to 'Completed'
     const result = await pool.query(
       "UPDATE medications SET status = 'Completed' WHERE id = $1 RETURNING *",
       [medicationId]

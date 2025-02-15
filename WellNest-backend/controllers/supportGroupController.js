@@ -1,10 +1,9 @@
+// supportGroupController.js
 const pool = require("../config/db");
-const { notifyUser } = require("./notificationController");
 const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
 const { API_BASE_URL } = require("../config/config");
-const { populate } = require("dotenv");
 
 // Configure multer for profile image uploads
 const storage = multer.diskStorage({
@@ -18,12 +17,11 @@ const storage = multer.diskStorage({
     cb(null, "uploads/"); // Ensure this folder exists in your project
   },
   filename: function (req, file, cb) {
-    //   cb(null, `${Date.now()}_${file.originalname}`);
-    // },
     cb(null, Date.now() + path.extname(file.originalname)); // Generate unique filename
   },
 });
 
+// Create a Multer instance for handling file uploads
 const upload = multer({
   storage: storage,
   limits: { fileSize: 5 * 1024 * 1024 }, // Limit file size to 5MB
@@ -37,37 +35,34 @@ const upload = multer({
     if (extname && mimetype) {
       return cb(null, true);
     }
-    cb(new Error("Only image files are allowed!"), false);
+    cb(new Error("Only image files are allowed!"), false); // Reject files that do not match the allowed types
   },
 }); // Define upload but do not call .single here
 
+// Create a new support group
 const createSupportGroup = async (req, res) => {
   const { co_id, group_name } = req.body;
 
-  let groupImage = "";
+  let groupImage = ""; // Initialize variable for group image
   if (req.file) {
     groupImage = `${API_BASE_URL}/uploads/${req.file.filename}`;
-    // req.file.path; // Store the file path
-    console.log(
-      "Uploaded file path:",
-      `${API_BASE_URL}/uploads/${req.file.filename}`
-    );
   }
 
   try {
+    // Insert the new support group into the database
     const query = await pool.query(
       ` INSERT INTO support_group (co_id, group_name, group_photo) VALUES ($1, $2, $3) `,
       [co_id, group_name, groupImage]
     );
 
     res.status(201).json({ message: "Support Group created successfully!" });
-    // res.status(200).json(result.rows[0]);
   } catch (error) {
     console.error("Error creating event:", error);
     res.status(500).json({ error: "Failed to create support group" });
   }
 };
 
+// Fetch details of a specific support group by ID
 const getSupportGroup = async (req, res) => {
   const { support_group_id } = req.params;
   const query = `
@@ -92,6 +87,7 @@ const getSupportGroup = async (req, res) => {
   }
 };
 
+// Fetch all support groups created by a specific community organizer
 const getSupportGroupByCoId = async (req, res) => {
   const { co_id } = req.params;
   const query = `
@@ -106,9 +102,6 @@ const getSupportGroupByCoId = async (req, res) => {
 
   try {
     const result = await pool.query(query, [co_id]);
-    // if (result.rows.length === 0) {
-    //   return res.status(404).json({ message: "Support Group not found." });
-    // }
     res.status(200).json(result.rows); // Return the first row of the result
   } catch (error) {
     console.error("Error fetching support group:", error.message);
@@ -116,6 +109,7 @@ const getSupportGroupByCoId = async (req, res) => {
   }
 };
 
+// Fetch all support groups
 const getAllSupportGroup = async (req, res) => {
   const query = `
     SELECT 
@@ -141,6 +135,7 @@ const getAllSupportGroup = async (req, res) => {
   }
 };
 
+// Fetch support groups that a specific user is part of
 const getSupportGroupByUserId = async (req, res) => {
   const { user_id } = req.params;
 
@@ -172,17 +167,14 @@ const getSupportGroupByUserId = async (req, res) => {
   }
 };
 
+// Update an existing support group
 const updateSupportGroup = async (req, res) => {
   const { co_id, group_name } = req.body;
 
   const { support_group_id } = req.params;
-  let groupImage = "";
+  let groupImage = ""; // Initialize variable for group image
   if (req.file) {
     groupImage = `${API_BASE_URL}/uploads/${req.file.filename}`;
-    console.log(
-      "Uploaded file path:",
-      `${API_BASE_URL}/uploads/${req.file.filename}`
-    );
   }
 
   const query = `
@@ -206,12 +198,13 @@ const updateSupportGroup = async (req, res) => {
   }
 };
 
+// Delete a support group
 const deleteSupportGroup = async (req, res) => {
   const { support_group_id } = req.params;
 
   const query = `
-        DELETE FROM support_group WHERE id = $1 RETURNING *
-    `;
+      DELETE FROM support_group WHERE id = $1 RETURNING *
+  `;
 
   try {
     const result = await pool.query(query, [support_group_id]);
@@ -230,24 +223,23 @@ const deleteSupportGroup = async (req, res) => {
   }
 };
 
+// Get all unjoined support groups for a specific user
 const getAllUnjoinedSupportGroup = async (req, res) => {
   const { userId } = req.params;
-  //   const userId = req.user.id; // Assuming you have user ID from the token in req.user
-  console.log("userId", userId);
   const query = `
      SELECT 
-          sg.id,
-          sg.co_id,
-          sg.group_name,
-          sg.group_photo
+        sg.id,
+        sg.co_id,
+        sg.group_name,
+        sg.group_photo
       FROM 
-          support_group sg
+        support_group sg
       WHERE 
-          sg.id NOT IN (
-              SELECT group_id 
-              FROM support_group_user 
-              WHERE user_id = $1
-          )
+        sg.id NOT IN (
+            SELECT group_id 
+            FROM support_group_user 
+            WHERE user_id = $1
+        )
       ORDER BY 
           sg.id;
     `;

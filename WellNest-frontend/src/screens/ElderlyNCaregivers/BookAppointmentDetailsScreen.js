@@ -1,3 +1,4 @@
+// BookAppointmentDetailsScreen.js
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -9,12 +10,10 @@ import {
   Image,
   Alert,
 } from "react-native";
-import { Picker } from "@react-native-picker/picker"; // New import
 import { Ionicons } from "@expo/vector-icons"; // Import icons from Expo
 import { FontAwesome } from "@expo/vector-icons"; // Import FontAwesome for the heart icon
 import { RadioButton } from "react-native-paper";
-import styles from "../../components/styles"; // Import your custom styles
-// import DoctorCard from "../../components/DoctorCard"; // Reuse doctor card component
+import styles from "../../components/styles"; // Import custom styles
 import API_BASE_URL from "../../../config/config";
 import axios from "axios";
 import NavigationBar from "../../components/NavigationBar";
@@ -30,7 +29,6 @@ const BookAppointmentDetailsScreen = ({ route, navigation }) => {
   const [patientSeenBefore, setPatientSeenBefore] = useState("New Patient");
   const [note, setNote] = useState("");
   const [userId, setUserId] = useState(null);
-  console.log("BookAppointmentDetailsScreen doctorId:", doctorId);
   const imageUri = doctor.profile_image
     ? `data:image/png;base64,${doctor.profile_image}`
     : "https://via.placeholder.com/150";
@@ -38,10 +36,8 @@ const BookAppointmentDetailsScreen = ({ route, navigation }) => {
   useEffect(() => {
     const fetchUserId = async () => {
       const userId = await getUserIdFromToken();
-      // console.log("userId:", userId);
       if (userId) {
         setUserId(userId);
-        // fetchProfile(userId);
       }
     };
 
@@ -52,12 +48,8 @@ const BookAppointmentDetailsScreen = ({ route, navigation }) => {
           alert("No token found. Please log in.");
           return;
         }
-        console.log("Authorization token:", token); // Debugging log
         const response = await axios.get(`${API_BASE_URL}/doctor/${doctorId}`);
         setDoctor(response.data);
-
-        // console.log("BookAppointmentDetailsScreen data:", response.data);
-        // console.log("BookAppointmentDetailsScreen data:", doctor);
       } catch (error) {
         Alert.alert("Error", "Failed to fetch doctor details.");
         console.error(error);
@@ -85,7 +77,6 @@ const BookAppointmentDetailsScreen = ({ route, navigation }) => {
 
   const fetchUserDetails = async (userId) => {
     try {
-      console.log("fetchUserDetailsuserId:", userId);
       const token = await AsyncStorage.getItem("token");
       const response = await fetch(`${API_BASE_URL}/profile/${userId}`, {
         headers: {

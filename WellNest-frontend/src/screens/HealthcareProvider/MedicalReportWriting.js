@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   ScrollView,
   Alert,
-  StyleSheet,
   ImageBackground,
   Image,
   Modal,
@@ -27,7 +26,6 @@ const MedicalReportWriting = ({ route }) => {
   const [encounterSummary, setEncounterSummary] = useState("");
   const [followUpDate, setFollowUpDate] = useState(null);
   const [adviceGiven, setAdviceGiven] = useState("");
-  const [userId, setUserId] = useState(null);
   const [appointments, setAppointments] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false); // Modal state
@@ -41,22 +39,9 @@ const MedicalReportWriting = ({ route }) => {
   ]);
   const navigation = useNavigation();
 
-  // useEffect(() => {
-  //   const fetchUserId = async () => {
-  //     const userId = await getUserIdFromToken();
-  //     // console.log("userId:", userId);
-  //     if (userId) {
-  //       setUserId(userId);
-  //       // fetchProfile(userId);
-  //     }
-  //   };
-
-  //   fetchUserId();
-  // }, []);
   useEffect(() => {
     const fetchMedicalReport = async () => {
       try {
-        console.log("fetchMedicalReport appointmentId:", appointmentId);
         const token = await AsyncStorage.getItem("token");
         const response = await fetch(
           `${API_BASE_URL}/medicalReports/${appointmentId}?appointment_type=${appointment_type}`,
@@ -91,14 +76,11 @@ const MedicalReportWriting = ({ route }) => {
   }, [appointmentId]);
   useEffect(() => {
     // Ensure appointments are fetched only when userId is set
-    // if (userId) {
     fetchAppointments();
-    // }
   }, []);
 
   const fetchAppointments = async () => {
     try {
-      console.log("MW appointmentId:", appointmentId);
       const token = await AsyncStorage.getItem("token");
 
       if (!token) {
@@ -116,77 +98,12 @@ const MedicalReportWriting = ({ route }) => {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      console.log("Fetched appointment details:", response.data);
       setAppointments(response.data);
     } catch (error) {
       console.error("Error fetching appointments:", error);
       Alert.alert("Error", "Error fetching appointments.");
     }
   };
-
-  // const fetchAppointments = async () => {
-  //   try {
-  //     console.log("MW appointmentId:", appointmentId);
-  //     const token = await AsyncStorage.getItem("token");
-  //     if (!token) {
-  //       alert("No token found. Please log in.");
-  //       return;
-  //     }
-
-  //     const response = await axios.get(
-  //       `${API_BASE_URL}/appointment/details/${appointmentId}`,
-  //       {
-  //         headers: { Authorization: `Bearer ${token}` },
-  //       }
-  //     );
-  //     // console.log("Fetched appointment details:", response.data);
-  //     setAppointments(response.data);
-  //   } catch (error) {
-  //     console.error("Error fetching appointments:", error);
-  //     Alert.alert("Error", "Error fetching appointments.");
-  //   }
-  // };
-
-  // const handleDeleteReport = async () => {
-  //   Alert.alert(
-  //     "Confirm Deletion",
-  //     "Are you sure you want to delete this medical report?",
-  //     [
-  //       {
-  //         text: "Cancel",
-  //         style: "cancel", // This will style the button as a cancel action
-  //       },
-  //       {
-  //         text: "Delete",
-  //         onPress: async () => {
-  //           try {
-  //             const token = await AsyncStorage.getItem("token");
-  //             const response = await fetch(
-  //               `${API_BASE_URL}/medicalReports/delete/${appointmentId}`,
-  //               {
-  //                 method: "DELETE",
-  //                 headers: {
-  //                   Authorization: `Bearer ${token}`,
-  //                 },
-  //               }
-  //             );
-
-  //             if (!response.ok) {
-  //               throw new Error("Failed to delete medical report.");
-  //             }
-
-  //             Alert.alert("Success", "Medical report deleted successfully.");
-  //             navigation.goBack(); // Navigate back after deletion
-  //           } catch (error) {
-  //             console.error("Error deleting medical report:", error);
-  //             Alert.alert("Error", "Failed to delete medical report.");
-  //           }
-  //         },
-  //       },
-  //     ],
-  //     { cancelable: false } // Prevents dismissing the alert by tapping outside
-  //   );
-  // };
 
   const handleDeleteReport = () => {
     setModalVisible(true); // Show modal
@@ -205,16 +122,12 @@ const MedicalReportWriting = ({ route }) => {
         }
       );
 
-      // Log the response for debugging
-      console.log("Delete response status:", response.status);
       const responseData = await response.json(); // Get the response body
-      console.log("Delete response data:", responseData); // Log the response data
 
       if (!response.ok) {
         throw new Error(
           responseData.message || "Failed to delete medical report."
         );
-        // throw new Error("Failed to delete medical report.");
       }
 
       setModalVisible(false); // Close modal on success
@@ -223,7 +136,6 @@ const MedicalReportWriting = ({ route }) => {
     } catch (error) {
       console.error("Error deleting medical report:", error);
       Alert.alert("Error", error.message || "Failed to delete medical report.");
-      // Alert.alert("Error", "Failed to delete medical report.");
     }
   };
 
@@ -308,23 +220,6 @@ const MedicalReportWriting = ({ route }) => {
         </TouchableOpacity>
         <Text style={styles.title}> Medical Report </Text>
       </View>
-
-      {/* <View style={styles.hpAcontainer}>
-        <View style={styles.doctorCard}>
-          <Image source={{ uri: imageUri }} style={styles.doctorImage} />
-          <View style={styles.doctorInfo}>
-            <Text style={styles.doctorName}>{appointments.full_name}</Text>
-            <Text style={styles.details}>Date: {appointments.app_date}</Text>
-            <Text style={styles.details}>Time: {appointments.app_time}</Text>
-            <Text style={styles.details}>
-              Patient: {appointments.who_will_see}
-            </Text>
-            <Text style={styles.details}>
-              Status: {appointments.app_status}
-            </Text>
-          </View>
-        </View>
-      </View> */}
 
       {/* Different Views for Virtual and Physical Appointments */}
       {appointment_type === "virtual" ? (
@@ -473,18 +368,6 @@ const MedicalReportWriting = ({ route }) => {
             >
               <Text style={styles.addButtonText}>+ Add Medicine</Text>
             </TouchableOpacity>
-
-            {/* <View style={styles.mrButtonContainer}> */}
-            {/* <TouchableOpacity
-                style={styles.mrDeleteButton}
-                // onPress={handleDeleteReport}
-                onPress={() => setModalVisible(true)} // Show modal
-              >
-                <View style={styles.dateInputContent}>
-                  <Ionicons name="trash-bin" size={20} color="#FFF" />
-                  <Text style={styles.mrButtonText}> Delete Report </Text>
-                </View>
-              </TouchableOpacity> */}
 
             <Modal
               animationType="slide"

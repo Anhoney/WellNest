@@ -1,13 +1,11 @@
-//HpVPastAppointments.js
-import React, { useEffect, useState } from "react";
+// HpVPastAppointments.js
+import React, { useState } from "react";
 import {
   View,
   Text,
   FlatList,
   TouchableOpacity,
-  StyleSheet,
   Alert,
-  ScrollView,
   ImageBackground,
   Image,
 } from "react-native";
@@ -35,7 +33,6 @@ const HpVPastAppointments = () => {
   const fetchPastAppointments = async () => {
     try {
       const hpId = await getUserIdFromToken(); // Get healthcare provider ID
-      console.log("hpId:", hpId);
       if (!hpId) {
         Alert.alert("Error", "Unable to fetch user information.");
         return;
@@ -55,10 +52,6 @@ const HpVPastAppointments = () => {
         data.map(async (appointment) => {
           const reportExists = await checkMedicalReportExists(
             appointment.hpva_id
-          );
-          // Debugging: Log the report existence for each appointment
-          console.log(
-            `Appointment ID: ${appointment.hpva_id}, Report Exists: ${reportExists}`
           );
 
           return { ...appointment, reportExists };
@@ -95,12 +88,9 @@ const HpVPastAppointments = () => {
 
   const checkMedicalReportExists = async (hpva_id) => {
     try {
-      console.log("checkMedicalReport:", hpva_id);
       const response = await axios.get(
         `${API_BASE_URL}/medicalReports/check/${hpva_id}/virtual`
       );
-      // Debugging: Log the response from the backend
-      console.log("Response from checkMedicalReportExists:", response.data);
 
       return response.data.exists; // Assume the API returns { exists: true/false }
     } catch (error) {
@@ -110,15 +100,12 @@ const HpVPastAppointments = () => {
   };
 
   const renderAppointment = ({ item }) => {
-    // Log the appointment date for debugging
-    console.log("appointments", item.hpva_date);
-
     let imageUri = item.profile_image
       ? item.profile_image // Base64 string returned from the backend
       : "https://via.placeholder.com/150";
 
     const appointmentType = "virtual"; // Set the appointment type for the check
-    console.log("Item.reportExists:", item.reportExists);
+
     return (
       <TouchableOpacity
         style={styles.card}
@@ -136,22 +123,6 @@ const HpVPastAppointments = () => {
           <Text style={styles.details}>Patient: {item.who_will_see}</Text>
           <Text style={styles.details}>Status: {item.status}</Text>
 
-          {/* Conditional rendering for the "Write Medical Report" button */}
-          {/* {item.app_status === "approved" && (
-            <TouchableOpacity
-              style={styles.approveButton}
-              onPress={() =>
-                navigation.navigate("MedicalReportWriting", {
-                  appointmentId: item.hp_app_id,
-                })
-              }
-            >
-              <View style={styles.buttonStatusContainer}>
-                <Ionicons name="document-text" size={24} color="#FFFFFF" />
-                <Text style={styles.medicalText}> Write Medical Report</Text>
-              </View>
-            </TouchableOpacity>
-          )} */}
           {/* Conditional rendering for the "Approve" and "Write Medical Report" buttons */}
           {item.status === "pending" && (
             <TouchableOpacity
@@ -167,17 +138,6 @@ const HpVPastAppointments = () => {
 
           {item.status === "approved" && (
             <TouchableOpacity
-              // style={[
-              //   styles.smallApproveButton,
-              //   {
-              //     backgroundColor: item.reportExists ? "blue" : "orange",
-              //     // backgroundColor: reportExists === null
-              //     //   ? "#ccc" // Loading state
-              //     //   : reportExists
-              //     //   ? "blue" // Exists
-              //     //   : "orange", // Does not exist
-              //   },
-              // ]}
               onPress={() =>
                 navigation.navigate("MedicalReportWriting", {
                   appointmentId: item.hpva_id,
@@ -185,7 +145,6 @@ const HpVPastAppointments = () => {
                 })
               }
             >
-              {/* <View style={styles.buttonStatusContainer}> */}
               <View
                 style={[
                   styles.buttonStatusContainer,
@@ -199,12 +158,6 @@ const HpVPastAppointments = () => {
                   {item.reportExists
                     ? " Edit Medical Report"
                     : " Write Medical Report"}
-                  {console.log("Inside renderAppointment:", item.reportExists)}
-                  {/* {reportExists === null
-                  ? "Loading..."
-                  : reportExists
-                  ? "Edit Medical Report"
-                  : "Write Medical Report"} */}
                 </Text>
               </View>
             </TouchableOpacity>
@@ -263,8 +216,6 @@ const HpVPastAppointments = () => {
           <Text style={styles.hpTitle}>Past Virtual {"\n"} Appointments </Text>
         </View>
         <Text>{"/n"}</Text>
-        {/* <View style={styles.hpContainer}> */}
-        {/* <Text style={styles.sectionTitle}>Past Virtual Appointments</Text> */}
         <View style={styles.singleUnderline}></View>
         {loading ? (
           <Text>Loading...</Text>
@@ -277,8 +228,6 @@ const HpVPastAppointments = () => {
             ListEmptyComponent={<Text>No upcoming appointments found.</Text>}
           />
         )}
-        {/* </View> */}
-        {/* Navigation Bar */}
         <HpNavigationBar navigation={navigation} />
       </ImageBackground>
     </View>

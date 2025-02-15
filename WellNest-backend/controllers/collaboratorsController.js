@@ -57,7 +57,6 @@ const createCollaborationRequest = async (req, res) => {
       message: "Collaboration request created successfully!",
       collaboration: result.rows[0], // Optionally include the created collaboration request
     });
-    // res.status(201).json(result.rows[0]);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -141,7 +140,6 @@ const acceptCollaborationRequest = async (req, res) => {
     );
     const updatedCollaboration = result.rows[0];
 
-    // collaboration = result.rows[0];
     // Notify the user directly
     await notifyUser(
       updatedCollaboration.collaborator_id, // Pass user ID from query result
@@ -199,21 +197,12 @@ const rejectCollaborationRequest = async (req, res) => {
 
     const updatedCollaboration = result.rows[0];
 
-    // collaboration = result.rows[0];
     // Notify the user directly
     await notifyUser(
       updatedCollaboration.collaborator_id, // Pass user ID from query result
       `${collaboratorUsername} have rejected your collaboration request at ${updatedCollaboration.created_at}. `,
       "collaboration_declined"
     );
-
-    // collaboration = result.rows[0];
-    // // Notify the user directly
-    // await notifyUser(
-    //   collaboration.collaborator_id, // Pass user ID from query result
-    //   ` ${collaboration.user_id} have rejected your collaboration request at ${collaboration.created_at}. `,
-    //   "collaboration_rejected"
-    // );
 
     res.json(result.rows[0]);
   } catch (error) {
@@ -273,7 +262,7 @@ const getAllAcceptedCollaborations = async (req, res) => {
 // Get user details for collaboration
 const getUserDetailsForCollaboration = async (req, res) => {
   const { userToCollabId } = req.params;
-  console.log(userToCollabId);
+
   try {
     const result = await pool.query(
       `
@@ -300,7 +289,7 @@ const getUserDetailsForCollaboration = async (req, res) => {
     `,
       [userToCollabId]
     );
-    console.log(result.rows);
+
     if (result.rows.length > 0) {
       res.json(result.rows[0]); // Return the user details
     } else {
@@ -314,7 +303,7 @@ const getUserDetailsForCollaboration = async (req, res) => {
 
 const getCaregiverInformation = async (req, res) => {
   const { caregiverId } = req.params;
-  console.log("getCaregiverInformation", caregiverId);
+
   try {
     const result = await pool.query(
       `
@@ -398,14 +387,10 @@ const getCaregiverInformation = async (req, res) => {
     }
     const data = {
       profile_image: profileImageBase64, // Send base64-encoded image
-      // profile_image: profileData.profile_image
-      //   ? `/uploads/${profileData.profile_image}`
-      //   : null,
       ...profileData,
     };
-    console.log("getCaregiverInformation", result.rows);
+
     if (result.rows.length > 0) {
-      // res.json(result.rows[0]); // Return the user details
       res.json(data);
     } else {
       res.status(404).json({ error: "User not found." });
@@ -440,21 +425,8 @@ const deleteCollaboration = async (req, res) => {
 // Get pending collaboration requests for a user
 const getPendingCollaborationRequests = async (req, res) => {
   const { userId } = req.params;
-  console.log("getPendingCollaborationRequests", userId);
-  try {
-    // const result = await pool.query(
-    //   `
-    //   SELECT c.*, u.full_name, p.username, hp.username AS hp_username, cp.username AS co_username
-    //   FROM collaborators c
-    //   JOIN users u ON c.user_id = u.id
-    //   JOIN profile p ON c.user_id = p.user_id
-    //   JOIN hp_profile hp ON c.user_id = hp.user_id
-    //   JOIN co_profile cp ON c.user_id = cp.user_id
-    //   WHERE c.collaborator_id = $1 AND c.status = 'pending'
-    // `,
-    //   [userId]
-    // );
 
+  try {
     const result = await pool.query(
       `
       SELECT c.*, 
@@ -475,12 +447,6 @@ const getPendingCollaborationRequests = async (req, res) => {
     );
     // Instead of returning a 404 error, just return an empty array if no requests are found
     res.json(result.rows); // This will return an empty array if no rows are found
-
-    // if (result.rows.length > 0) {
-    //   res.json(result.rows); // Return the pending requests
-    // } else {
-    //   res.status(404).json({ message: "No pending collaboration requests." });
-    // }
   } catch (error) {
     console.error("Error fetching pending collaboration requests:", error);
     res.status(500).json({ error: error.message });

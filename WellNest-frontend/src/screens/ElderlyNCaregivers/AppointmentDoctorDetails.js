@@ -1,4 +1,4 @@
-//AppointmentDoctorDetails.js
+// AppointmentDoctorDetails.js
 import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
@@ -8,12 +8,10 @@ import {
   Alert,
   Image,
   ImageBackground,
-  ScrollView,
 } from "react-native";
 import DateTimePickerModal from "react-native-modal-datetime-picker"; // Ensure this is imported
 import styles from "../../components/styles"; // Assuming you have a styles file
 import axios from "axios";
-import { useRoute } from "@react-navigation/native";
 import NavigationBar from "../../components/NavigationBar"; // Import here
 import { Ionicons } from "@expo/vector-icons"; // Import icons from Expo
 import { FontAwesome } from "@expo/vector-icons"; // Import FontAwesome for the heart icon
@@ -23,13 +21,11 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 const AppointmentDoctorDetails = ({ route, navigation }) => {
   const { doctorId, selectedDate } = route.params;
   const [doctor, setDoctor] = useState({});
-  //   const [selectedDate, setSelectedDate] = useState("");
   const [availableTimes, setAvailableTimes] = useState([]);
   const [selectedTime, setSelectedTime] = useState("");
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false); // Date picker visibility state
   const [favorites, setFavorites] = useState([]);
   const isFavorite = favorites.includes(doctorId);
-  //   const route = useRoute();
 
   const imageUri = doctor.profile_image
     ? `data:image/png;base64,${doctor.profile_image}`
@@ -102,26 +98,6 @@ const AppointmentDoctorDetails = ({ route, navigation }) => {
         : [];
 
       setAvailableTimes(filteredTimes);
-
-      // if (filteredTimes.length === 0) {
-      //   Alert.alert(
-      //     "No Available Times",
-      //     "No available time slots for this date."
-      //   );
-      // }
-
-      // if (response.data.length === 0) {
-      //   Alert.alert(
-      //     "No Available Times",
-      //     "No available time slots for this date."
-      //   );
-      // } else {
-      //   // Filter out the booked or occupied slots
-      //   const filteredTimes = response.data.filter(
-      //     (timeSlot) => !timeSlot.booked
-      //   );
-      //   setAvailableTimes(filteredTimes); // Update available times with fetched data
-      // }
     } catch (error) {
       Alert.alert("Error", "Failed to fetch available times.");
       console.error(error);
@@ -163,7 +139,6 @@ const AppointmentDoctorDetails = ({ route, navigation }) => {
 
   // Handle the selected date
   const handleConfirmDate = async (selectedDate) => {
-    // const formattedDate = selectedDate.toISOString().split("T")[0]; // Format to YYYY-MM-DD
     // Format the date as YYYY-MM-DD using local time
     const formattedDate = `${selectedDate.getFullYear()}-${(
       selectedDate.getMonth() + 1
@@ -174,33 +149,8 @@ const AppointmentDoctorDetails = ({ route, navigation }) => {
     setDate(formattedDate); // Update the date state
     setDatePickerVisibility(false);
 
-    // Log the selected date for debugging
-    // console.log("Selected Date:", formattedDate);
-
     // Fetch available times for the newly selected date
     await fetchAvailableTimes(formattedDate);
-
-    // try {
-    //   const response = await axios.get(`${API_BASE_URL}/availableTimes`, {
-    //     params: { doctorId, date: formattedDate },
-    //   });
-    //   //   setAvailableTimes(response.data);
-
-    //   // Log the API response to ensure we're getting the correct data
-    //   console.log("Available Times Response:", response.data);
-
-    //   if (response.data.length === 0) {
-    //     Alert.alert(
-    //       "No Available Times",
-    //       "No available time slots for this date."
-    //     );
-    //   } else {
-    //     setAvailableTimes(response.data); // Update available times with filtered data
-    //   }
-    // } catch (error) {
-    //   Alert.alert("Error", "Failed to fetch available times.");
-    //   console.error(error);
-    // }
   };
   // Function to format the date with commas
   const formatDate = (dateToFormat) => {
@@ -353,7 +303,6 @@ const AppointmentDoctorDetails = ({ route, navigation }) => {
             { key: "DatePicker" },
             { key: "TimeSlots" },
             { key: "NextButton" },
-            // { key: "BookButton" },
           ]}
           keyExtractor={(item) => item.key}
           renderItem={({ item }) => {
@@ -364,7 +313,6 @@ const AppointmentDoctorDetails = ({ route, navigation }) => {
                   onPress={() => {
                     navigation.navigate("DoctorProfileScreen", {
                       doctorId: doctorId, // Assuming item.id is the doctor's ID
-                      // selectedDate: date.toISOString().split("T")[0], // Pass the selected date
                     });
                   }}
                 >
@@ -479,15 +427,12 @@ const AppointmentDoctorDetails = ({ route, navigation }) => {
             }
 
             if (item.key === "NextButton") {
-              // if (item.key === "BookButton") {
               return (
                 <TouchableOpacity
                   style={styles.signOutButton}
                   onPress={handleNext}
-                  // onPress={handleBookAppointment}
                 >
                   <Text style={styles.buttonText}>Next</Text>
-                  {/* <Text style={styles.buttonText}>Book Appointment</Text> */}
                 </TouchableOpacity>
               );
             }

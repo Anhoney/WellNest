@@ -4,14 +4,12 @@ import {
   View,
   Text,
   TouchableOpacity,
-  FlatList,
   Alert,
   ScrollView,
   ImageBackground,
   Image,
   Modal,
 } from "react-native";
-import { FontAwesome } from "@expo/vector-icons";
 import axios from "axios";
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
@@ -32,15 +30,12 @@ const HpVUpcomingAppointmentDetails = ({ route }) => {
   const [modalVisible, setModalVisible] = useState(false); // Modal visibility state
   const [receiptVisible, setReceiptVisible] = useState(false); // Receipt modal visibility state
   const [selectedReceipt, setSelectedReceipt] = useState(null); // State for selected receipt
-  console.log("hpva_id:", hpva_id);
 
   useEffect(() => {
     const fetchUserId = async () => {
       const userId = await getUserIdFromToken();
-      // console.log("userId:", userId);
       if (userId) {
         setUserId(userId);
-        // fetchProfile(userId);
       }
     };
 
@@ -49,9 +44,7 @@ const HpVUpcomingAppointmentDetails = ({ route }) => {
 
   useEffect(() => {
     // Ensure appointments are fetched only when userId is set
-    // if (userId) {
     fetchAppointments();
-    // }
   }, [userId]);
 
   // Function to format service names
@@ -76,7 +69,6 @@ const HpVUpcomingAppointmentDetails = ({ route }) => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      //   console.log("Fetched appointment details:", response.data); // Log the response
       setAppointments(response.data);
     } catch (error) {
       console.error("Error fetching appointments:", error);
@@ -128,7 +120,6 @@ const HpVUpcomingAppointmentDetails = ({ route }) => {
   const imageUri = appointments.profile_image
     ? `data:image/png;base64${appointments.profile_image}`
     : "https://via.placeholder.com/150";
-  //   console.log("Image URI:", imageUri);
 
   const isPDF = selectedReceipt && selectedReceipt.url.endsWith(".pdf");
 
@@ -160,10 +151,6 @@ const HpVUpcomingAppointmentDetails = ({ route }) => {
             <Text style={styles.details}>
               Patient: {appointments.who_will_see || "N/A"}
             </Text>
-            {/* <Text style={styles.details}>Status: {appointments.status}</Text>
-            <Text style={styles.details}>
-              Payment Status: {appointments.payment_status}
-            </Text> */}
             <Text
               style={[
                 styles.details,
@@ -243,7 +230,6 @@ const HpVUpcomingAppointmentDetails = ({ route }) => {
               <View style={styles.tableRow}>
                 <Text style={styles.tableCell}>Appointment Created At:</Text>
                 <Text style={styles.tableCell}>
-                  {/* {formatCreatedAt(appointments.created_at)} */}
                   {appointments.created_at
                     ? formatCreatedAt(appointments.created_at)
                     : "N/A"}
@@ -268,7 +254,6 @@ const HpVUpcomingAppointmentDetails = ({ route }) => {
       <View>
         <TouchableOpacity
           style={styles.deleteButton}
-          // onPress={deleteAppointment}
           onPress={() => setModalVisible(true)} // Show modal
         >
           <Text style={styles.deleteButtonText}>Delete Appointment</Text>
@@ -315,8 +300,6 @@ const HpVUpcomingAppointmentDetails = ({ route }) => {
         visible={receiptVisible}
         onRequestClose={() => setReceiptVisible(false)}
       >
-        {/* <View style={styles.modalContainer}>
-          <View style={styles.modalView}> */}
         <Ionicons
           name="close-circle"
           size={36}
@@ -331,7 +314,6 @@ const HpVUpcomingAppointmentDetails = ({ route }) => {
         {isPDF ? (
           <WebView
             source={{ uri: appointments.receipt_url }} // Use selectedReceipt.url
-            // source={{ uri: selectedReceipt }}
             style={{ flex: 1 }}
             onError={(error) => {
               console.error("WebView Error:", error);
@@ -341,7 +323,6 @@ const HpVUpcomingAppointmentDetails = ({ route }) => {
         ) : (
           <ImageViewer
             imageUrls={[{ url: appointments.receipt_url }]} // Use selectedReceipt.url
-            // imageUrls={[{ url: selectedReceipt }]} // Single image array
             enableSwipeDown
             onSwipeDown={() => {
               setSelectedReceipt(null);

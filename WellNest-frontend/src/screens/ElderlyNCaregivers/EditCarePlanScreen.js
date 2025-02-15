@@ -1,11 +1,9 @@
-//EditCarePlanScreen.js
+// EditCarePlanScreen.js
 import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
   TextInput,
-  Button,
-  StyleSheet,
   ImageBackground,
   Image,
   ScrollView,
@@ -25,9 +23,6 @@ const EditCarePlanScreen = ({ route, navigation }) => {
   const { carePlan, currentPlanUserId } = route.params || {};
   const [title, setTitle] = useState(carePlan ? carePlan.title : "");
   const [plan, setPlan] = useState(carePlan ? carePlan.plan : "");
-  // const [writer_id, setWriter_Id] = useState(
-  //   carePlan ? carePlan.username : ""
-  // );
   const [writerName, setWriterName] = useState(
     carePlan && carePlan.username
       ? carePlan.username
@@ -51,9 +46,6 @@ const EditCarePlanScreen = ({ route, navigation }) => {
       Alert.alert("Validation Error", "Please fill in all fields.");
       return;
     }
-    console.log("writerId", writerId);
-    console.log("userId", userId);
-    console.log("currentPlanUserId", currentPlanUserId);
     const token = await AsyncStorage.getItem("token");
 
     if (!token) {
@@ -91,14 +83,11 @@ const EditCarePlanScreen = ({ route, navigation }) => {
           }
         );
       }
-      console.log("Response:", response.data);
       // Check the response status
       if (response.status === 200 || response.status === 201) {
         alert(response.data.message); // Use the message from the backend
         navigation.goBack();
       }
-
-      //   navigation.goBack();
     } catch (error) {
       console.error("Error saving care plan:", error);
       alert("An error occurred while saving the care plan.");
@@ -162,7 +151,6 @@ const EditCarePlanScreen = ({ route, navigation }) => {
       </View>
 
       <ScrollView contentContainerStyle={styles.hpContainer}>
-        {/* <View style={styles.ecpContainer}> */}
         {carePlan && (
           <TouchableOpacity
             onPress={() => setDeleteModalVisible(true)}
@@ -176,7 +164,6 @@ const EditCarePlanScreen = ({ route, navigation }) => {
             />
           </TouchableOpacity>
         )}
-        {/* <Text style={styles.sectionTitle}>Add care plan{"\n"}</Text> */}
         <Text style={styles.sectionTitle}>
           {carePlan ? "Edit Care Plan" : "Add Care Plan"}
         </Text>
@@ -195,9 +182,6 @@ const EditCarePlanScreen = ({ route, navigation }) => {
           value={plan}
           onChangeText={setPlan}
         />
-        {/* <Text style={styles.label}>Plan By: {writerName || "You"}</Text>
-        <Text style={styles.label}>Updated By:</Text>
-        <Text>{formatDate(carePlan.updated_at)}</Text> */}
 
         {/* Only show these fields if editing an existing care plan */}
         {carePlan && (
@@ -216,10 +200,6 @@ const EditCarePlanScreen = ({ route, navigation }) => {
             {carePlan ? "Update" : "Submit"}
           </Text>
         </TouchableOpacity>
-        {/* {carePlan && (
-            
-          <Button title="Delete" onPress={handleDelete} color="red" />
-        )} */}
 
         <TouchableOpacity
           style={styles.ecpCancelButton}
@@ -227,7 +207,6 @@ const EditCarePlanScreen = ({ route, navigation }) => {
         >
           <Text style={styles.ecpCancelButtonText}>Cancel</Text>
         </TouchableOpacity>
-        {/* </View> */}
       </ScrollView>
 
       <Modal
@@ -249,10 +228,6 @@ const EditCarePlanScreen = ({ route, navigation }) => {
             <View style={styles.modalButtons}>
               <TouchableOpacity
                 style={styles.modalConfirmButton}
-                // onPress={() => {
-                //   handleDelete();
-                //   setDeleteModalVisible(false);
-                // }}
                 onPress={confirmDeletion}
               >
                 <Text style={styles.modalConfirmButtonText}>Confirm</Text>

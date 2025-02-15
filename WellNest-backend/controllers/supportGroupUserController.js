@@ -1,32 +1,14 @@
+//supportGroupUserController.js
 const pool = require("../config/db");
 
-// const addSupportGroupUser = async (req, res) => {
-//   const { group_id, user_id, date } = req.body;
-
-//   const query = `INSERT INTO support_group_user (group_id, user_id, join_date) VALUES ($1, $2, $3)  RETURNING *`;
-
-//   try {
-//     const result = await pool.query(query, [group_id, user_id, date]);
-//     if (result.rows.length === 0) {
-//       res
-//         .status(500)
-//         .json({ error: `Failed to add user to support group ${group_id}` });
-//     }
-//     res.status(200).json(result.rows[0]); // Return the first row of the result
-//   } catch (error) {
-//     console.error("Error add user to support group:", error);
-//     res
-//       .status(500)
-//       .json({ error: `Failed to add user to support group ${group_id}` });
-//   }
-// };
+// Function to add a user to a support group
 const addSupportGroupUser = async (req, res) => {
   const { group_id, user_id, date } = req.body;
   // Check if the user is already a member of the group
   const checkMembershipQuery = `
- SELECT * FROM support_group_user 
- WHERE group_id = $1 AND user_id = $2
-`;
+  SELECT * FROM support_group_user 
+  WHERE group_id = $1 AND user_id = $2
+  `;
 
   try {
     const membershipCheckResult = await pool.query(checkMembershipQuery, [
@@ -40,6 +22,7 @@ const addSupportGroupUser = async (req, res) => {
         .json({ error: "User  is already a member of this support group." });
     }
 
+    // Insert the user into the support group
     const query = `INSERT INTO support_group_user (group_id, user_id, join_date) VALUES ($1, $2, $3) RETURNING *`;
 
     const result = await pool.query(query, [group_id, user_id, date]);
@@ -58,6 +41,7 @@ const addSupportGroupUser = async (req, res) => {
   }
 };
 
+// Function to fetch all users in a specific support group by group ID
 const getAllSupportGroupUserByGroupId = async (req, res) => {
   const { group_id } = req.params;
 
@@ -91,10 +75,9 @@ const getAllSupportGroupUserByGroupId = async (req, res) => {
   }
 };
 
+// Function to delete a user from a support group
 const deleteSupportGroupUser = async (req, res) => {
-  console.log("Delete Support Group User");
   const { group_id, user_id } = req.body;
-  console.log(group_id, "Userid", user_id);
 
   const query = `DELETE FROM support_group_user WHERE group_id = $1 AND user_id = $2 RETURNING *`;
 
@@ -117,6 +100,7 @@ const deleteSupportGroupUser = async (req, res) => {
   }
 };
 
+// Function to fetch all support groups a specific user
 const getAllSupportGroupByUserId = async (req, res) => {
   const { user_id } = req.params;
 

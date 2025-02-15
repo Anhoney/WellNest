@@ -1,12 +1,6 @@
+// FirstPage.js
 import React, { useEffect } from "react";
-import {
-  ImageBackground,
-  View,
-  Text,
-  Image,
-  TouchableOpacity,
-} from "react-native";
-//import { View, Text, StyleSheet, Image } from 'react-native';
+import { ImageBackground, View, Text } from "react-native";
 import styles from "../components/styles"; // Import shared styles
 
 const FirstPage = ({ navigation }) => {
@@ -25,16 +19,8 @@ const FirstPage = ({ navigation }) => {
       <View style={styles.firstContainer}>
         <Text style={styles.titleFirstLine}>Welcome to</Text>
         <Text style={styles.titleSecondLine}>WellNest</Text>
-        {/* <Text style={styles.title}>Welcome to WellNest</Text> */}
       </View>
     </ImageBackground>
-    // <View style={styles.container}>
-    //   <Image
-    //     source={require('./assets/splash.png')} // Use your app's logo or splash image
-    //     style={styles.logo}
-    //   />
-    //   <Text style={styles.text}>Welcome to WellNest</Text>
-    // </View>
   );
 };
 

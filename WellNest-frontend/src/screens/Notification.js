@@ -1,4 +1,4 @@
-//Notification.js
+// Notification.js
 import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
@@ -6,7 +6,6 @@ import {
   FlatList,
   TouchableOpacity,
   ImageBackground,
-  StyleSheet,
   Alert,
 } from "react-native";
 import axios from "axios";
@@ -15,7 +14,6 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import API_BASE_URL from "../../config/config";
 import { getUserIdFromToken } from "../../services/authService";
-import NavigationBar from "../components/NavigationBar";
 import * as Calendar from "expo-calendar";
 
 const Notifications = () => {
@@ -39,13 +37,10 @@ const Notifications = () => {
         const calendars = await Calendar.getCalendarsAsync(
           Calendar.EntityTypes.EVENT
         );
-        console.log("Here are all your calendars:");
-        console.log({ calendars });
 
         const expoCalendarIds = calendars
           .filter((calendar) => calendar.title === "Expo Calendar")
           .map((calendar) => calendar.id);
-        console.log("Expo Calendar IDs:", expoCalendarIds);
       }
     })();
   }, []);
@@ -110,7 +105,7 @@ const Notifications = () => {
 
   const fetchUserId = async () => {
     const userId = await getUserIdFromToken();
-    // console.log("userId:", userId);
+
     if (userId) {
       setUserId(userId);
       fetchNotifications(userId); // Fetch notifications when userId is available
@@ -129,7 +124,6 @@ const Notifications = () => {
       const unread = response.data.filter((notif) => !notif.is_read).length;
       setUnreadCount(unread);
     } catch (error) {
-      //   console.error("Error fetching notifications:", error);
       console.error(
         "Error fetching notifications:",
         error.response ? error.response.data : error.message
@@ -138,27 +132,6 @@ const Notifications = () => {
       setLoading(false);
     }
   };
-
-  // const addToCalendar = async (title, dateTime) => {
-  //   try {
-  //     const { status } = await Calendar.requestCalendarPermissionsAsync();
-  //     const { status: writeStatus } = await Calendar.requestRemindersPermissionsAsync();
-  //     if (status === "granted"&& writeStatus === "granted") {
-  //       const defaultCalendarSource =
-  //         await Calendar.getDefaultCalendarSourceAsync();
-  //       await Calendar.createEventAsync(defaultCalendarSource.id, {
-  //         title: title,
-  //         startDate: new Date(dateTime),
-  //         endDate: new Date(new Date(dateTime).getTime() + 60 * 60 * 1000), // 1-hour event
-  //         timeZone: "GMT", // Adjust to the local time zone
-  //         notes: "Reminder for your appointment.",
-  //       });
-  //       Alert.alert("Success", "Event added to your calendar!");
-  //     }
-  //   } catch (error) {
-  //     console.error("Error adding to calendar:", error);
-  //   }
-  // };
 
   const markAsRead = async (notificationIds) => {
     try {
@@ -184,32 +157,11 @@ const Notifications = () => {
     }
   };
 
-  // const handleNotificationPress = async (item) => {
-  //   await markAsRead([item.notification_id]); // Mark notification as read
-  //   if (
-  //     item.notification_type === "appointment_approved" &&
-  //     item.eventDateTime
-  //   ) {
-  //     const title = "Appointment Reminder"; // Customize as needed
-  //     console.log("Adding to calendar:", title, "at", item.eventDateTime);
-  //     // Ensure eventDateTime is a valid date
-  //     const eventDateTime = new Date(item.eventDateTime);
-  //     if (isNaN(eventDateTime.getTime())) {
-  //       Alert.alert("Error", "Invalid event date and time.");
-  //       return;
-  //     }
-  //     addToCalendar(title, item.eventDateTime); // Create calendar event
-  //   } else {
-  //     Alert.alert("Notification", item.message);
-  //   }
-  // };
-
   const handleNotificationPress = async (item) => {
     await markAsRead([item.notification_id]); // Mark notification as read
 
     if (item.notification_type === "appointment_approved") {
       const title = "WellNest Appointment Scheduled"; // Customize as needed
-      console.log("Adding to calendar:", title, "with message:", item.message);
 
       // Extract date and time from the message
       const dateTimeRegex =
@@ -217,14 +169,9 @@ const Notifications = () => {
       const match = item.message.match(dateTimeRegex);
 
       if (match) {
-        // const timeString = match[1]; // Extracted time, e.g., "9:00 AM"
-        // const dateString = match[2]; // Extracted date, e.g., "22 Dec 2024"
         const [_, timeString, dateString] = match; // Destructure the matched groups
         // Combine dateString and timeString to form a full date-time string
-        // const dateTimeString = ⁠`${dateString} ${timeString}`;
         const dateTimeString = `${dateString} ${timeString}`;
-
-        console.log("DateTime String:", dateTimeString);
 
         // Parse the date-time string to a Date object
         const [day, month, year, time, period] = dateTimeString
@@ -260,7 +207,6 @@ const Notifications = () => {
           adjustedHours,
           minutes
         );
-        console.log("Event DateTime:", eventDateTime);
 
         if (isNaN(eventDateTime.getTime())) {
           Alert.alert("Error", "Invalid event date and time.");
@@ -268,7 +214,6 @@ const Notifications = () => {
         }
 
         const isoDateTime = eventDateTime.toISOString();
-        console.log("ISO Event DateTime:", isoDateTime);
 
         addToCalendar(title, isoDateTime); // Create calendar event
       } else {
@@ -282,11 +227,6 @@ const Notifications = () => {
     }
   };
 
-  //   useEffect(() => {
-  //     if (userId) {
-  //       fetchNotifications();
-  //     }
-  //   }, [userId]);
   useEffect(() => {
     const interval = setInterval(() => {
       fetchUserId(); // Re-fetch userId to ensure notifications are up to date
@@ -313,31 +253,6 @@ const Notifications = () => {
         <Text style={styles.title}>Notification</Text>
       </View>
       <View style={styles.notiContainer}>
-        {/* <TouchableOpacity style={styles.iconContainer}>
-          <Text style={styles.notificationIcon}>🔔</Text>
-          {unreadCount > 0 && <View style={styles.redDot} />}
-        </TouchableOpacity> */}
-        {/* <FlatList
-          data={notifications}
-          keyExtractor={(item) => item.notification_id.toString()}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              style={[
-                styles.notificationItem,
-                !item.is_read && styles.unreadItem,
-              ]}
-              onPress={() => markAsRead([item.notification_id])}
-            >
-              <Text style={styles.message}>{item.message}</Text>
-              <Text style={styles.timestamp}>
-                {new Date(item.created_at).toLocaleString()}
-              </Text>
-            </TouchableOpacity>
-          )}
-          ListEmptyComponent={
-            <Text style={styles.noNotifications}>No notifications</Text>
-          }
-        /> */}
         <FlatList
           data={notifications}
           keyExtractor={(item) => item.notification_id.toString()}
@@ -360,7 +275,6 @@ const Notifications = () => {
           }
         />
       </View>
-      {/* <NavigationBar navigation={navigation} activePage="Notifications" /> */}
     </ImageBackground>
   );
 };

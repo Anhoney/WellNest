@@ -1,4 +1,4 @@
-//CoCreateNEditOpportunity.js
+// CoCreateNEditOpportunity.js
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -22,14 +22,9 @@ import { RadioButton } from "react-native-paper"; // For the radio button
 import CoNavigationBar from "../../components/CoNavigationBar"; // Import your custom navigation bar component
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import DateTimePickerModal from "react-native-modal-datetime-picker"; // Ensure this is imported
-import {
-  validateFields,
-  getInputStyle,
-} from "../../components/validationUtils"; // Import validation functions
 import API_BASE_URL from "../../../config/config";
 import { getUserIdFromToken } from "../../../services/authService";
 import * as ImagePicker from "expo-image-picker";
-import { Buffer } from "buffer";
 
 const CoCreateNEditOpportunity = () => {
   const [title, setTitle] = useState("");
@@ -118,8 +113,6 @@ const CoCreateNEditOpportunity = () => {
       });
       console.log("ImagePicker result:", result);
       if (!result.canceled) {
-        // console.log("Image selected:", result.assets[0].uri);
-        // setSelectedFile(result.assets[0].uri);
         setPhoto(result.assets[0].uri);
         setSelectedFile(result);
       } else {
@@ -128,23 +121,6 @@ const CoCreateNEditOpportunity = () => {
     } catch (error) {
       console.error("Error picking image:", error);
     }
-    //   if (!result.canceled && result.assets && result.assets.length > 0) {
-    //     const selectedAsset = result.assets[0];
-    //     setPhoto(selectedAsset.uri); // Set the image URI
-    //     setSelectedFile(selectedAsset); // Store the file details
-    //     console.log("Image selected:", selectedAsset.uri);
-    //   } else {
-    //     console.log("Image selection was cancelled.");
-    //   }
-    // } catch (error) {
-    //   console.error("Error picking image:", error);
-    // }
-    // if (result.canceled) {
-    //   console.log("User canceled the image picker.");
-    //   return;
-    // }
-
-    // setSelectedFile(result);
   };
   const validateForm = () => {
     if (!title.trim()) {
@@ -173,7 +149,6 @@ const CoCreateNEditOpportunity = () => {
   const handleSubmit = async () => {
     if (!validateForm()) return;
     try {
-      console.log("UserId opp:", userId);
       const token = await AsyncStorage.getItem("token");
 
       if (!token) {
@@ -190,7 +165,6 @@ const CoCreateNEditOpportunity = () => {
       formData.append("terms_and_conditions", TnC);
       formData.append("capacity", capacity);
       formData.append("opportunity_status", opportunityStatus);
-      // formData.append("registration_due", registrationDue);
 
       // Format registrationDue as a string in 'YYYY-MM-DD' format
       if (registrationDue) {
@@ -208,11 +182,6 @@ const CoCreateNEditOpportunity = () => {
       };
 
       if (photo) {
-        // const uri = profile_image;
-        // const uri = profile_image.startsWith("file://")
-        //   ? profile_image
-        //   : `file://${profile_image}`; // Ensure correct URI format
-        // const localUri = uri;
         const uri = normalizeFilePath(photo);
         const filename = uri.split("/").pop();
         const type = `image/${filename.split(".").pop()}`;
@@ -222,7 +191,6 @@ const CoCreateNEditOpportunity = () => {
           name: filename,
           type: type,
         };
-        // console.log("Appending image to FormData:", file);
         formData.append("photo", file);
       } else {
         // If no new photo is selected, append the existing photo data
@@ -231,25 +199,7 @@ const CoCreateNEditOpportunity = () => {
         }
         console.log("No photo to upload.");
       }
-      // if (photo)
-      //   formData.append("photo", {
-      //     uri: uri,
-      //     name: assets[0].name,
-      //     type: selectedFile.mimeType,
-      //   });
-      //   formData.append("photo", photo);
-      console.log("Form Data:", {
-        title,
-        fees: fee,
-        location,
-        date,
-        time,
-        notes: note,
-        terms_and_conditions: TnC,
-        capacity,
-        opportunity_status: opportunityStatus,
-        registration_due: registrationDue,
-      });
+
       const config = {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -311,16 +261,6 @@ const CoCreateNEditOpportunity = () => {
       ]
     );
   };
-
-  //   if (loading) {
-  //     return (
-  //       <View style={styles.centeredContainer}>
-  //         <Text style={styles.loadingText}>
-  //           Checking existing appointments...
-  //         </Text>
-  //       </View>
-  //     );
-  //   }
 
   // Functions to handle date picker
   const showDatePicker = () => {
@@ -459,8 +399,6 @@ const CoCreateNEditOpportunity = () => {
             mode="date"
             display="inline"
             onConfirm={handleDateConfirm}
-            // value={registrationDue}
-            // onCancel={hideDatePicker}
             onCancel={() => setDatePickerVisibility(false)}
             date={registrationDue || new Date()} // Default to current date
             minimumDate={new Date()} // Propportunity past dates
@@ -474,13 +412,7 @@ const CoCreateNEditOpportunity = () => {
             onChangeText={setCapacity}
             keyboardType="numeric"
           />
-          {/* <Text style={styles.label}>Event Status</Text>
-          <TextInput
-            style={styles.hpInput}
-            placeholder="Event Status"
-            value={opportunityStatus}
-            onChangeText={setEventStatus}
-          /> */}
+
           <Text style={styles.label}>Event Status</Text>
           <RadioButton.Group
             onValueChange={setOpportunityStatus}
